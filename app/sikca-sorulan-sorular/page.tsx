@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
-    q: "TÜDAP nedir?",
+    q: "TÜDAP nedir?Eren",
     a: "TÜDAP (Türkçe Dilbilim Araştırma Platformu), Türkiye Türkçesine özgü fonetik transkripsiyon, sözdizimi analizi ve terminoloji araçları sunan ücretsiz bir akademik platformdur.",
   },
   {
