@@ -64,28 +64,52 @@ export default function SayfalarPage() {
 
   // Load sections when active page changes
   useEffect(() => {
+    let cancelled = false
     setLoading(true)
-    getPageSections(activePage).then((rows) => {
-      setSections(rows)
-      const initial: Record<string, string> = {}
-      rows.forEach((r) => (initial[r.key] = r.content))
-      setDrafts(initial)
-      setSavedKeys([])
-      setLoading(false)
-    })
-  }, [activePage])
+    getPageSections(activePage)
+      .then((rows) => {
+        if (cancelled) return
+        setSections(rows)
+        const initial: Record<string, string> = {}
+        rows.forEach((r) => (initial[r.key] = r.content))
+        setDrafts(initial)
+        setSavedKeys([])
+      })
+      .catch(() => {
+        if (cancelled) return
+        setSections([])
+        setDrafts({})
+        toast({
+          title: "Sayfa içerikleri yüklenemedi",
+          description: "Veritabanı bağlantısını veya page_sections tablosunu kontrol edin.",
+          variant: "destructive",
+        })
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [activePage, toast])
 
   const isDirty = sections.some((s) => drafts[s.key] !== s.content)
 
   const handleSave = () => {
     startTransition(async () => {
-      const updates = sections.map((s) => ({ key: s.key, content: drafts[s.key] ?? s.content }))
-      await upsertAllPageSections(activePage, updates)
-      // Update local baseline
-      setSections((prev) => prev.map((s) => ({ ...s, content: drafts[s.key] ?? s.content })))
-      setSavedKeys(sections.map((s) => s.key))
-      toast({ title: "Kaydedildi", description: "Sayfa içerikleri güncellendi." })
-      setTimeout(() => setSavedKeys([]), 2500)
+      try {
+        const updates = sections.map((s) => ({ key: s.key, content: drafts[s.key] ?? s.content }))
+        await upsertAllPageSections(activePage, updates)
+        // Update local baseline only after the server confirms the write.
+        setSections((prev) => prev.map((s) => ({ ...s, content: drafts[s.key] ?? s.content })))
+        setSavedKeys(sections.map((s) => s.key))
+        toast({ title: "Kaydedildi", description: "Sayfa içerikleri güncellendi." })
+        setTimeout(() => setSavedKeys([]), 2500)
+      } catch {
+        toast({
+          title: "Kaydetme başarısız",
+          description: "İçerik güncellenemedi. Veritabanı bağlantısını kontrol edin.",
+          variant: "destructive",
+        })
+      }
     })
   }
 

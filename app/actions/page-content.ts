@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { db } from '@/lib/db'
 import { pageSections } from '@/lib/db/schema'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 
@@ -25,13 +25,60 @@ export type PageSection = {
   updatedAt: Date
 }
 
+const DEFAULT_SECTIONS: Record<string, Array<{ key: string; label: string; content: string }>> = {
+  hakkinda: [
+    { key: 'proje_hakkinda', label: 'Proje Hakkında', content: 'TÜDAP (Türkçe Dilbilim Platformu), dilbilim alanında dijital kaynak eksikliğini gidermek amacıyla geliştirilmiş akademik bir platformdur.' },
+    { key: 'ozellikler', label: 'Özellikler', content: 'IPA fonetik transkripsiyon\nDilbilim terimleri sözlüğü\nAkademik blog\nEtkinlik ajandası' },
+    { key: 'kullanim_alanlari', label: 'Kullanım Alanları', content: 'Dilbilim araştırmaları ve akademik çalışmalar\nTürkçe öğretimi ve telaffuz eğitimi\nKonuşma terapisi ve ses eğitimi' },
+    { key: 'akademik_temel', label: 'Akademik Temel', content: 'IPA transkripsiyon sistemi, Türkçenin sesbilimsel özelliklerine dayalı akademik kurallara dayanmaktadır.' },
+    { key: 'iletisim_notu', label: 'İletişim', content: 'Öneri, hata bildirimi ve iş birliği talepleriniz için iletisim@dilbilim.org.tr adresine yazabilirsiniz.' },
+  ],
+  iletisim: [
+    { key: 'giris_metni', label: 'Giriş Metni', content: 'Sorularınız, önerileriniz ve akademik iş birliği talepleriniz için her zaman açığız.' },
+    { key: 'eposta_adresi', label: 'E-posta Adresi', content: 'iletisim@dilbilim.org.tr' },
+    { key: 'sss_1_soru', label: 'SSS 1 Soru', content: 'Bu platform ücretsiz mi?' },
+    { key: 'sss_1_cevap', label: 'SSS 1 Cevap', content: 'Evet, TÜDAP tamamen ücretsizdir ve kar amacı gütmemektedir.' },
+    { key: 'sss_2_soru', label: 'SSS 2 Soru', content: 'Verilerim saklanıyor mu?' },
+    { key: 'sss_2_cevap', label: 'SSS 2 Cevap', content: 'Hayır. Girdiğiniz metinler yalnızca tarayıcınızda işlenir.' },
+    { key: 'sss_3_soru', label: 'SSS 3 Soru', content: 'Hata bildirimi nasıl yapabilirim?' },
+    { key: 'sss_3_cevap', label: 'SSS 3 Cevap', content: "Herhangi bir araç sayfasındaki 'Hata Bildir' butonu veya e-posta ile bildirimde bulunabilirsiniz." },
+  ],
+}
+
+let pageSectionsTableReady: Promise<void> | null = null
+
+function ensurePageSectionsTable() {
+  if (!pageSectionsTableReady) {
+    pageSectionsTableReady = db.execute(sql`
+      CREATE TABLE IF NOT EXISTS page_sections (
+        id SERIAL PRIMARY KEY,
+        page TEXT NOT NULL,
+        key TEXT NOT NULL,
+        label TEXT NOT NULL,
+        content TEXT NOT NULL DEFAULT '',
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `).then(() => undefined)
+  }
+  return pageSectionsTableReady
+}
+
 export async function getPageSections(page: string): Promise<PageSection[]> {
+  await ensurePageSectionsTable()
   const rows = await db
     .select()
     .from(pageSections)
     .where(eq(pageSections.page, page))
     .orderBy(pageSections.sortOrder)
-  return rows
+  if (rows.length > 0) return rows
+  return (DEFAULT_SECTIONS[page] ?? []).map((section, index) => ({
+    id: 0,
+    page,
+    ...section,
+    sortOrder: index,
+    updatedAt: new Date(),
+  }))
 }
 
 export async function upsertPageSection(
@@ -40,11 +87,22 @@ export async function upsertPageSection(
   content: string
 ): Promise<void> {
   await requireAdminOrModerator()
+  await ensurePageSectionsTable()
 
-  await db
+  const updated = await db
     .update(pageSections)
     .set({ content: content.trim(), updatedAt: new Date() })
     .where(and(eq(pageSections.page, page), eq(pageSections.key, key)))
+
+  if (updated.rowCount === 0) {
+    await db.insert(pageSections).values({
+      page,
+      key,
+      label: key,
+      content: content.trim(),
+      sortOrder: 0,
+    })
+  }
 
   revalidatePath(`/${page === 'hakkinda' ? 'hakkinda' : 'iletisim'}`)
   revalidatePath('/en/about')
@@ -56,12 +114,23 @@ export async function upsertAllPageSections(
   updates: { key: string; content: string }[]
 ): Promise<void> {
   await requireAdminOrModerator()
+  await ensurePageSectionsTable()
 
-  for (const { key, content } of updates) {
-    await db
+  for (const [index, { key, content }] of updates.entries()) {
+    const updated = await db
       .update(pageSections)
       .set({ content: content.trim(), updatedAt: new Date() })
       .where(and(eq(pageSections.page, page), eq(pageSections.key, key)))
+
+    if (updated.rowCount === 0) {
+      await db.insert(pageSections).values({
+        page,
+        key,
+        label: key,
+        content: content.trim(),
+        sortOrder: index,
+      })
+    }
   }
 
   revalidatePath(`/${page === 'hakkinda' ? 'hakkinda' : 'iletisim'}`)
