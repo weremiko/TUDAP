@@ -317,7 +317,7 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
     saveQueryLog({
       inputText: clean,
       ipaOutput: ipa,
-      transcriptionType: mode,
+      transcriptionType: mode === "broad" ? "broad" : "narrow",
       charCount: clean.length,
     }).catch(() => {})
   }
