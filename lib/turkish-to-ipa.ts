@@ -504,6 +504,7 @@ function addStress(transcribed: string): string {
 // ──────────────────────────────────────────────
 export function turkishToIPA(text: string, options: TranscriptionOptions): string {
   if (!text) return ""
+  const rules = { ...DEFAULT_RULES, ...options.rules }
 
   const tokens = text.split(/(\s+|[.,!?;:—\-()'"«»""])/g)
 

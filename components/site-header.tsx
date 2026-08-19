@@ -148,7 +148,7 @@ export function SiteHeader() {
         {/* Mobile */}
         <div className="md:hidden flex items-center justify-between py-3.5">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.svg" alt="TÜDAP Logo" className="h-8 w-8" />
+            <img src="/logo.png" alt="TÜDAP Logo" className="h-8 w-8" />
             <span className="font-serif text-base font-bold text-foreground">TÜDAP</span>
           </Link>
           <Button

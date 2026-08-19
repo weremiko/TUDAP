@@ -260,7 +260,7 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
   }, [session?.user])
 
   // Process pipeline
-  const processInput = async (raw: string, mode: TranscriptionMode, rules: AdvancedRules) => {
+  const processInput = async (raw: string, mode: TranscriptionMode, ruleSet: AdvancedRules) => {
     if (!raw.trim()) { setOutputText(""); return }
     
     // Check query limit for anonymous users
@@ -302,10 +302,10 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
         if (customMap.has(key)) {
           return customMap.get(key)!
         }
-        return turkishToIPA(token, getTranscriptionOptions(mode, rules))
+        return turkishToIPA(token, getTranscriptionOptions(mode, ruleSet))
       }).join("")
     } else {
-      ipa = turkishToIPA(clean, getTranscriptionOptions(mode, rules))
+      ipa = turkishToIPA(clean, getTranscriptionOptions(mode, ruleSet))
     }
     
     setLoadingStep(2)
