@@ -73,6 +73,8 @@ export const queryLogs = pgTable('query_logs', {
   ipaOutput: text('ipa_output').notNull(),
   transcriptionType: text('transcription_type').notNull().default('broad'),
   charCount: integer('char_count').notNull().default(0),
+  ipAddress: text('ip_address'),
+  userId: text('user_id'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 

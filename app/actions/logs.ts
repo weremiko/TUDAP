@@ -2,9 +2,40 @@
 
 import { db } from '@/lib/db'
 import { queryLogs, user } from '@/lib/db/schema'
-import { desc, count, ilike, or, and, gte, eq, lte } from 'drizzle-orm'
+import { desc, count, ilike, or, and, gte, eq, sql } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
+
+const ANONYMOUS_MINUTE_LIMIT = 10
+const MEMBER_MINUTE_LIMIT = 60
+
+let queryRateColumnsReady: Promise<void> | null = null
+
+function ensureQueryRateColumns() {
+  if (!queryRateColumnsReady) {
+    queryRateColumnsReady = db.execute(sql`
+      ALTER TABLE query_logs
+        ADD COLUMN IF NOT EXISTS ip_address TEXT,
+        ADD COLUMN IF NOT EXISTS user_id TEXT
+    `).then(() => undefined)
+  }
+  return queryRateColumnsReady
+}
+
+function getClientIp(requestHeaders: Headers): string {
+  return requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || requestHeaders.get('x-real-ip')
+    || 'unknown'
+}
+
+async function getUserRole(userId: string): Promise<string | null> {
+  const [account] = await db
+    .select({ role: user.role })
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1)
+  return account?.role ?? null
+}
 
 export async function saveQueryLog(data: {
   inputText: string
@@ -12,9 +43,15 @@ export async function saveQueryLog(data: {
   transcriptionType: 'broad' | 'narrow'
   charCount: number
 }) {
-  // No auth required — any visitor's transcription is logged
   try {
-    await db.insert(queryLogs).values(data)
+    await ensureQueryRateColumns()
+    const requestHeaders = await headers()
+    const session = await auth.api.getSession({ headers: requestHeaders })
+    await db.insert(queryLogs).values({
+      ...data,
+      ipAddress: getClientIp(requestHeaders),
+      userId: session?.user?.id ?? null,
+    })
   } catch {
     // Silently fail — logging should never break the main UX
   }
@@ -64,38 +101,40 @@ export async function getLogStats() {
   return { total: Number(total), today: Number(todayCount) }
 }
 
-// Check if user reached daily query limit (5 for anonymous, unlimited for authenticated)
+// Anonymous: 10/minute by IP. Members: 60/minute.
+// Admins and moderators are intentionally unlimited.
 export async function checkQueryLimit(): Promise<{ allowed: boolean; remaining: number }> {
-  const session = await auth.api.getSession({ headers: await headers() })
-  
-  // Authenticated users have no limit
+  await ensureQueryRateColumns()
+  const requestHeaders = await headers()
+  const session = await auth.api.getSession({ headers: requestHeaders })
+
+  let subject: ReturnType<typeof eq>
+  let minuteLimit: number
+
   if (session?.user) {
-    return { allowed: true, remaining: -1 }
+    const role = await getUserRole(session.user.id)
+    if (role === 'admin' || role === 'moderator') {
+      return { allowed: true, remaining: -1 }
+    }
+    subject = eq(queryLogs.userId, session.user.id)
+    minuteLimit = MEMBER_MINUTE_LIMIT
+  } else {
+    subject = eq(queryLogs.ipAddress, getClientIp(requestHeaders))
+    minuteLimit = ANONYMOUS_MINUTE_LIMIT
   }
-  
-  // Anonymous: 5 queries per day limit
-  // Note: This is client-side verified via sessionStorage key count
-  // Server-side enforcement happens here but client tracks actual usage
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const tomorrow = new Date(today)
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  
-  const [{ count: queriestoday }] = await db
-    .select({ count: count() })
+
+  const now = new Date()
+  const minuteStart = new Date(now.getTime() - 60_000)
+  const [{ minuteCount }] = await db
+    .select({ minuteCount: count() })
     .from(queryLogs)
-    .where(
-      and(
-        gte(queryLogs.createdAt, today),
-        lte(queryLogs.createdAt, tomorrow)
-      )
-    )
-  
-  const used = Number(queriestoday)
-  const limit = 5
-  const remaining = Math.max(0, limit - used)
-  
-  return { allowed: used < limit, remaining }
+    .where(and(subject, gte(queryLogs.createdAt, minuteStart)))
+
+  const minuteRemaining = Math.max(0, minuteLimit - Number(minuteCount))
+  return {
+    allowed: minuteRemaining > 0,
+    remaining: minuteRemaining,
+  }
 }
 
 export async function exportQueryLogs(format: 'csv' | 'json') {

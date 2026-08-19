@@ -3,13 +3,10 @@
 import { useState, useEffect, useRef } from "react"
 import {
   Moon, Sun, Volume2, Copy, BookOpen, ChevronUp,
-  Download, RotateCcw, AlertTriangle, Lock, ChevronDown,
+  Download, RotateCcw, AlertTriangle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
@@ -172,26 +169,13 @@ const LS_MODE = "tudap_transcriber_mode"
 const LS_DARK  = "tudap_transcriber_dark"
 
 type TranscriptionMode = "narrow" | "broad" | "traditional"
-type AdvancedRules = {
-  allophones: boolean
-  assimilation: boolean
-  aspiration: boolean
-  stress: boolean
-}
 
-const DEFAULT_RULES: AdvancedRules = {
-  allophones: true,
-  assimilation: true,
-  aspiration: true,
-  stress: true,
-}
-
-function getTranscriptionOptions(mode: TranscriptionMode, rules: AdvancedRules) {
+function getTranscriptionOptions(mode: TranscriptionMode) {
   return {
     broad: mode !== "narrow",
     rules: mode === "traditional"
-      ? { ...rules, allophones: false, aspiration: false, stress: false }
-      : rules,
+      ? { allophones: false, assimilation: true, aspiration: false, stress: false }
+      : undefined,
   }
 }
 
@@ -207,15 +191,11 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
   const [inputText,          setInputText]          = useState("")
   const [outputText,         setOutputText]          = useState("")
   const [transcriptionMode, setTranscriptionMode] = useState<TranscriptionMode>("narrow")
-  const [advancedRules, setAdvancedRules] = useState<AdvancedRules>(DEFAULT_RULES)
-  const [advancedOpen, setAdvancedOpen] = useState(false)
   const [isDark,             setIsDark]              = useState(false)
   const [showReference,      setShowReference]       = useState(false)
   const [isProcessing,       setIsProcessing]        = useState(false)
   const [loadingStep,        setLoadingStep]         = useState(0)
   const [wordLimitWarning,   setWordLimitWarning]    = useState(false)
-  const [queryLimitRemaining, setQueryLimitRemaining] = useState(5)
-  const [isQueryLimited,     setIsQueryLimited]      = useState(false)
   const [customTranscriptions, setCustomTranscriptions] = useState<Array<{input: string, output: string}>>([])
 
   // Error report state — no dialog, just direct send
@@ -238,45 +218,31 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
     }
     setTranscriptionMode(savedMode)
     setInputText(savedInput)
-    if (savedInput) setOutputText(turkishToIPA(savedInput, getTranscriptionOptions(savedMode, DEFAULT_RULES)))
+    if (savedInput) setOutputText(turkishToIPA(savedInput, getTranscriptionOptions(savedMode)))
     if (savedInput.length > 0) {
       toast({ title: t.toastSession.title, description: t.toastSession.desc })
     }
   }, [inputHydrated, modeHydrated, darkHydrated]) // eslint-disable-line
 
-  // Check query limit on mount and when session changes
+  // Load custom transcriptions once on mount
   useEffect(() => {
-    const checkLimit = async () => {
-      const { allowed, remaining } = await checkQueryLimit()
-      setIsQueryLimited(!allowed && !session?.user)
-      setQueryLimitRemaining(remaining)
-    }
-    checkLimit()
-    
-    // Load custom transcriptions once on mount
     getCustomTranscriptions()
       .then(data => setCustomTranscriptions(data))
       .catch(err => console.error('[v0] Error loading custom transcriptions:', err))
-  }, [session?.user])
+  }, [])
 
   // Process pipeline
-  const processInput = async (raw: string, mode: TranscriptionMode, ruleSet: AdvancedRules) => {
+  const processInput = async (raw: string, mode: TranscriptionMode) => {
     if (!raw.trim()) { setOutputText(""); return }
     
-    // Check query limit for anonymous users
-    if (!session?.user) {
-      const { allowed, remaining } = await checkQueryLimit()
-      if (!allowed) {
-        setIsQueryLimited(true)
-        setQueryLimitRemaining(remaining)
-        toast({
-          title: t.toastLimitReached.title,
-          description: t.toastLimitReached.desc,
-          variant: "destructive"
-        })
-        return
-      }
-      setQueryLimitRemaining(remaining)
+    const { allowed } = await checkQueryLimit()
+    if (!allowed) {
+      toast({
+        title: t.toastLimitReached.title,
+        description: t.toastLimitReached.desc,
+        variant: "destructive"
+      })
+      return
     }
     
     setIsProcessing(true)
@@ -302,10 +268,10 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
         if (customMap.has(key)) {
           return customMap.get(key)!
         }
-        return turkishToIPA(token, getTranscriptionOptions(mode, ruleSet))
+        return turkishToIPA(token, getTranscriptionOptions(mode))
       }).join("")
     } else {
-      ipa = turkishToIPA(clean, getTranscriptionOptions(mode, ruleSet))
+      ipa = turkishToIPA(clean, getTranscriptionOptions(mode))
     }
     
     setLoadingStep(2)
@@ -332,20 +298,14 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
     // Debounce processInput: clear timer, set new one (500ms)
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
     debounceTimerRef.current = setTimeout(() => {
-      processInput(value, transcriptionMode, advancedRules)
+      processInput(value, transcriptionMode)
     }, 500)
   }
 
   const handleModeChange = (mode: TranscriptionMode) => {
     setTranscriptionMode(mode)
     setSavedMode(mode)
-    if (inputText.trim()) processInput(inputText, mode, advancedRules)
-  }
-
-  const handleRuleChange = (rule: keyof AdvancedRules, checked: boolean) => {
-    const nextRules = { ...advancedRules, [rule]: checked }
-    setAdvancedRules(nextRules)
-    if (inputText.trim()) processInput(inputText, transcriptionMode, nextRules)
+    if (inputText.trim()) processInput(inputText, mode)
   }
 
   const toggleDarkMode = () => {
@@ -427,26 +387,6 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
               {t.betaBanner.text}
             </p>
           </div>
-
-          {/* Query limit warning for anonymous users */}
-          {!session?.user && (
-            <div className="rounded-lg border border-blue-200/60 bg-blue-50/60 dark:bg-blue-900/20 dark:border-blue-800/40 px-4 py-3">
-              <div className="flex items-start gap-3">
-                <Lock className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-blue-900 dark:text-blue-200">
-                    {t.limitLabel} <span className="font-bold">{Math.max(0, queryLimitRemaining)} / 5</span>
-                  </p>
-                  <p className="text-xs text-blue-800 dark:text-blue-300 mt-1">
-                    <a href="/sign-in" className="underline hover:no-underline font-medium">{t.limitSignIn}</a>{" "}
-                    {lang === "en" ? "or " : "veya "}
-                    <a href="/sign-up" className="underline hover:no-underline font-medium">{t.limitSignUp}</a>
-                    {lang === "en" ? " for unlimited use." : " — sınırsız kullanım için."}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Title row */}
           <div className="flex items-start justify-between gap-4 border-b border-border pb-8">
@@ -541,29 +481,6 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
               </Button>
             </div>
 
-            <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="rounded-lg border border-border bg-card">
-              <CollapsibleTrigger asChild>
-                <button type="button" className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-foreground">
-                  <span>{lang === "en" ? "Advanced phonetic settings" : "Gelişmiş Fonetik Ayarlar"}</span>
-                  {advancedOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-                </button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="border-t border-border px-4 py-4">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {([
-                    ["allophones", lang === "en" ? "Allophonic variation" : "Alofonik değişkeler"],
-                    ["assimilation", lang === "en" ? "Assimilation and morphology" : "Benzeşme ve biçimbilim"],
-                    ["aspiration", lang === "en" ? "Initial aspiration" : "Sözcük başı üfleme"],
-                    ["stress", lang === "en" ? "Lexical stress" : "Sözcük vurgusu"],
-                  ] as const).map(([rule, label]) => (
-                    <label key={rule} className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <Checkbox checked={advancedRules[rule]} onCheckedChange={(checked) => handleRuleChange(rule, checked === true)} />
-                      <span>{label}</span>
-                    </label>
-                  ))}
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
           </div>
 
           {/* Editor grid */}
