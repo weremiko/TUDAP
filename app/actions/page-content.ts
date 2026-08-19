@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { db } from '@/lib/db'
-import { pageSections } from '@/lib/db/schema'
+import { pageSections, user } from '@/lib/db/schema'
 import { eq, and, sql } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
@@ -10,8 +10,14 @@ import { headers } from 'next/headers'
 async function requireAdminOrModerator() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) throw new Error('Oturum açmanız gerekiyor')
-  const role = (session.user as any).role
-  if (role !== 'admin' && role !== 'moderator') throw new Error('Yetkisiz erişim')
+  const [currentUser] = await db
+    .select({ role: user.role })
+    .from(user)
+    .where(eq(user.id, session.user.id))
+    .limit(1)
+  if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'moderator')) {
+    throw new Error('Yetkisiz erişim')
+  }
   return { userId: session.user.id, userName: session.user.name ?? 'Admin' }
 }
 
