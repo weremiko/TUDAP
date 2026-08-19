@@ -3,11 +3,13 @@
 import { useState, useEffect, useRef } from "react"
 import {
   Moon, Sun, Volume2, Copy, BookOpen, ChevronUp,
-  Download, RotateCcw, AlertTriangle, Lock,
+  Download, RotateCcw, AlertTriangle, Lock, ChevronDown,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
@@ -77,7 +79,7 @@ const LOADING_STEPS_EN = [
 const UI = {
   tr: {
     loadingSteps: LOADING_STEPS_TR,
-    betaBanner: { bold: "Beta Sürümü:", text: "Bu araç aktif geliştirme aşamasındadır ve %100 doğruluk garanti etmez. Akademik çalışmalar için sonuçları uzman denetiminden geçirerek kullanınız." },
+    betaBanner: { bold: "Akademik Açık Erişim Sürümü:", text: "Bu araç aktif geliştirme aşamasındadır ve %100 doğruluk garanti etmez. Akademik çalışmalar için sonuçları uzman denetiminden geçirerek kullanınız." },
     limitLabel: "Günlük sorgu sınırı:",
     limitSub: (r: number) => `Oturum açın veya kayıt olun — sınırsız kullanım için.`,
     limitSignIn: "Oturum açın",
@@ -94,11 +96,11 @@ const UI = {
     consonants: "Ünsüzler",
     inputLabel: "Türkçe Metin",
     wordCount: (c: number, m: number) => `${c} / ${m} sözcük`,
-    wordLimit: (m: number) => `En fazla ${m} sözcük girilebilir. Beta sürümde sözcük sınırı uygulanmaktadır.`,
+    wordLimit: (m: number) => `En fazla ${m} sözcük girilebilir. Akademik Açık Erişim Sürümünde sözcük sınırı uygulanmaktadır.`,
     placeholder: "Çevirmek istediğiniz Türkçe metni buraya yazın…",
     speak: "Seslendir",
     clear: "Temizle",
-    reportBtn: "Hata Bildir",
+    reportBtn: "Hatalı Çevriyazı Bildir",
     reportWord: "Hatalı sözcük (ör: 'kitap')…",
     reportNote: "Açıklama (isteğe bağlı)…",
     reportSend: "Gönder",
@@ -166,8 +168,32 @@ const UI = {
 }
 
 const LS_INPUT = "tudap_transcriber_input"
-const LS_BROAD = "tudap_transcriber_broad"
+const LS_MODE = "tudap_transcriber_mode"
 const LS_DARK  = "tudap_transcriber_dark"
+
+type TranscriptionMode = "narrow" | "broad" | "traditional"
+type AdvancedRules = {
+  allophones: boolean
+  assimilation: boolean
+  aspiration: boolean
+  stress: boolean
+}
+
+const DEFAULT_RULES: AdvancedRules = {
+  allophones: true,
+  assimilation: true,
+  aspiration: true,
+  stress: true,
+}
+
+function getTranscriptionOptions(mode: TranscriptionMode, rules: AdvancedRules) {
+  return {
+    broad: mode !== "narrow",
+    rules: mode === "traditional"
+      ? { ...rules, allophones: false, aspiration: false, stress: false }
+      : rules,
+  }
+}
 
 export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
   const t = UI[lang]
@@ -175,12 +201,14 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
   const { data: session } = useSession()
 
   const [savedInput, setSavedInput, , inputHydrated] = useLocalStorage<string>(LS_INPUT, "")
-  const [savedBroad, setSavedBroad, , broadHydrated] = useLocalStorage<boolean>(LS_BROAD, true)
+  const [savedMode, setSavedMode, , modeHydrated] = useLocalStorage<TranscriptionMode>(LS_MODE, "narrow")
   const [savedDark,  setSavedDark,  , darkHydrated]  = useLocalStorage<boolean>(LS_DARK, false)
 
   const [inputText,          setInputText]          = useState("")
   const [outputText,         setOutputText]          = useState("")
-  const [broadTranscription, setBroadTranscription]  = useState(true)
+  const [transcriptionMode, setTranscriptionMode] = useState<TranscriptionMode>("narrow")
+  const [advancedRules, setAdvancedRules] = useState<AdvancedRules>(DEFAULT_RULES)
+  const [advancedOpen, setAdvancedOpen] = useState(false)
   const [isDark,             setIsDark]              = useState(false)
   const [showReference,      setShowReference]       = useState(false)
   const [isProcessing,       setIsProcessing]        = useState(false)
@@ -200,7 +228,7 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
 
   // Hydrate from localStorage
   useEffect(() => {
-    if (!inputHydrated || !broadHydrated || !darkHydrated) return
+    if (!inputHydrated || !modeHydrated || !darkHydrated) return
     if (sessionRestoredRef.current) return
     sessionRestoredRef.current = true
 
@@ -208,13 +236,13 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
       setIsDark(true)
       document.documentElement.classList.add("dark")
     }
-    setBroadTranscription(savedBroad)
+    setTranscriptionMode(savedMode)
     setInputText(savedInput)
-    if (savedInput) setOutputText(turkishToIPA(savedInput, { broad: savedBroad }))
+    if (savedInput) setOutputText(turkishToIPA(savedInput, getTranscriptionOptions(savedMode, DEFAULT_RULES)))
     if (savedInput.length > 0) {
       toast({ title: t.toastSession.title, description: t.toastSession.desc })
     }
-  }, [inputHydrated, broadHydrated, darkHydrated]) // eslint-disable-line
+  }, [inputHydrated, modeHydrated, darkHydrated]) // eslint-disable-line
 
   // Check query limit on mount and when session changes
   useEffect(() => {
@@ -232,7 +260,7 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
   }, [session?.user])
 
   // Process pipeline
-  const processInput = async (raw: string, broad: boolean) => {
+  const processInput = async (raw: string, mode: TranscriptionMode, rules: AdvancedRules) => {
     if (!raw.trim()) { setOutputText(""); return }
     
     // Check query limit for anonymous users
@@ -274,10 +302,10 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
         if (customMap.has(key)) {
           return customMap.get(key)!
         }
-        return turkishToIPA(token, { broad: true })
+        return turkishToIPA(token, getTranscriptionOptions(mode, rules))
       }).join("")
     } else {
-      ipa = turkishToIPA(clean, { broad: true })
+      ipa = turkishToIPA(clean, getTranscriptionOptions(mode, rules))
     }
     
     setLoadingStep(2)
@@ -289,7 +317,7 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
     saveQueryLog({
       inputText: clean,
       ipaOutput: ipa,
-      transcriptionType: 'broad',
+      transcriptionType: mode,
       charCount: clean.length,
     }).catch(() => {})
   }
@@ -304,13 +332,20 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
     // Debounce processInput: clear timer, set new one (500ms)
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
     debounceTimerRef.current = setTimeout(() => {
-      processInput(value, broadTranscription)
+      processInput(value, transcriptionMode, advancedRules)
     }, 500)
   }
 
-  const handleBroadToggle = (checked: boolean) => {
-    setBroadTranscription(checked)
-    setSavedBroad(true)
+  const handleModeChange = (mode: TranscriptionMode) => {
+    setTranscriptionMode(mode)
+    setSavedMode(mode)
+    if (inputText.trim()) processInput(inputText, mode, advancedRules)
+  }
+
+  const handleRuleChange = (rule: keyof AdvancedRules, checked: boolean) => {
+    const nextRules = { ...advancedRules, [rule]: checked }
+    setAdvancedRules(nextRules)
+    if (inputText.trim()) processInput(inputText, transcriptionMode, nextRules)
   }
 
   const toggleDarkMode = () => {
@@ -463,17 +498,72 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
             </div>
           )}
 
-          {/* Broad transcription label + reference toggle */}
-          <div className="flex items-center justify-between gap-4">
-            <Label className="text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">{t.broad}</span>
-              <span className="ml-2 font-mono text-xs text-muted-foreground">/ … /</span>
-            </Label>
-            <Button variant="ghost" size="sm" onClick={() => setShowReference(!showReference)}
-              className="text-muted-foreground hover:text-foreground gap-1.5 text-xs">
-              <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">{showReference ? t.refClose : t.refOpen}</span>
-            </Button>
+          {/* Transcription modes */}
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2" role="tablist" aria-label="Transkripsiyon biçimi">
+              {([
+                ["narrow", lang === "en" ? "Modern acoustic phonetics" : "Modern Akustik Fonetik", "[ … ]"],
+                ["broad", lang === "en" ? "Broad phonemic transcription" : "Geniş Fonemik Çevriyazı", "/ … /"],
+                ["traditional", lang === "en" ? "Traditional / comparative" : "Geleneksel / Karşılaştırmalı", "IPA"],
+              ] as const).map(([mode, label, notation]) => (
+                <button
+                  key={mode}
+                  type="button"
+                  role="tab"
+                  aria-selected={transcriptionMode === mode}
+                  onClick={() => handleModeChange(mode)}
+                  className={`min-h-16 rounded-lg border px-3 py-2 text-left transition-colors ${
+                    transcriptionMode === mode
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border bg-card text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  <span className="block text-xs font-medium leading-snug">{label}</span>
+                  <span className="mt-1 block font-mono text-xs opacity-70">{notation}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+              <Label className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">
+                  {transcriptionMode === "narrow" ? (lang === "en" ? "Modern acoustic phonetics" : "Modern Akustik Fonetik") :
+                    transcriptionMode === "broad" ? t.broad : (lang === "en" ? "Traditional / comparative" : "Geleneksel / Karşılaştırmalı")}
+                </span>
+                <span className="ml-2 font-mono text-xs text-muted-foreground">
+                  {transcriptionMode === "narrow" ? "[ … ]" : transcriptionMode === "broad" ? "/ … /" : "IPA"}
+                </span>
+              </Label>
+              <Button variant="ghost" size="sm" onClick={() => setShowReference(!showReference)}
+                className="text-muted-foreground hover:text-foreground gap-1.5 text-xs">
+                <BookOpen className="h-4 w-4" />
+                <span className="hidden sm:inline">{showReference ? t.refClose : t.refOpen}</span>
+              </Button>
+            </div>
+
+            <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="rounded-lg border border-border bg-card">
+              <CollapsibleTrigger asChild>
+                <button type="button" className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-foreground">
+                  <span>{lang === "en" ? "Advanced phonetic settings" : "Gelişmiş Fonetik Ayarlar"}</span>
+                  {advancedOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="border-t border-border px-4 py-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {([
+                    ["allophones", lang === "en" ? "Allophonic variation" : "Alofonik değişkeler"],
+                    ["assimilation", lang === "en" ? "Assimilation and morphology" : "Benzeşme ve biçimbilim"],
+                    ["aspiration", lang === "en" ? "Initial aspiration" : "Sözcük başı üfleme"],
+                    ["stress", lang === "en" ? "Lexical stress" : "Sözcük vurgusu"],
+                  ] as const).map(([rule, label]) => (
+                    <label key={rule} className="flex items-center gap-3 text-sm text-muted-foreground">
+                      <Checkbox checked={advancedRules[rule]} onCheckedChange={(checked) => handleRuleChange(rule, checked === true)} />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
 
           {/* Editor grid */}

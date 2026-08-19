@@ -1,5 +1,18 @@
 export interface TranscriptionOptions {
   broad: boolean
+  rules?: {
+    allophones: boolean
+    assimilation: boolean
+    aspiration: boolean
+    stress: boolean
+  }
+}
+
+const DEFAULT_RULES = {
+  allophones: true,
+  assimilation: true,
+  aspiration: true,
+  stress: true,
 }
 
 // ──────────────────────────────────────────────
@@ -105,13 +118,16 @@ function applyNLAssimilation(word: string): string {
 // Ana transkripsiyon (tek kelime, IPA dizisi döndürür)
 // ──────────────────────────────────────────────
 function transcribeWord(rawWord: string, options: TranscriptionOptions): string {
+  const rules = { ...DEFAULT_RULES, ...options.rules }
   // 1. Ön işleme zinciri
   let word = rawWord.toLowerCase()
-  word = applyMetathesis(word)
-  word = applyHDrop(word)
-  word = applyNAssimilation(word)
-  word = applyNLAssimilation(word)
-  word = applyVowelDrop(word)
+  if (rules.assimilation) {
+    word = applyMetathesis(word)
+    word = applyHDrop(word)
+    word = applyNAssimilation(word)
+    word = applyNLAssimilation(word)
+    word = applyVowelDrop(word)
+  }
 
   const chars = word.split("")
   let result = ""
@@ -142,6 +158,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
       // Türkçe kökenli artdamaksıl [α]; yabancı ödünç sözcüklerde öndamaksıl [a]
       // <ğ> yanında uzun [αː], diş-üstün konsonant yanında [a]
       if (c === "a") {
+        if (!rules.allophones) { result += "a"; continue }
         const afterIsGhOrLong = next === "ğ" || next === "ː"
         const prevIsGhOrLong = prev === "ğ" || prev === "ː"
         const nearDentalOrAlveolar = /[tdsznl]/.test(next) || /[tdsznl]/.test(prev)
@@ -161,6 +178,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
       // Açık [ɛ]: tek heceli sözcük, kelime sonu, <ğ>/<y> yanında, çok heceli son hece
       // Kapalı [e]: yabancı uzun, çok heceli ilk hece, ek aldığında
       if (c === "e") {
+        if (!rules.allophones) { result += "e"; continue }
         const syllables = countSyllablesBefore(chars, i)
         const totalSyllables = countTotalSyllables(chars)
         const isWordFinal = !isVowel(next) && (isLast || !chars.slice(i + 1).some(isVowel))
@@ -179,11 +197,12 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
 
       // ── /ı/ ──
       // Değişkesi yok: daima ortadil-düz-dar [ϊ]
-      if (c === "ı") { result += "ϊ"; continue }
+      if (c === "ı") { result += rules.allophones ? "ϊ" : "ɯ"; continue }
 
       // ── /i/ ──
       // Kısa → açık [ɪ], uzun (ğ sonrası) → kapalı [i]
       if (c === "i") {
+        if (!rules.allophones) { result += "i"; continue }
         const isLong = prev === "ğ" || next === "ː"
         result += isLong ? "i" : "ɪ"
         continue
@@ -192,6 +211,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
       // ── /o/ ──
       // Türkçe kökenli kısa → açık [ɔ], alıntı/uzun → kapalı [o]
       if (c === "o") {
+        if (!rules.allophones) { result += "o"; continue }
         const isLong = prev === "ğ" || next === "ː"
         result += isLong ? "o" : "ɔ"
         continue
@@ -200,6 +220,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
       // ── /ö/ ──
       // Açık [œ] (genel), kapalı [ø] (uzun/ğ sonrası); sözcük sonunda kullanılmaz (Türkçe kısıtı)
       if (c === "ö") {
+        if (!rules.allophones) { result += "ö"; continue }
         const isLong = prev === "ğ" || next === "ː"
         result += isLong ? "ø" : "œ"
         continue
@@ -208,6 +229,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
       // ── /u/ ──
       // Kısa → açık [U], alıntı/uzun (ğ sonrası veya uzatma) → [ʊ:] veya [ʊ]
       if (c === "u") {
+        if (!rules.allophones) { result += "u"; continue }
         const isLong = prev === "ğ" || next === "ː"
         result += isLong ? "ʊ:" : "U"
         continue
@@ -216,6 +238,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
       // ── /ü/ ──
       // Açık [Y], kapalı [y] (uzun/ğ sonrası)
       if (c === "ü") {
+        if (!rules.allophones) { result += "y"; continue }
         const isLong = prev === "ğ" || next === "ː"
         result += isLong ? "y" : "Y"
         continue
@@ -241,14 +264,14 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
     // ── /p/ – aspirasyon ──
     // Kelime/hece başı + arkasından ünlü geliyorsa üflemeli [pʰ]; sözcük sonunda yok
     if (c === "p") {
-      const aspirate = isWordOrSyllableStart(chars, i) && isVowel(next) && !isLast
+      const aspirate = rules.aspiration && isWordOrSyllableStart(chars, i) && isVowel(next) && !isLast
       result += aspirate ? "pʰ" : "p"
       continue
     }
 
     // ── /t/ – aspirasyon ──
     if (c === "t") {
-      const aspirate = isWordOrSyllableStart(chars, i) && isVowel(next) && !isLast
+      const aspirate = rules.aspiration && isWordOrSyllableStart(chars, i) && isVowel(next) && !isLast
       result += aspirate ? "tʰ" : "t"
       continue
     }
@@ -258,29 +281,29 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
     // Kalın ünlüler (a, ı, o, u) ve y/∙I gibi yarı ünlü / IPA sembolleri damaksıllaştırmaz.
     // Sözcük sonunda aspirasyon yok.
     if (c === "k") {
-      const front = (prev.length > 0 && REAL_FRONT_VOWELS.includes(prev)) ||
-                    (next.length > 0 && REAL_FRONT_VOWELS.includes(next))
+      const front = rules.allophones && ((prev.length > 0 && REAL_FRONT_VOWELS.includes(prev)) ||
+                    (next.length > 0 && REAL_FRONT_VOWELS.includes(next)))
       const base = front ? "c" : "k"
-      const aspirate = isWordOrSyllableStart(chars, i) && isVowel(next) && !isLast
+      const aspirate = rules.aspiration && isWordOrSyllableStart(chars, i) && isVowel(next) && !isLast
       result += aspirate ? base + "ʰ" : base
       continue
     }
 
     // ── /b/ – son ses ötümsüzleşmesi ──
     if (c === "b") {
-      result += isLast ? "p" : "b"
+      result += rules.allophones && isLast ? "p" : "b"
       continue
     }
 
     // ── /d/ – son ses ötümsüzleşmesi ──
     if (c === "d") {
-      result += isLast ? "t" : "d"
+      result += rules.allophones && isLast ? "t" : "d"
       continue
     }
 
     // ── /c/ (Türkçe <c> = /dʒ/) – son ses ötümsüzleşmesi ──
     if (c === "c") {
-      result += isLast ? "tʃ" : "dʒ"
+      result += rules.allophones && isLast ? "tʃ" : "dʒ"
       continue
     }
 
@@ -288,6 +311,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
     // Damaksıllaşma YALNIZCA gerçek öndil ünlüsü (e, i, ö, ü) komşuluğunda.
     // y, ∙I, kalın ünlüler (a, ı, o, u) damaksıllaştırmaz.
     if (c === "g") {
+      if (!rules.allophones) { result += "ɡ"; continue }
       const front = (prev.length > 0 && REAL_FRONT_VOWELS.includes(prev)) ||
                     (next.length > 0 && REAL_FRONT_VOWELS.includes(next))
       if (isLast) {
@@ -300,7 +324,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
 
     // ── /z/ – son seste yarı ötümsüzleşme ──
     if (c === "z") {
-      result += isLast ? "z̥" : "z"
+      result += rules.allophones && isLast ? "z̥" : "z"
       continue
     }
 
@@ -322,6 +346,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
 
     // ── /l/ – ince/kalın değişke ──
     if (c === "l") {
+      if (!rules.allophones) { result += "l"; continue }
       // Öndil ünlüleri ve alıntı /a/ yanında ince [l], artdil ünlüleriyle kalın [ɫ]
       const thinContext = isFrontVowel(prev) || isFrontVowel(next)
       result += thinContext ? "l" : "ɫ"
@@ -330,6 +355,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
 
     // ── /r/ – konum değişkeleri ──
     if (c === "r") {
+      if (!rules.allophones) { result += "ɾ"; continue }
       if (isFirst) {
         result += "r"         // sözcük başı: çok vuruşlu [r]
       } else if (isLast) {
@@ -342,6 +368,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
 
     // ── /f, v/ – dudaksıllaşma ──
     if (c === "f") {
+      if (!rules.allophones) { result += "f"; continue }
       const roundCtx = isRoundVowel(prev) || isRoundVowel(next)
       result += roundCtx ? "ɸ" : "f"
       continue
@@ -352,6 +379,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
     // Yuvarlak ünlüler (o, ö, u, ü) yanında dudaksıllaşma [β] veya [v˚]
     // Yuvarlak-düz ünlü arasında (içses) → [ʋ]
     if (c === "v") {
+      if (!rules.allophones) { result += "v"; continue }
       const prevRound = isRoundVowel(prev)
       const nextRound = isRoundVowel(next)
       const prevVowel = isVowel(prev)
@@ -405,6 +433,7 @@ function transcribeWord(rawWord: string, options: TranscriptionOptions): string 
     // Art ünlü (a, ı, o, u) yanında art damak sürtünücü [x]
     // Ön ünlü (e, i, ö, ü) yanında veya sözcük başında gırtlak sürtünücü [h]
     if (c === "h") {
+      if (!rules.allophones) { result += "h"; continue }
       const backCtx = isBackVowel(prev) || isBackVowel(next)
       result += backCtx ? "x" : "h"
       continue
@@ -483,7 +512,7 @@ export function turkishToIPA(text: string, options: TranscriptionOptions): strin
       if (!token) return ""
       if (token.match(/^[\s.,!?;:—\-()'"«»""]+$/)) return token
       const transcribed = transcribeWord(token, options)
-      const withStress = options.broad ? transcribed : addStress(transcribed)
+      const withStress = !options.broad && rules.stress ? addStress(transcribed) : transcribed
       return options.broad ? `/${withStress}/` : `[${withStress}]`
     })
     .join("")
