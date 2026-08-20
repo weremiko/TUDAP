@@ -83,8 +83,8 @@ const TOOLS = [
     icon: BookText,
     color: "text-chart-2",
     bg: "bg-chart-2/10 group-hover:bg-chart-2/20",
-    title: "Madde Başı Sözlüğü",
-    desc: "700+ madde başı, Türkçe örnekler ve akademik açıklamalar. Sesbilim, sözdizimi, anlambilim ve daha fazlası. Yönetici panelinden dinamik ekleme.",
+    title: "Dilbilim Terimleri Sözlüğü",
+    desc: "700+ terim, Türkçe örnekler ve akademik açıklamalar. Sesbilim, sözdizimi, anlambilim ve daha fazlası. Yönetici panelinden dinamik ekleme.",
     badge: "Aktif",
     disabled: false,
   },
@@ -155,8 +155,8 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
             {[
               ["3", "Aktif Araç"],
-              ["700+", "Madde Başı"],
-              ["Ücretsiz", "Ücretsiz"],
+              ["700+", "Dilbilim Terimi"],
+              ["%100", "Ücretsiz"],
             ].map(([val, label]) => (
               <div key={label}>
                 <p className="text-2xl md:text-3xl font-serif font-bold text-foreground">{val}</p>

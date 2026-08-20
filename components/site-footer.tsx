@@ -2,7 +2,7 @@ import Link from "next/link"
 
 const TOOL_LINKS = [
   { href: "/cevirici",      label: "Sesbilimsel Abece Çeviricisi" },
-  { href: "/terim-sozlugu", label: "Madde Başı Sözlüğü" },
+  { href: "/terim-sozlugu", label: "Dilbilim Terimleri Sözlüğü" },
 ]
 
 const PLATFORM_LINKS = [

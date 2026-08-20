@@ -9,7 +9,7 @@ import { authClient } from "@/lib/auth-client"
 
 const TOOL_LINKS = [
   { href: "/cevirici",      label: "Sesbilimsel Abece Çeviricisi" },
-  { href: "/terim-sozlugu", label: "Madde Başı Sözlüğü" },
+  { href: "/terim-sozlugu", label: "Dilbilim Terimleri Sözlüğü" },
 ]
 
 const NAV_LINKS = [
