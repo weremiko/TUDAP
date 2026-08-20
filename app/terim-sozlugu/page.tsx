@@ -121,7 +121,7 @@ export default function GlossaryPage() {
 
           <div className="space-y-3">
             <div className="flex flex-wrap items-start justify-between gap-4">
-              <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground">Dilbilim Terimleri Sözlüğü</h1>
+              <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground">Madde Başı Sözlüğü</h1>
               <Button variant="outline" size="sm" onClick={() => setSuggestionOpen(true)} className="gap-2 shrink-0">
                 <Lightbulb className="h-4 w-4" />Madde Başı Öner
               </Button>

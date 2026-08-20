@@ -42,7 +42,7 @@ export default async function AdminIndexPage() {
   const statCardsAll = [
     { label: "Toplam Kullanıcı",  value: stats.totalUsers,        icon: Users,        href: "/admin/kullanicilar" },
     { label: "Aktif Oturum",      value: stats.activeSessions,    icon: Activity,     href: null },
-    { label: "Sözlük Terimi",     value: glossaryData.total,      icon: BookOpen,     href: "/admin/sozluk" },
+    { label: "Madde Başı",        value: glossaryData.total,      icon: BookOpen,     href: "/admin/sozluk" },
     { label: "Bugün Sorgu",       value: logStats.today,          icon: TrendingUp,   href: "/admin/loglar" },
     { label: "Toplam Sorgu",      value: logStats.total,          icon: ClipboardList,href: "/admin/loglar" },
     { label: "Admin Sayısı",      value: stats.adminCount,        icon: ShieldCheck,  href: "/admin/kullanicilar" },
@@ -50,7 +50,7 @@ export default async function AdminIndexPage() {
   ]
 
   const statCardsMod = [
-    { label: "Sözlük Terimi",     value: glossaryData.total,      icon: BookOpen,     href: "/admin/sozluk" },
+    { label: "Madde Başı",        value: glossaryData.total,      icon: BookOpen,     href: "/admin/sozluk" },
     { label: "Hata Raporu (Bugün)",value: errorStats.today,        icon: AlertTriangle,href: "/admin/hatalar" },
     { label: "Toplam Hata Raporu", value: errorStats.total,        icon: AlertTriangle,href: "/admin/hatalar" },
   ]
@@ -122,7 +122,7 @@ export default async function AdminIndexPage() {
           <div className="space-y-2">
             {[
               { href: "/admin/kullanicilar", icon: Users,        label: "Kullanıcı Yönetimi", desc: "Tüm hesapları listele ve yönet" },
-              { href: "/admin/sozluk",       icon: BookOpen,     label: "Sözlük Yönetimi",   desc: "Dilbilim terimlerini düzenle" },
+              { href: "/admin/sozluk",       icon: BookOpen,     label: "Madde Başı Yönetimi", desc: "Madde başlarını düzenle" },
               { href: "/admin/loglar",       icon: ClipboardList,label: "Sorgu Logları",      desc: "Çevirici kullanım kayıtları" },
             ].map((item) => (
               <Link

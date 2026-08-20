@@ -10,8 +10,8 @@ const BASE = "https://dilbilim.org.tr"
 
 export const metadata: Metadata = {
   title: "TÜDAP — Türkçe Dilbilim Platformu | IPA Çevirici & Terim Sözlüğü",
-  description:
-    "Türkçe dilbilim platformu: ücretsiz IPA fonetik transkripsiyon aracı, 700+ terimlik dilbilim sözlüğü, akademik blog ve etkinlik ajandası. Sesbilim, sözdizimi ve morfoloji araçları.",
+   description:
+     "Türkçe dilbilim platformu: ücretsiz IPA fonetik transkripsiyon aracı, 700+ madde başı, akademik blog ve etkinlik ajandası. Sesbilim, sözdizimi ve morfoloji araçları.",
   keywords: [
     "türkçe dilbilim", "IPA çevirici", "fonetik transkripsiyon", "türkçe IPA",
     "sesbilimsel transkripsiyon", "dilbilim terimleri sözlüğü", "dilbilim araçları",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "TÜDAP — Türkçe Dilbilim Platformu",
-    description: "Ücretsiz IPA fonetik transkripsiyon, 700+ terimlik dilbilim sözlüğü, blog ve etkinlik ajandası.",
+    description: "Ücretsiz IPA fonetik transkripsiyon, 700+ madde başı, blog ve etkinlik ajandası.",
     images: [`${BASE}/og-image.png`],
   },
 }
@@ -74,7 +74,7 @@ const TOOLS = [
     color: "text-primary",
     bg: "bg-primary/10 group-hover:bg-primary/20",
     title: "Sesbilimsel Abece Çeviricisi",
-    desc: "Türkçe metinleri IPA formatına çevirin. Geniş ve dar transkripsiyon seçenekleri ile akademik düzeyde çıktı. Günde 5 sorgu (oturum açıp sınırsız).",
+    desc: "Türkçe metinleri IPA formatına çevirin. Geniş ve dar transkripsiyon seçenekleri ile akademik düzeyde çıktı.",
     badge: "Aktif",
     disabled: false,
   },
@@ -83,8 +83,8 @@ const TOOLS = [
     icon: BookText,
     color: "text-chart-2",
     bg: "bg-chart-2/10 group-hover:bg-chart-2/20",
-    title: "Dilbilim Terimleri Sözlüğü",
-    desc: "700+ terim, Türkçe örnekler ve akademik açıklamalar. Sesbilim, sözdizimi, anlambilim ve daha fazlası. Yönetici panelinden dinamik ekleme.",
+    title: "Madde Başı Sözlüğü",
+    desc: "700+ madde başı, Türkçe örnekler ve akademik açıklamalar. Sesbilim, sözdizimi, anlambilim ve daha fazlası. Yönetici panelinden dinamik ekleme.",
     badge: "Aktif",
     disabled: false,
   },
@@ -152,12 +152,11 @@ export default function Home() {
       {/* Stats strip */}
       <section className="border-y border-border bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
             {[
               ["3", "Aktif Araç"],
-              ["700+", "Dilbilim Terimi"],
-              ["50+", "günlük ziyaretçi"],
-              ["%100", "İşlevsellik"],
+              ["700+", "Madde Başı"],
+              ["Ücretsiz", "Ücretsiz"],
             ].map(([val, label]) => (
               <div key={label}>
                 <p className="text-2xl md:text-3xl font-serif font-bold text-foreground">{val}</p>
