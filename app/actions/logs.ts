@@ -11,7 +11,7 @@ const MEMBER_MINUTE_LIMIT = 60
 
 let queryRateColumnsReady: Promise<void> | null = null
 
-export function ensureQueryRateColumns() {
+export async function ensureQueryRateColumns() {
   if (!queryRateColumnsReady) {
     queryRateColumnsReady = db.execute(sql`
       ALTER TABLE query_logs
@@ -19,7 +19,7 @@ export function ensureQueryRateColumns() {
         ADD COLUMN IF NOT EXISTS user_id TEXT
     `).then(() => undefined)
   }
-  return queryRateColumnsReady
+  await queryRateColumnsReady
 }
 
 function getClientIp(requestHeaders: Headers): string {

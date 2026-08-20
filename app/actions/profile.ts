@@ -10,7 +10,7 @@ import { sql } from 'drizzle-orm'
 
 let profileColumnsReady: Promise<void> | null = null
 
-export function ensureProfileColumns() {
+export async function ensureProfileColumns() {
   if (!profileColumnsReady) {
     profileColumnsReady = db.execute(sql`
       ALTER TABLE "user"
@@ -20,7 +20,7 @@ export function ensureProfileColumns() {
         ADD COLUMN IF NOT EXISTS profile_visibility BOOLEAN NOT NULL DEFAULT FALSE
     `).then(() => undefined)
   }
-  return profileColumnsReady
+  await profileColumnsReady
 }
 
 async function requireUser() {
