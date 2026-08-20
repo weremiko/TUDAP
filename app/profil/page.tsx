@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import Link from 'next/link'
-import { Settings, Mail, Shield } from 'lucide-react'
+import { Settings, Mail, Shield, Building2, CalendarDays, Sparkles, Users, FileText, Copy } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Profil — TÜDAP',
@@ -45,61 +45,59 @@ export default async function ProfilePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SiteHeader />
-      <main className="container mx-auto max-w-3xl px-4 py-12 flex-1">
-        <div className="flex items-start justify-between gap-4 mb-8">
+      <main className="container mx-auto max-w-5xl px-4 py-10 md:py-14 flex-1">
+        <div className="flex items-end justify-between gap-4 mb-8">
           <div>
-            <p className="text-xs uppercase tracking-widest text-accent font-medium">Hesap</p>
-            <h1 className="text-3xl font-serif font-bold text-foreground mt-2">Profilim</h1>
-            <p className="text-sm text-muted-foreground mt-2">Hesap bilgilerinizi ve üyelik durumunuzu görüntüleyin.</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-accent font-medium">Hesap merkezi</p>
+            <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground mt-2">Profilim</h1>
           </div>
           <Button asChild variant="outline" size="sm" className="gap-2 shrink-0">
-            <Link href="/profil/ayarlar"><Settings className="h-4 w-4" />Ayarlar</Link>
+            <Link href="/profil/ayarlar"><Settings className="h-4 w-4" />Profili düzenle</Link>
           </Button>
         </div>
 
-        <Card className="p-6">
-          <div className="flex items-center gap-4 pb-6 border-b border-border">
-            <Avatar className="h-16 w-16">
+        <section className="border-y border-border py-7 md:py-9">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5 md:gap-7">
+            <Avatar className="h-24 w-24 md:h-28 md:w-28 border-4 border-background ring-1 ring-border">
               <AvatarImage src={profile.image ?? undefined} alt={profile.name} />
-              <AvatarFallback className="text-lg">{initials}</AvatarFallback>
+              <AvatarFallback className="text-2xl font-serif">{initials}</AvatarFallback>
             </Avatar>
-            <div>
-              <h2 className="text-xl font-semibold text-foreground">{profile.name}</h2>
-              <p className="text-sm text-muted-foreground">{profile.email}</p>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground">{profile.name}</h2>
+                <span className="text-[10px] uppercase tracking-widest border border-accent/30 text-accent px-2 py-1 rounded-full">{profile.role === 'user' ? 'Üye' : profile.role}</span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">{profile.email}</p>
+              {profile.institution && <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-3"><Building2 className="h-3.5 w-3.5" />{profile.institution}</p>}
             </div>
+            {profile.profileVisibility && <Button asChild variant="ghost" size="sm" className="gap-2 self-start sm:self-center"><Link href={`/profil/${session.user.id}`}><Copy className="h-3.5 w-3.5" />Genel profil</Link></Button>}
           </div>
-          {profile.bio && <p className="pt-6 text-sm leading-relaxed text-muted-foreground">{profile.bio}</p>}
-          <dl className="grid gap-5 sm:grid-cols-2 pt-6">
-            <div className="flex items-start gap-3">
-              <Mail className="h-4 w-4 text-muted-foreground mt-0.5" />
-              <div><dt className="text-xs uppercase tracking-widest text-muted-foreground">E-posta</dt><dd className="text-sm text-foreground mt-1">{profile.email}</dd></div>
+          <div className="grid grid-cols-3 max-w-xl mt-8 border-t border-border pt-5">
+            <div><p className="text-xl font-semibold text-foreground">{followSummary.followers}</p><p className="text-xs text-muted-foreground mt-1">Takipçi</p></div>
+            <div><p className="text-xl font-semibold text-foreground">{followSummary.following}</p><p className="text-xs text-muted-foreground mt-1">Takip</p></div>
+            <div><p className="text-xl font-semibold text-foreground">{profile.points.toLocaleString('tr-TR')}</p><p className="text-xs text-muted-foreground mt-1">Topluluk puanı</p></div>
+          </div>
+        </section>
+
+        <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-10 md:gap-14 pt-9">
+          <section>
+            <div className="flex items-center gap-2 mb-5"><Sparkles className="h-4 w-4 text-accent" /><h2 className="text-sm uppercase tracking-[0.16em] font-semibold text-foreground">Hakkımda</h2></div>
+            {profile.bio ? <p className="text-sm leading-7 text-muted-foreground max-w-xl">{profile.bio}</p> : <p className="text-sm text-muted-foreground">Henüz bir biyografi eklemediniz. <Link href="/profil/ayarlar" className="text-primary hover:underline">Profilinizi tamamlayın.</Link></p>}
+            <dl className="grid sm:grid-cols-2 gap-x-8 gap-y-5 mt-8 pt-6 border-t border-border">
+              <div><dt className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground"><Mail className="h-3.5 w-3.5" />E-posta</dt><dd className="text-sm text-foreground mt-2 break-all">{profile.email}</dd></div>
+              <div><dt className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground"><CalendarDays className="h-3.5 w-3.5" />Üyelik</dt><dd className="text-sm text-foreground mt-2">{profile.createdAt.toLocaleDateString('tr-TR')}</dd></div>
+            </dl>
+          </section>
+          <aside className="border-l-0 md:border-l border-border md:pl-8">
+            <div className="flex items-center gap-2 mb-5"><FileText className="h-4 w-4 text-primary" /><h2 className="text-sm uppercase tracking-[0.16em] font-semibold text-foreground">Katkı özeti</h2></div>
+            <div className="space-y-5">
+              <div><p className="text-3xl font-serif font-bold text-foreground">{transcriptionCount.toLocaleString('tr-TR')}</p><p className="text-xs text-muted-foreground mt-1">Kayıtlı transkripsiyon</p></div>
+              <div className="h-px bg-border" />
+              <div><p className="text-sm font-medium text-foreground">Topluluk katkısı</p><p className="text-xs leading-relaxed text-muted-foreground mt-1">Onaylanan hata bildirimleri ve madde başı önerileri puan kazandırır.</p></div>
+              <Link href="/terim-sozlugu" className="inline-flex items-center gap-2 text-sm text-primary hover:underline"><Users className="h-4 w-4" />Topluluğa katkıda bulun</Link>
             </div>
-            <div className="flex items-start gap-3">
-              <Shield className="h-4 w-4 text-muted-foreground mt-0.5" />
-              <div><dt className="text-xs uppercase tracking-widest text-muted-foreground">Hesap türü</dt><dd className="text-sm text-foreground mt-1">{profile.role === 'user' ? 'Üye' : profile.role}</dd></div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Shield className="h-4 w-4 text-muted-foreground mt-0.5" />
-              <div><dt className="text-xs uppercase tracking-widest text-muted-foreground">Üyelik</dt><dd className="text-sm text-foreground mt-1">{profile.createdAt.toLocaleDateString('tr-TR')}</dd></div>
-            </div>
-            {profile.institution && <div className="flex items-start gap-3 sm:col-span-2"><Mail className="h-4 w-4 text-muted-foreground mt-0.5" /><div><dt className="text-xs uppercase tracking-widest text-muted-foreground">Kurum</dt><dd className="text-sm text-foreground mt-1">{profile.institution}</dd></div></div>}
-          </dl>
-          <div className="mt-6 border-t border-border pt-6">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Transkripsiyon kullanımı</p>
-            <p className="text-2xl font-semibold text-foreground mt-2">{transcriptionCount.toLocaleString('tr-TR')}</p>
-            <p className="text-xs text-muted-foreground mt-1">Bu hesapla oluşturulan kayıtlı çalışma</p>
-          </div>
-          <div className="mt-6 border-t border-border pt-6">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">Topluluk puanı</p>
-            <p className="text-2xl font-semibold text-foreground mt-2">{profile.points.toLocaleString('tr-TR')}</p>
-            <p className="text-xs text-muted-foreground mt-1">Onaylanan katkılarınızdan kazandığınız puan</p>
-          </div>
-          <div className="mt-6 flex gap-8 border-t border-border pt-6 text-sm">
-            <span><strong className="text-foreground">{followSummary.followers}</strong> <span className="text-muted-foreground">takipçi</span></span>
-            <span><strong className="text-foreground">{followSummary.following}</strong> <span className="text-muted-foreground">takip</span></span>
-          </div>
-          {profile.profileVisibility && <p className="mt-5 text-xs text-muted-foreground">Herkese açık profil: <Link href={`/profil/${session.user.id}`} className="text-primary hover:underline">Profil bağlantısını görüntüle</Link></p>}
-        </Card>
+          </aside>
+        </div>
       </main>
       <SiteFooter />
     </div>
