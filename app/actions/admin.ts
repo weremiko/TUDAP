@@ -6,6 +6,15 @@ import { user, session } from '@/lib/db/schema'
 import { desc, eq, count, gt } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { sql } from 'drizzle-orm'
+
+let verificationColumnsReady: Promise<void> | null = null
+function ensureVerificationColumn() {
+  if (!verificationColumnsReady) {
+    verificationColumnsReady = db.execute(sql`ALTER TABLE "user" ADD COLUMN IF NOT EXISTS blue_verified BOOLEAN NOT NULL DEFAULT FALSE`).then(() => undefined)
+  }
+  return verificationColumnsReady
+}
 
 async function requireAdmin() {
   const s = await auth.api.getSession({ headers: await headers() })
@@ -55,17 +64,27 @@ export async function getAdminStats() {
 
 export async function getAllUsers() {
   await requireAdmin()
+  await ensureVerificationColumn()
   return db
     .select({
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
+      blueVerified: user.blueVerified,
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,
     })
     .from(user)
     .orderBy(desc(user.createdAt))
+}
+
+export async function setUserBlueVerification(userId: string, verified: boolean) {
+  await requireAdmin()
+  await ensureVerificationColumn()
+  await db.update(user).set({ blueVerified: verified, updatedAt: new Date() }).where(eq(user.id, userId))
+  revalidatePath('/admin/kullanicilar')
+  revalidatePath('/profil')
 }
 
 export async function setUserRole(userId: string, role: 'admin' | 'moderator' | 'user') {

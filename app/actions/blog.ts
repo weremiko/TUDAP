@@ -2,10 +2,19 @@
 
 import { db } from '@/lib/db'
 import { blogPosts, user } from '@/lib/db/schema'
-import { eq, desc, count } from 'drizzle-orm'
+import { eq, desc, count, and } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { sql } from 'drizzle-orm'
+
+let submissionColumnReady: Promise<void> | null = null
+function ensureSubmissionColumn() {
+  if (!submissionColumnReady) {
+    submissionColumnReady = db.execute(sql`ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS submission_status TEXT NOT NULL DEFAULT 'approved'`).then(() => undefined)
+  }
+  return submissionColumnReady
+}
 
 async function requireAdminOrModerator() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -28,8 +37,9 @@ function generateSlug(title: string): string {
 }
 
 export async function getBlogPosts(page = 1, limit = 10, publishedOnly = true) {
+  await ensureSubmissionColumn()
   const offset = (page - 1) * limit
-  const where = publishedOnly ? eq(blogPosts.published, true) : undefined
+  const where = publishedOnly ? and(eq(blogPosts.published, true), eq(blogPosts.submissionStatus, 'approved')) : undefined
 
   const [posts, [{ total }]] = await Promise.all([
     db.select().from(blogPosts)
@@ -43,6 +53,7 @@ export async function getBlogPosts(page = 1, limit = 10, publishedOnly = true) {
 }
 
 export async function getBlogPostBySlug(slug: string) {
+  await ensureSubmissionColumn()
   const [post] = await db.select().from(blogPosts)
     .where(eq(blogPosts.slug, slug)).limit(1)
   return post ?? null
@@ -50,6 +61,7 @@ export async function getBlogPostBySlug(slug: string) {
 
 export async function getAdminBlogPosts(page = 1, limit = 20) {
   await requireAdminOrModerator()
+  await ensureSubmissionColumn()
   const offset = (page - 1) * limit
   const [posts, [{ total }]] = await Promise.all([
     db.select().from(blogPosts).orderBy(desc(blogPosts.createdAt)).limit(limit).offset(offset),
@@ -66,6 +78,7 @@ export async function createBlogPost(data: {
   authorName?: string
   tags?: string
 }) {
+  await ensureSubmissionColumn()
   const { userId, userName } = await requireAdminOrModerator()
 
   if (!data.title.trim()) throw new Error('Başlık boş olamaz')
@@ -129,6 +142,33 @@ export async function toggleBlogPostPublished(id: number, published: boolean) {
 export async function deleteBlogPost(id: number) {
   await requireAdminOrModerator()
   await db.delete(blogPosts).where(eq(blogPosts.id, id))
+  revalidatePath('/blog')
+  revalidatePath('/admin/blog')
+}
+
+export async function submitBlogApplication(data: { title: string; content: string; excerpt: string; tags?: string }) {
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session?.user) throw new Error('Oturum açmanız gerekiyor')
+  await ensureSubmissionColumn()
+  if (!data.title.trim() || !data.content.trim()) throw new Error('Başlık ve içerik zorunludur')
+  const [author] = await db.select({ name: user.name }).from(user).where(eq(user.id, session.user.id)).limit(1)
+  if (!author) throw new Error('Kullanıcı bulunamadı')
+  let slug = generateSlug(data.title)
+  const existing = await db.select({ id: blogPosts.id }).from(blogPosts).where(eq(blogPosts.slug, slug)).limit(1)
+  if (existing.length > 0) slug = `${slug}-${Date.now()}`
+  const [post] = await db.insert(blogPosts).values({
+    title: data.title.trim(), slug, content: data.content.trim(), excerpt: data.excerpt.trim(),
+    authorId: session.user.id, authorName: author.name, tags: data.tags?.trim() || '',
+    published: false, submissionStatus: 'pending',
+  }).returning()
+  revalidatePath('/admin/blog')
+  return post
+}
+
+export async function setBlogSubmissionStatus(id: number, status: 'pending' | 'approved' | 'rejected') {
+  await requireAdminOrModerator()
+  await ensureSubmissionColumn()
+  await db.update(blogPosts).set({ submissionStatus: status, published: status === 'approved', updatedAt: new Date() }).where(eq(blogPosts.id, id))
   revalidatePath('/blog')
   revalidatePath('/admin/blog')
 }

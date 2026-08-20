@@ -10,6 +10,7 @@ export const user = pgTable('user', {
   emailVerified: boolean('emailVerified').notNull().default(false),
   image: text('image'),
   role: text('role').notNull().default('user'),
+  blueVerified: boolean('blue_verified').notNull().default(false),
   points: integer('points').notNull().default(0),
   institution: text('institution'),
   bio: text('bio'),
@@ -111,6 +112,7 @@ export const blogPosts = pgTable('blog_posts', {
   authorName: text('author_name').notNull().default(''),
   tags: text('tags').notNull().default(''),
   published: boolean('published').notNull().default(false),
+  submissionStatus: text('submission_status').notNull().default('approved'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })

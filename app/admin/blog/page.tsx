@@ -10,7 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { Plus, Pencil, Trash2, Globe, EyeOff, ExternalLink, RefreshCw, FileText } from "lucide-react"
-import { getAdminBlogPosts, deleteBlogPost, toggleBlogPostPublished } from "@/app/actions/blog"
+import { getAdminBlogPosts, deleteBlogPost, toggleBlogPostPublished, setBlogSubmissionStatus } from "@/app/actions/blog"
 
 interface Post {
   id: number
@@ -20,6 +20,7 @@ interface Post {
   content: string
   authorName: string
   published: boolean
+  submissionStatus?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -64,6 +65,14 @@ export default function AdminBlogPage() {
         title: post.published ? "Taslağa alındı" : "Yayımlandı",
         description: `"${post.title}" ${post.published ? "taslağa alındı" : "yayımlandı"}.`,
       })
+      load()
+    })
+  }
+
+  const handleSubmission = (post: Post, status: "approved" | "rejected") => {
+    startTransition(async () => {
+      await setBlogSubmissionStatus(post.id, status)
+      toast({ title: status === "approved" ? "Başvuru onaylandı" : "Başvuru reddedildi" })
       load()
     })
   }
@@ -118,6 +127,7 @@ export default function AdminBlogPage() {
                       <Badge variant={post.published ? "default" : "secondary"} className="text-xs shrink-0">
                         {post.published ? "Yayımda" : "Taslak"}
                       </Badge>
+                      {post.submissionStatus === "pending" && <Badge variant="outline" className="text-xs border-amber-500 text-amber-700">Başvuru bekliyor</Badge>}
                     </div>
                     {post.excerpt && (
                       <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{post.excerpt}</p>
@@ -130,6 +140,10 @@ export default function AdminBlogPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    {post.submissionStatus === "pending" && <>
+                      <Button variant="outline" size="sm" onClick={() => handleSubmission(post, "approved")} disabled={isPending} className="h-8 text-xs">Onayla</Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleSubmission(post, "rejected")} disabled={isPending} className="h-8 text-xs text-destructive">Reddet</Button>
+                    </>}
                     {post.published && (
                       <Button variant="ghost" size="icon" asChild className="h-8 w-8" title="Siteye git">
                         <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
@@ -137,7 +151,7 @@ export default function AdminBlogPage() {
                         </a>
                       </Button>
                     )}
-                    <Button
+                    {post.submissionStatus !== "pending" && <Button
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
@@ -149,7 +163,7 @@ export default function AdminBlogPage() {
                         ? <EyeOff className="h-3.5 w-3.5" />
                         : <Globe className="h-3.5 w-3.5" />
                       }
-                    </Button>
+                    </Button>}
                     <Button
                       variant="ghost"
                       size="icon"

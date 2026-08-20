@@ -15,12 +15,17 @@ export async function ensureProfileColumns() {
     profileColumnsReady = db.execute(sql`
       ALTER TABLE "user"
         ADD COLUMN IF NOT EXISTS points INTEGER NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS blue_verified BOOLEAN NOT NULL DEFAULT FALSE,
         ADD COLUMN IF NOT EXISTS institution TEXT,
         ADD COLUMN IF NOT EXISTS bio TEXT,
         ADD COLUMN IF NOT EXISTS profile_visibility BOOLEAN NOT NULL DEFAULT FALSE
     `).then(() => undefined)
   }
   await profileColumnsReady
+}
+
+function hasEduDomain(email: string) {
+  return email.trim().toLowerCase().endsWith('.edu.tr')
 }
 
 async function requireUser() {
@@ -80,7 +85,7 @@ export async function getOwnProfile() {
   const userId = await requireUser()
   await ensureProfileColumns()
   const [profile] = await db
-    .select({ name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility, points: user.points })
+    .select({ name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility, points: user.points, blueVerified: user.blueVerified })
     .from(user)
     .where(eq(user.id, userId))
     .limit(1)
@@ -120,10 +125,10 @@ export async function getFollowSummary(targetUserId: string) {
 export async function getPublicProfile(targetUserId: string) {
   await Promise.all([ensureProfileColumns(), ensureSocialTable()])
   const [profile] = await db
-    .select({ id: user.id, name: user.name, image: user.image, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility })
+    .select({ id: user.id, name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility, blueVerified: user.blueVerified })
     .from(user)
     .where(eq(user.id, targetUserId))
     .limit(1)
   if (!profile || !profile.profileVisibility) return null
-  return { ...profile, ...(await getFollowSummary(targetUserId)) }
+  return { ...profile, isVerified: profile.blueVerified || hasEduDomain(profile.email), ...(await getFollowSummary(targetUserId)) }
 }

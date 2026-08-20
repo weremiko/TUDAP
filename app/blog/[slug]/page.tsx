@@ -77,7 +77,7 @@ export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
   const post = await getBlogPostBySlug(slug)
 
-  if (!post || !post.published) notFound()
+  if (!post || !post.published || post.submissionStatus !== 'approved') notFound()
 
   const wordCount = post.content.split(/\s+/).filter(Boolean).length
   const readTime = Math.ceil(wordCount / 200)

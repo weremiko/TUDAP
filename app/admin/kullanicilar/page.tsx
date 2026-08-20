@@ -1,13 +1,13 @@
 "use client"
 
 import { useEffect, useState, useTransition } from "react"
-import { getAllUsers, setUserRole, deleteUser } from "@/app/actions/admin"
+import { getAllUsers, setUserRole, deleteUser, setUserBlueVerification } from "@/app/actions/admin"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { ShieldCheck, ShieldHalf, Trash2, Loader2, RefreshCw } from "lucide-react"
+import { ShieldCheck, ShieldHalf, Trash2, Loader2, RefreshCw, BadgeCheck } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 
@@ -58,6 +58,14 @@ export default function UsersPage() {
     })
   }
 
+  const handleVerification = (userId: string, verified: boolean) => {
+    startTransition(async () => {
+      await setUserBlueVerification(userId, verified)
+      toast({ title: verified ? "Mavi tik verildi" : "Mavi tik kaldırıldı" })
+      await load()
+    })
+  }
+
   return (
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between">
@@ -101,7 +109,7 @@ export default function UsersPage() {
                       <div className="flex items-center gap-2">
                         {role === "admin" && <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />}
                         {role === "moderator" && <ShieldHalf className="h-3.5 w-3.5 text-amber-600 shrink-0" />}
-                        <p className="text-sm font-medium text-foreground">{u.name}</p>
+                        <p className="text-sm font-medium text-foreground flex items-center gap-1">{u.name}{u.blueVerified && <BadgeCheck className="h-4 w-4 text-primary" />}</p>
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -118,6 +126,9 @@ export default function UsersPage() {
                       </p>
                     </td>
                     <td className="px-4 py-3 text-right">
+                      <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={isPending} onClick={() => handleVerification(u.id, !u.blueVerified)}>
+                        <BadgeCheck className="h-3.5 w-3.5 text-primary" />{u.blueVerified ? "Tiki kaldır" : "Mavi tik"}
+                      </Button>
                       <Select
                         value={role}
                         onValueChange={(v) => handleRoleChange(u.id, v as Role)}

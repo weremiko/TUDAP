@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import Link from 'next/link'
-import { Settings, Mail, Shield, Building2, CalendarDays, Sparkles, Users, FileText, Copy } from 'lucide-react'
+import { Settings, Mail, Shield, Building2, CalendarDays, Sparkles, Users, FileText, Copy, BadgeCheck, PenLine } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Profil — TÜDAP',
@@ -64,7 +64,7 @@ export default async function ProfilePage() {
             </Avatar>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground">{profile.name}</h2>
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground flex items-center gap-2">{profile.name}{(profile.blueVerified || profile.email.toLowerCase().endsWith('.edu.tr')) && <BadgeCheck className="h-5 w-5 text-primary" aria-label="Doğrulanmış profil" />}</h2>
                 <span className="text-[10px] uppercase tracking-widest border border-accent/30 text-accent px-2 py-1 rounded-full">{profile.role === 'user' ? 'Üye' : profile.role}</span>
               </div>
               <p className="text-sm text-muted-foreground mt-1">{profile.email}</p>
@@ -95,6 +95,7 @@ export default async function ProfilePage() {
               <div className="h-px bg-border" />
               <div><p className="text-sm font-medium text-foreground">Topluluk katkısı</p><p className="text-xs leading-relaxed text-muted-foreground mt-1">Onaylanan hata bildirimleri ve madde başı önerileri puan kazandırır.</p></div>
               <Link href="/terim-sozlugu" className="inline-flex items-center gap-2 text-sm text-primary hover:underline"><Users className="h-4 w-4" />Topluluğa katkıda bulun</Link>
+              <Link href="/profil/blog-basvurusu" className="flex items-center gap-2 text-sm text-primary hover:underline"><PenLine className="h-4 w-4" />Blog yazısı gönder</Link>
             </div>
           </aside>
         </div>
