@@ -15,6 +15,9 @@ export const user = pgTable('user', {
   institution: text('institution'),
   bio: text('bio'),
   profileVisibility: boolean('profile_visibility').notNull().default(false),
+  teamRole: text('team_role'),
+  teamOrder: integer('team_order').notNull().default(0),
+  teamVisible: boolean('team_visible').notNull().default(false),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })

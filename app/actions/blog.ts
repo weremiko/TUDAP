@@ -70,6 +70,17 @@ export async function getAdminBlogPosts(page = 1, limit = 20) {
   return { posts, total: Number(total), pages: Math.ceil(Number(total) / limit) }
 }
 
+export async function getAdminBlogPostsByStatus(status: 'pending' | 'draft' | 'published') {
+  await requireAdminOrModerator()
+  await ensureSubmissionColumn()
+  const where = status === 'pending'
+    ? eq(blogPosts.submissionStatus, 'pending')
+    : status === 'published'
+      ? and(eq(blogPosts.submissionStatus, 'approved'), eq(blogPosts.published, true))
+      : and(eq(blogPosts.submissionStatus, 'approved'), eq(blogPosts.published, false))
+  return db.select().from(blogPosts).where(where).orderBy(desc(blogPosts.createdAt))
+}
+
 export async function createBlogPost(data: {
   title: string
   content: string

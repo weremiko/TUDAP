@@ -10,7 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { Plus, Pencil, Trash2, Globe, EyeOff, ExternalLink, RefreshCw, FileText } from "lucide-react"
-import { getAdminBlogPosts, deleteBlogPost, toggleBlogPostPublished, setBlogSubmissionStatus } from "@/app/actions/blog"
+import { getAdminBlogPostsByStatus, deleteBlogPost, toggleBlogPostPublished, setBlogSubmissionStatus } from "@/app/actions/blog"
 
 interface Post {
   id: number
@@ -32,21 +32,22 @@ export default function AdminBlogPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [deleteTarget, setDeleteTarget] = useState<Post | null>(null)
+  const [activeTab, setActiveTab] = useState<"pending" | "draft" | "published">("pending")
   const { toast } = useToast()
 
   const load = async () => {
     setIsLoading(true)
     try {
-      const result = await getAdminBlogPosts(1, 100)
-      setPosts(result.posts as Post[])
-      setTotal(result.total)
+      const result = await getAdminBlogPostsByStatus(activeTab)
+      setPosts(result as Post[])
+      setTotal(result.length)
     } catch {
       toast({ title: "Yüklenemedi", variant: "destructive" })
     }
     setIsLoading(false)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [activeTab])
 
   const handleDelete = () => {
     if (!deleteTarget) return
@@ -87,10 +88,7 @@ export default function AdminBlogPage() {
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
             <h1 className="text-2xl font-serif font-bold text-foreground">Blog Yönetimi</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {total} yazı — {posts.filter(p => p.published).length} yayımda,{" "}
-              {posts.filter(p => !p.published).length} taslak
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">{total} kayıt</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={load} disabled={isLoading} className="bg-transparent">
@@ -102,6 +100,12 @@ export default function AdminBlogPage() {
               Yeni Yazı
             </Button>
           </div>
+        </div>
+
+        <div className="flex gap-1 border-b border-border">
+          {([['pending', 'Başvurular'], ['draft', 'Taslaklar'], ['published', 'Yayınlananlar']] as const).map(([tab, label]) => (
+            <button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 py-2.5 text-sm border-b-2 -mb-px ${activeTab === tab ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground'}`}>{label}</button>
+          ))}
         </div>
 
         {/* List */}
@@ -127,7 +131,7 @@ export default function AdminBlogPage() {
                       <Badge variant={post.published ? "default" : "secondary"} className="text-xs shrink-0">
                         {post.published ? "Yayımda" : "Taslak"}
                       </Badge>
-                      {post.submissionStatus === "pending" && <Badge variant="outline" className="text-xs border-amber-500 text-amber-700">Başvuru bekliyor</Badge>}
+                      {activeTab === "pending" && <Badge variant="outline" className="text-xs border-amber-500 text-amber-700">Başvuru bekliyor</Badge>}
                     </div>
                     {post.excerpt && (
                       <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{post.excerpt}</p>
@@ -140,7 +144,7 @@ export default function AdminBlogPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    {post.submissionStatus === "pending" && <>
+                    {activeTab === "pending" && <>
                       <Button variant="outline" size="sm" onClick={() => handleSubmission(post, "approved")} disabled={isPending} className="h-8 text-xs">Onayla</Button>
                       <Button variant="ghost" size="sm" onClick={() => handleSubmission(post, "rejected")} disabled={isPending} className="h-8 text-xs text-destructive">Reddet</Button>
                     </>}
@@ -151,7 +155,7 @@ export default function AdminBlogPage() {
                         </a>
                       </Button>
                     )}
-                    {post.submissionStatus !== "pending" && <Button
+                    {activeTab !== "pending" && <Button
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"

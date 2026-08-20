@@ -11,7 +11,13 @@ import { sql } from 'drizzle-orm'
 let verificationColumnsReady: Promise<void> | null = null
 function ensureVerificationColumn() {
   if (!verificationColumnsReady) {
-    verificationColumnsReady = db.execute(sql`ALTER TABLE "user" ADD COLUMN IF NOT EXISTS blue_verified BOOLEAN NOT NULL DEFAULT FALSE`).then(() => undefined)
+    verificationColumnsReady = db.execute(sql`
+      ALTER TABLE "user"
+        ADD COLUMN IF NOT EXISTS blue_verified BOOLEAN NOT NULL DEFAULT FALSE,
+        ADD COLUMN IF NOT EXISTS team_role TEXT,
+        ADD COLUMN IF NOT EXISTS team_order INTEGER NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS team_visible BOOLEAN NOT NULL DEFAULT FALSE
+    `).then(() => undefined)
   }
   return verificationColumnsReady
 }
@@ -72,11 +78,30 @@ export async function getAllUsers() {
       email: user.email,
       role: user.role,
       blueVerified: user.blueVerified,
+      teamRole: user.teamRole,
+      teamOrder: user.teamOrder,
+      teamVisible: user.teamVisible,
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,
     })
     .from(user)
     .orderBy(desc(user.createdAt))
+}
+
+export async function setUserTeamMember(userId: string, data: { role: 'founder' | 'advisor' | 'member' | null; order: number; visible: boolean }) {
+  await requireAdmin()
+  await ensureVerificationColumn()
+  await db.update(user).set({ teamRole: data.role, teamOrder: Math.max(0, data.order || 0), teamVisible: data.visible, updatedAt: new Date() }).where(eq(user.id, userId))
+  revalidatePath('/admin/kullanicilar')
+  revalidatePath('/takimimiz')
+}
+
+export async function getPublicTeamMembers() {
+  await ensureVerificationColumn()
+  return db.select({ id: user.id, name: user.name, image: user.image, institution: user.institution, bio: user.bio, blueVerified: user.blueVerified, teamRole: user.teamRole, teamOrder: user.teamOrder })
+    .from(user)
+    .where(eq(user.teamVisible, true))
+    .orderBy(user.teamOrder, desc(user.createdAt))
 }
 
 export async function setUserBlueVerification(userId: string, verified: boolean) {

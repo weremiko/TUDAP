@@ -1,13 +1,13 @@
 "use client"
 
 import { useEffect, useState, useTransition } from "react"
-import { getAllUsers, setUserRole, deleteUser, setUserBlueVerification } from "@/app/actions/admin"
+import { getAllUsers, setUserRole, deleteUser, setUserBlueVerification, setUserTeamMember } from "@/app/actions/admin"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { ShieldCheck, ShieldHalf, Trash2, Loader2, RefreshCw, BadgeCheck } from "lucide-react"
+import { ShieldCheck, ShieldHalf, Trash2, Loader2, RefreshCw, BadgeCheck, UsersRound } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 
@@ -62,6 +62,14 @@ export default function UsersPage() {
     startTransition(async () => {
       await setUserBlueVerification(userId, verified)
       toast({ title: verified ? "Mavi tik verildi" : "Mavi tik kaldırıldı" })
+      await load()
+    })
+  }
+
+  const handleTeamToggle = (u: User) => {
+    startTransition(async () => {
+      await setUserTeamMember(u.id, { role: u.teamRole ? null : 'member', order: u.teamOrder, visible: !u.teamRole })
+      toast({ title: u.teamRole ? "Takımdan çıkarıldı" : "Takıma eklendi" })
       await load()
     })
   }
@@ -128,6 +136,9 @@ export default function UsersPage() {
                     <td className="px-4 py-3 text-right">
                       <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={isPending} onClick={() => handleVerification(u.id, !u.blueVerified)}>
                         <BadgeCheck className="h-3.5 w-3.5 text-primary" />{u.blueVerified ? "Tiki kaldır" : "Mavi tik"}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={isPending} onClick={() => handleTeamToggle(u)} title="Takıma ekle/çıkar">
+                        <UsersRound className="h-3.5 w-3.5" />{u.teamRole ? "Takımdan çıkar" : "Takıma ekle"}
                       </Button>
                       <Select
                         value={role}

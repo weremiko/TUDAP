@@ -49,6 +49,10 @@ const DEFAULT_SECTIONS: Record<string, Array<{ key: string; label: string; conte
     { key: 'sss_3_soru', label: 'SSS 3 Soru', content: 'Hata bildirimi nasıl yapabilirim?' },
     { key: 'sss_3_cevap', label: 'SSS 3 Cevap', content: "Herhangi bir araç sayfasındaki 'Hata Bildir' butonu veya e-posta ile bildirimde bulunabilirsiniz." },
   ],
+  takimimiz: [
+    { key: 'kurucu', label: 'Kurucu', content: '' },
+    { key: 'akademik_danisman', label: 'Akademik Danışman', content: '' },
+  ],
 }
 
 let pageSectionsTableReady: Promise<void> | null = null
@@ -110,7 +114,7 @@ export async function upsertPageSection(
     })
   }
 
-  revalidatePath(`/${page === 'hakkinda' ? 'hakkinda' : 'iletisim'}`)
+  revalidatePath(`/${page === 'hakkinda' ? 'hakkinda' : page === 'takimimiz' ? 'takimimiz' : 'iletisim'}`)
   revalidatePath('/en/about')
   revalidatePath('/en/contact')
 }
@@ -139,7 +143,7 @@ export async function upsertAllPageSections(
     }
   }
 
-  revalidatePath(`/${page === 'hakkinda' ? 'hakkinda' : 'iletisim'}`)
+  revalidatePath(`/${page === 'hakkinda' ? 'hakkinda' : page === 'takimimiz' ? 'takimimiz' : 'iletisim'}`)
   revalidatePath('/en/about')
   revalidatePath('/en/contact')
 }

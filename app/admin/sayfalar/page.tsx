@@ -14,6 +14,7 @@ import { useSession } from "@/lib/auth-client"
 const PAGES = [
   { key: "hakkinda", label: "Hakkında", path: "/hakkinda" },
   { key: "iletisim", label: "İletişim", path: "/iletisim" },
+  { key: "takimimiz", label: "Takımımız", path: "/takimimiz" },
 ]
 
 function SectionEditor({
