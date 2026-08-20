@@ -26,7 +26,8 @@ function SectionEditor({
   value: string
   onChange: (val: string) => void
 }) {
-  const isMultiline = value.includes("\n") || value.length > 120
+  const isImageUrl = section.key.endsWith("_fotograf")
+  const isMultiline = !isImageUrl && (value.includes("\n") || value.length > 120)
 
   return (
     <div className="space-y-2">
@@ -41,13 +42,20 @@ function SectionEditor({
           </span>
         )}
       </div>
-      <Textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        rows={isMultiline ? Math.min(Math.max(value.split("\n").length + 1, 4), 12) : 3}
-        className="text-sm font-sans resize-y min-h-[72px]"
-        placeholder="İçerik girin…"
-      />
+      {isImageUrl ? (
+        <>
+          <input type="url" value={value} onChange={(e) => onChange(e.target.value)} className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" placeholder="https://…" />
+          {value && <img src={value} alt="Önizleme" className="mt-3 h-24 w-24 rounded-full object-cover border border-border" />}
+        </>
+      ) : (
+        <Textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          rows={isMultiline ? Math.min(Math.max(value.split("\n").length + 1, 4), 12) : 3}
+          className="text-sm font-sans resize-y min-h-[72px]"
+          placeholder="İçerik girin…"
+        />
+      )}
     </div>
   )
 }

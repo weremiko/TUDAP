@@ -50,8 +50,10 @@ const DEFAULT_SECTIONS: Record<string, Array<{ key: string; label: string; conte
     { key: 'sss_3_cevap', label: 'SSS 3 Cevap', content: "Herhangi bir araç sayfasındaki 'Hata Bildir' butonu veya e-posta ile bildirimde bulunabilirsiniz." },
   ],
   takimimiz: [
-    { key: 'kurucu', label: 'Kurucu', content: '' },
-    { key: 'akademik_danisman', label: 'Akademik Danışman', content: '' },
+    { key: 'kurucu', label: 'Kurucu bilgisi', content: '' },
+    { key: 'kurucu_fotograf', label: 'Kurucu fotoğrafı (URL)', content: '' },
+    { key: 'akademik_danisman', label: 'Akademik Danışman bilgisi', content: '' },
+    { key: 'akademik_danisman_fotograf', label: 'Akademik Danışman fotoğrafı (URL)', content: '' },
   ],
 }
 

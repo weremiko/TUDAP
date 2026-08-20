@@ -9,6 +9,7 @@ const PLATFORM_LINKS = [
   { href: "/blog", label: "Blog" },
   { href: "/ajanda", label: "Ajanda" },
   { href: "/hakkinda", label: "Platform Hakkında" },
+  { href: "/takimimiz", label: "Takımımız" },
   { href: "/iletisim", label: "İletişim" },
   { href: "/sikca-sorulan-sorular", label: "Sık Sorulan Sorular" },
 ]

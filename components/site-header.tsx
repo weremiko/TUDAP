@@ -16,6 +16,7 @@ const NAV_LINKS = [
   { href: "/blog",     label: "Blog" },
   { href: "/ajanda",   label: "Ajanda" },
   { href: "/hakkinda", label: "Hakkında" },
+  { href: "/takimimiz", label: "Takımımız" },
   { href: "/iletisim", label: "İletişim" },
 ]
 
