@@ -4,7 +4,10 @@ import { headers } from 'next/headers'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { user } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { queryLogs } from '@/lib/db/schema'
+import { eq, count } from 'drizzle-orm'
+import { ensureProfileColumns } from '@/app/actions/profile'
+import { ensureQueryRateColumns } from '@/app/actions/logs'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { Button } from '@/components/ui/button'
@@ -21,12 +24,13 @@ export const metadata: Metadata = {
 export default async function ProfilePage() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) redirect('/sign-in')
+  await Promise.all([ensureProfileColumns(), ensureQueryRateColumns()])
 
-  const [profile] = await db
-    .select({ name: user.name, email: user.email, image: user.image, role: user.role, createdAt: user.createdAt })
-    .from(user)
-    .where(eq(user.id, session.user.id))
-    .limit(1)
+  const [[profile], [{ transcriptionCount }]] = await Promise.all([
+    db.select({ name: user.name, email: user.email, image: user.image, role: user.role, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility, createdAt: user.createdAt })
+      .from(user).where(eq(user.id, session.user.id)).limit(1),
+    db.select({ transcriptionCount: count() }).from(queryLogs).where(eq(queryLogs.userId, session.user.id)),
+  ])
 
   if (!profile) redirect('/sign-in')
 
@@ -63,6 +67,7 @@ export default async function ProfilePage() {
               <p className="text-sm text-muted-foreground">{profile.email}</p>
             </div>
           </div>
+          {profile.bio && <p className="pt-6 text-sm leading-relaxed text-muted-foreground">{profile.bio}</p>}
           <dl className="grid gap-5 sm:grid-cols-2 pt-6">
             <div className="flex items-start gap-3">
               <Mail className="h-4 w-4 text-muted-foreground mt-0.5" />
@@ -72,7 +77,17 @@ export default async function ProfilePage() {
               <Shield className="h-4 w-4 text-muted-foreground mt-0.5" />
               <div><dt className="text-xs uppercase tracking-widest text-muted-foreground">Hesap türü</dt><dd className="text-sm text-foreground mt-1">{profile.role === 'user' ? 'Üye' : profile.role}</dd></div>
             </div>
+            <div className="flex items-start gap-3">
+              <Shield className="h-4 w-4 text-muted-foreground mt-0.5" />
+              <div><dt className="text-xs uppercase tracking-widest text-muted-foreground">Üyelik</dt><dd className="text-sm text-foreground mt-1">{profile.createdAt.toLocaleDateString('tr-TR')}</dd></div>
+            </div>
+            {profile.institution && <div className="flex items-start gap-3 sm:col-span-2"><Mail className="h-4 w-4 text-muted-foreground mt-0.5" /><div><dt className="text-xs uppercase tracking-widest text-muted-foreground">Kurum</dt><dd className="text-sm text-foreground mt-1">{profile.institution}</dd></div></div>}
           </dl>
+          <div className="mt-6 border-t border-border pt-6">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">Transkripsiyon kullanımı</p>
+            <p className="text-2xl font-semibold text-foreground mt-2">{transcriptionCount.toLocaleString('tr-TR')}</p>
+            <p className="text-xs text-muted-foreground mt-1">Bu hesapla oluşturulan kayıtlı çalışma</p>
+          </div>
         </Card>
       </main>
       <SiteFooter />

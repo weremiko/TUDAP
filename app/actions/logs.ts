@@ -11,7 +11,7 @@ const MEMBER_MINUTE_LIMIT = 60
 
 let queryRateColumnsReady: Promise<void> | null = null
 
-function ensureQueryRateColumns() {
+export function ensureQueryRateColumns() {
   if (!queryRateColumnsReady) {
     queryRateColumnsReady = db.execute(sql`
       ALTER TABLE query_logs

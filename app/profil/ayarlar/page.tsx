@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { updateProfile } from '@/app/actions/profile'
+import { getOwnProfile, updateProfile } from '@/app/actions/profile'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { Button } from '@/components/ui/button'
@@ -18,14 +18,23 @@ export default function ProfileSettingsPage() {
   const { data: session } = useSession()
   const [name, setName] = useState(session?.user?.name ?? '')
   const [image, setImage] = useState((session?.user as { image?: string | null } | undefined)?.image ?? '')
+  const [institution, setInstitution] = useState('')
+  const [bio, setBio] = useState('')
+  const [profileVisibility, setProfileVisibility] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!session?.user) return
-    setName(session.user.name)
-    setImage((session.user as { image?: string | null }).image ?? '')
+    getOwnProfile().then((profile) => {
+      if (!profile) return
+      setName(profile.name)
+      setImage(profile.image ?? '')
+      setInstitution(profile.institution ?? '')
+      setBio(profile.bio ?? '')
+      setProfileVisibility(profile.profileVisibility)
+    }).catch(() => setError('Profil bilgileri yüklenemedi.'))
   }, [session?.user])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -34,7 +43,7 @@ export default function ProfileSettingsPage() {
     setMessage(null)
     setError(null)
     try {
-      await updateProfile({ name, image })
+      await updateProfile({ name, image, institution, bio, profileVisibility })
       setMessage('Profil bilgileriniz güncellendi.')
       router.refresh()
     } catch (caught) {
@@ -75,6 +84,19 @@ export default function ProfileSettingsPage() {
               <Label htmlFor="image">Profil görseli URL’si</Label>
               <Input id="image" type="url" value={image} onChange={(event) => setImage(event.target.value)} placeholder="https://…" maxLength={500} />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="institution">Kurum / Üniversite</Label>
+              <Input id="institution" value={institution} onChange={(event) => setInstitution(event.target.value)} maxLength={120} placeholder="Örn. Ankara Üniversitesi" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="bio">Kısa biyografi</Label>
+              <textarea id="bio" value={bio} onChange={(event) => setBio(event.target.value)} maxLength={500} rows={4} placeholder="Kendinizden kısaca bahsedin…" className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+              <p className="text-xs text-muted-foreground text-right">{bio.length} / 500</p>
+            </div>
+            <label className="flex items-start gap-3 rounded-md border border-border p-3 text-sm">
+              <input type="checkbox" checked={profileVisibility} onChange={(event) => setProfileVisibility(event.target.checked)} className="mt-0.5" />
+              <span><span className="block font-medium text-foreground">Profilimi görünür yap</span><span className="text-xs text-muted-foreground">Bu tercih ileride herkese açık profil kartlarında kullanılabilir.</span></span>
+            </label>
             {message && <p className="text-sm text-primary" role="status">{message}</p>}
             {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
             <div className="flex justify-end">
