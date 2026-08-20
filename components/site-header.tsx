@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Menu, X, ChevronDown, LogIn, LogOut, LayoutDashboard, Globe } from "lucide-react"
+import { Menu, X, ChevronDown, LogIn, LogOut, LayoutDashboard, Globe, UserCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
 
@@ -121,7 +121,9 @@ export function SiteHeader() {
                     <Link href="/admin"><LayoutDashboard className="h-3.5 w-3.5 mr-1.5" />Admin</Link>
                   </Button>
                 )}
-                <span className="text-xs text-muted-foreground hidden lg:block">{session.user.name}</span>
+                <Button asChild variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-foreground">
+                  <Link href="/profil"><UserCircle className="h-3.5 w-3.5 mr-1.5" />Profil</Link>
+                </Button>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -190,6 +192,9 @@ export function SiteHeader() {
                     <LayoutDashboard className="h-4 w-4" />Admin Paneli
                   </Link>
                 )}
+                <Link href="/profil" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded text-sm text-foreground hover:bg-muted/50">
+                  <UserCircle className="h-4 w-4" />Profil
+                </Link>
                 <button onClick={handleSignOut} className="w-full flex items-center gap-2 px-3 py-2 rounded text-sm text-destructive hover:bg-destructive/10 transition-colors">
                   <LogOut className="h-4 w-4" />Çıkış Yap
                 </button>
