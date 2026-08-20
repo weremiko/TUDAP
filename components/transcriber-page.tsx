@@ -84,6 +84,7 @@ const UI = {
     toolLabel: "Sesbilim Aracı",
     title: "Sesbilimsel Abece Çeviricisi",
     desc: "Türkçe metinleri Uluslararası Fonetik Alfabe formatına dönüştürün. Türkiye Türkçesi boğumlanma özelliklerine dayalı akademik transkripsiyon.",
+    methodology: "Motorumuz kural tabanlı çalıştığı için bağlamsal istisnalarda sapmalar olabilmektedir; temel mantık Ergenç (2002)'ye dayanmaktadır.",
     broad: "Geniş Transkripsiyon",
     refOpen: "IPA Referans",
     refClose: "Referansı Kapat",
@@ -128,6 +129,7 @@ const UI = {
     toolLabel: "Phonetics Tool",
     title: "Phonetic Transcription Tool",
     desc: "Convert Turkish text into International Phonetic Alphabet notation. Academic broad transcription based on Turkish phonological properties.",
+    methodology: "Because the engine is rule-based, deviations may occur in contextual exceptions; its core logic is based on Ergenç (2002).",
     broad: "Broad Transcription",
     refOpen: "IPA Reference",
     refClose: "Close Reference",
@@ -397,6 +399,9 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
               </h1>
               <p className="text-muted-foreground text-sm leading-relaxed max-w-xl">
                 {t.desc}
+              </p>
+              <p className="max-w-xl border-l-2 border-primary/30 pl-3 text-xs leading-relaxed text-muted-foreground/80">
+                {t.methodology}
               </p>
             </div>
             {/* Dark mode toggle isolated to transcriber */}

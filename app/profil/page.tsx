@@ -6,7 +6,7 @@ import { db } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { queryLogs } from '@/lib/db/schema'
 import { eq, count } from 'drizzle-orm'
-import { ensureProfileColumns } from '@/app/actions/profile'
+import { ensureProfileColumns, getFollowSummary } from '@/app/actions/profile'
 import { ensureQueryRateColumns } from '@/app/actions/logs'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
@@ -26,10 +26,11 @@ export default async function ProfilePage() {
   if (!session?.user) redirect('/sign-in')
   await Promise.all([ensureProfileColumns(), ensureQueryRateColumns()])
 
-  const [[profile], [{ transcriptionCount }]] = await Promise.all([
+  const [[profile], [{ transcriptionCount }], followSummary] = await Promise.all([
     db.select({ name: user.name, email: user.email, image: user.image, role: user.role, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility, createdAt: user.createdAt })
       .from(user).where(eq(user.id, session.user.id)).limit(1),
     db.select({ transcriptionCount: count() }).from(queryLogs).where(eq(queryLogs.userId, session.user.id)),
+    getFollowSummary(session.user.id),
   ])
 
   if (!profile) redirect('/sign-in')
@@ -88,6 +89,11 @@ export default async function ProfilePage() {
             <p className="text-2xl font-semibold text-foreground mt-2">{transcriptionCount.toLocaleString('tr-TR')}</p>
             <p className="text-xs text-muted-foreground mt-1">Bu hesapla oluşturulan kayıtlı çalışma</p>
           </div>
+          <div className="mt-6 flex gap-8 border-t border-border pt-6 text-sm">
+            <span><strong className="text-foreground">{followSummary.followers}</strong> <span className="text-muted-foreground">takipçi</span></span>
+            <span><strong className="text-foreground">{followSummary.following}</strong> <span className="text-muted-foreground">takip</span></span>
+          </div>
+          {profile.profileVisibility && <p className="mt-5 text-xs text-muted-foreground">Herkese açık profil: <Link href={`/profil/${session.user.id}`} className="text-primary hover:underline">Profil bağlantısını görüntüle</Link></p>}
         </Card>
       </main>
       <SiteFooter />

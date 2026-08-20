@@ -1,9 +1,9 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { user } from '@/lib/db/schema'
+import { user, userFollows } from '@/lib/db/schema'
 import { auth } from '@/lib/auth'
-import { eq } from 'drizzle-orm'
+import { eq, and, count } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { sql } from 'drizzle-orm'
@@ -28,6 +28,23 @@ async function requireUser() {
   return session.user.id
 }
 
+let socialTableReady: Promise<void> | null = null
+
+function ensureSocialTable() {
+  if (!socialTableReady) {
+    socialTableReady = db.execute(sql`
+      CREATE TABLE IF NOT EXISTS user_follows (
+        follower_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+        following_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        PRIMARY KEY (follower_id, following_id),
+        CHECK (follower_id <> following_id)
+      )
+    `).then(() => undefined)
+  }
+  return socialTableReady
+}
+
 export async function updateProfile(data: { name: string; image: string; institution: string; bio: string; profileVisibility: boolean }) {
   const userId = await requireUser()
   await ensureProfileColumns()
@@ -39,8 +56,11 @@ export async function updateProfile(data: { name: string; image: string; institu
   if (name.length < 2 || name.length > 80) {
     throw new Error('Ad Soyad 2 ile 80 karakter arasında olmalıdır')
   }
-  if (image.length > 500) {
-    throw new Error('Profil görseli adresi çok uzun')
+  if (image.length > 2_100_000) {
+    throw new Error('Profil görseli 2 MB sınırını aşamaz')
+  }
+  if (image.startsWith('data:') && !/^data:image\/(png|jpeg|webp|gif);base64,/.test(image)) {
+    throw new Error('Desteklenmeyen profil görseli biçimi')
   }
   if (institution.length > 120 || bio.length > 500) {
     throw new Error('Kurum veya biyografi alanı çok uzun')
@@ -64,4 +84,45 @@ export async function getOwnProfile() {
     .where(eq(user.id, userId))
     .limit(1)
   return profile ?? null
+}
+
+export async function toggleFollow(targetUserId: string) {
+  const userId = await requireUser()
+  await ensureSocialTable()
+  if (userId === targetUserId) throw new Error('Kendi profilinizi takip edemezsiniz')
+  const [target] = await db.select({ id: user.id }).from(user).where(eq(user.id, targetUserId)).limit(1)
+  if (!target) throw new Error('Kullanıcı bulunamadı')
+  const [existing] = await db.select().from(userFollows).where(and(eq(userFollows.followerId, userId), eq(userFollows.followingId, targetUserId))).limit(1)
+  if (existing) {
+    await db.delete(userFollows).where(and(eq(userFollows.followerId, userId), eq(userFollows.followingId, targetUserId)))
+    return false
+  }
+  await db.insert(userFollows).values({ followerId: userId, followingId: targetUserId })
+  return true
+}
+
+export async function getFollowSummary(targetUserId: string) {
+  await ensureSocialTable()
+  const currentUserId = await requireUser().catch(() => null)
+  const [[{ followers }], [{ following }]] = await Promise.all([
+    db.select({ followers: count() }).from(userFollows).where(eq(userFollows.followingId, targetUserId)),
+    db.select({ following: count() }).from(userFollows).where(eq(userFollows.followerId, targetUserId)),
+  ])
+  let isFollowing = false
+  if (currentUserId) {
+    const [row] = await db.select().from(userFollows).where(and(eq(userFollows.followerId, currentUserId), eq(userFollows.followingId, targetUserId))).limit(1)
+    isFollowing = Boolean(row)
+  }
+  return { followers: Number(followers), following: Number(following), isFollowing }
+}
+
+export async function getPublicProfile(targetUserId: string) {
+  await Promise.all([ensureProfileColumns(), ensureSocialTable()])
+  const [profile] = await db
+    .select({ id: user.id, name: user.name, image: user.image, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility })
+    .from(user)
+    .where(eq(user.id, targetUserId))
+    .limit(1)
+  if (!profile || !profile.profileVisibility) return null
+  return { ...profile, ...(await getFollowSummary(targetUserId)) }
 }

@@ -53,6 +53,22 @@ export default function ProfileSettingsPage() {
     }
   }
 
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setError('Lütfen bir görsel dosyası seçin.')
+      return
+    }
+    if (file.size > 1_500_000) {
+      setError('Profil fotoğrafı 1,5 MB’dan küçük olmalıdır.')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => setImage(String(reader.result))
+    reader.readAsDataURL(file)
+  }
+
   if (!session?.user) {
     return <main className="min-h-svh bg-background" />
   }
@@ -81,8 +97,12 @@ export default function ProfileSettingsPage() {
               <p className="text-xs text-muted-foreground">E-posta adresi hesap kimliğidir ve bu ekrandan değiştirilemez.</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="image">Profil görseli URL’si</Label>
-              <Input id="image" type="url" value={image} onChange={(event) => setImage(event.target.value)} placeholder="https://…" maxLength={500} />
+              <Label htmlFor="photo">Profil fotoğrafı</Label>
+              <Input id="photo" type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={handlePhotoChange} className="h-auto py-2" />
+              <p className="text-xs text-muted-foreground">PNG, JPG, WEBP veya GIF; en fazla 1,5 MB.</p>
+              {image && <button type="button" onClick={() => setImage('')} className="text-xs text-destructive hover:underline">Fotoğrafı kaldır</button>}
+              <Label htmlFor="image" className="sr-only">Profil görseli URL’si</Label>
+              <Input id="image" type="url" value={image.startsWith('data:') ? '' : image} onChange={(event) => setImage(event.target.value)} placeholder="İsterseniz görsel URL’si kullanın" maxLength={500} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="institution">Kurum / Üniversite</Label>

@@ -17,6 +17,12 @@ export const user = pgTable('user', {
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
 
+export const userFollows = pgTable('user_follows', {
+  followerId: text('follower_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  followingId: text('following_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
 export const session = pgTable('session', {
   id: text('id').primaryKey(),
   expiresAt: timestamp('expiresAt').notNull(),
