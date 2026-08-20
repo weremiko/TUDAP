@@ -27,7 +27,7 @@ export default async function ProfilePage() {
   await Promise.all([ensureProfileColumns(), ensureQueryRateColumns()])
 
   const [[profile], [{ transcriptionCount }], followSummary] = await Promise.all([
-    db.select({ name: user.name, email: user.email, image: user.image, role: user.role, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility, createdAt: user.createdAt })
+    db.select({ name: user.name, email: user.email, image: user.image, role: user.role, points: user.points, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility, createdAt: user.createdAt })
       .from(user).where(eq(user.id, session.user.id)).limit(1),
     db.select({ transcriptionCount: count() }).from(queryLogs).where(eq(queryLogs.userId, session.user.id)),
     getFollowSummary(session.user.id),
@@ -88,6 +88,11 @@ export default async function ProfilePage() {
             <p className="text-xs uppercase tracking-widest text-muted-foreground">Transkripsiyon kullanımı</p>
             <p className="text-2xl font-semibold text-foreground mt-2">{transcriptionCount.toLocaleString('tr-TR')}</p>
             <p className="text-xs text-muted-foreground mt-1">Bu hesapla oluşturulan kayıtlı çalışma</p>
+          </div>
+          <div className="mt-6 border-t border-border pt-6">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">Topluluk puanı</p>
+            <p className="text-2xl font-semibold text-foreground mt-2">{profile.points.toLocaleString('tr-TR')}</p>
+            <p className="text-xs text-muted-foreground mt-1">Onaylanan katkılarınızdan kazandığınız puan</p>
           </div>
           <div className="mt-6 flex gap-8 border-t border-border pt-6 text-sm">
             <span><strong className="text-foreground">{followSummary.followers}</strong> <span className="text-muted-foreground">takipçi</span></span>

@@ -20,6 +20,7 @@ interface ErrorReport {
   userEmail: string
   url: string
   errorWord: string
+  reportType?: string
   resolved: boolean
   createdAt: Date
 }
@@ -162,6 +163,7 @@ export default function AdminErrorsPage() {
               <div className="space-y-2">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
+                    {report.reportType === 'term-suggestion' && <Badge variant="secondary" className="mb-2">Madde Başı Önerisi</Badge>}
                     <p className="text-sm font-medium text-foreground line-clamp-2">{report.message}</p>
                   </div>
                   <Badge variant="outline" className="shrink-0">
@@ -197,22 +199,22 @@ export default function AdminErrorsPage() {
                   </p>
                 </div>
                 <div className="flex gap-2 mt-3 pt-3 border-t border-border flex-wrap">
-                  {!report.resolved && report.errorWord ? (
+                  {!report.resolved ? (
                     <>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        onClick={() => {
-                          setFixTarget(report)
-                          setFixIPA('')
-                          setFixModalOpen(true)
-                        }}
-                        disabled={isPending}
-                        className="h-7 text-xs"
-                      >
-                        <Plus className="h-3.5 w-3.5 mr-1" />
-                        Çeviri Düzelt
-                      </Button>
+                      {report.errorWord && <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => {
+                            setFixTarget(report)
+                            setFixIPA('')
+                            setFixModalOpen(true)
+                          }}
+                          disabled={isPending}
+                          className="h-7 text-xs"
+                        >
+                          <Plus className="h-3.5 w-3.5 mr-1" />
+                          Çeviri Düzelt
+                        </Button>}
                       <Button 
                         size="sm" 
                         variant="outline" 

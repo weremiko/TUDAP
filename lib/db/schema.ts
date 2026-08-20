@@ -10,6 +10,7 @@ export const user = pgTable('user', {
   emailVerified: boolean('emailVerified').notNull().default(false),
   image: text('image'),
   role: text('role').notNull().default('user'),
+  points: integer('points').notNull().default(0),
   institution: text('institution'),
   bio: text('bio'),
   profileVisibility: boolean('profile_visibility').notNull().default(false),
@@ -93,6 +94,9 @@ export const errorReports = pgTable('error_reports', {
   userEmail: text('user_email').notNull().default('anonymous'),
   url: text('url').notNull().default(''),
   errorWord: text('error_word').notNull().default(''),
+  userId: text('user_id'),
+  reportType: text('report_type').notNull().default('error'),
+  pointsAwarded: boolean('points_awarded').notNull().default(false),
   resolved: boolean('resolved').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })

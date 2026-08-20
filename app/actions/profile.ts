@@ -14,6 +14,7 @@ export function ensureProfileColumns() {
   if (!profileColumnsReady) {
     profileColumnsReady = db.execute(sql`
       ALTER TABLE "user"
+        ADD COLUMN IF NOT EXISTS points INTEGER NOT NULL DEFAULT 0,
         ADD COLUMN IF NOT EXISTS institution TEXT,
         ADD COLUMN IF NOT EXISTS bio TEXT,
         ADD COLUMN IF NOT EXISTS profile_visibility BOOLEAN NOT NULL DEFAULT FALSE
@@ -79,7 +80,7 @@ export async function getOwnProfile() {
   const userId = await requireUser()
   await ensureProfileColumns()
   const [profile] = await db
-    .select({ name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility })
+    .select({ name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility, points: user.points })
     .from(user)
     .where(eq(user.id, userId))
     .limit(1)

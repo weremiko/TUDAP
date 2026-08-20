@@ -2,10 +2,24 @@
 
 import { db } from '@/lib/db'
 import { errorReports, user } from '@/lib/db/schema'
-import { desc, count, eq, gte } from 'drizzle-orm'
+import { desc, count, eq, gte, sql } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import PDFDocument from 'pdfkit'
+
+let errorColumnsReady: Promise<void> | null = null
+
+function ensureErrorColumns() {
+  if (!errorColumnsReady) {
+    errorColumnsReady = db.execute(sql`
+      ALTER TABLE error_reports
+        ADD COLUMN IF NOT EXISTS user_id TEXT,
+        ADD COLUMN IF NOT EXISTS report_type TEXT NOT NULL DEFAULT 'error',
+        ADD COLUMN IF NOT EXISTS points_awarded BOOLEAN NOT NULL DEFAULT FALSE
+    `).then(() => undefined)
+  }
+  return errorColumnsReady
+}
 
 async function requireAdminOrModerator() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -20,13 +34,18 @@ export async function saveErrorReport(data: {
   userEmail?: string
   url?: string
   errorWord?: string
+  reportType?: 'error' | 'term-suggestion'
 }) {
   try {
+    await ensureErrorColumns()
+    const session = await auth.api.getSession({ headers: await headers() })
     await db.insert(errorReports).values({
       message: data.message || '',
       userEmail: data.userEmail || 'anonymous',
       url: data.url || '',
       errorWord: data.errorWord || '',
+      userId: session?.user?.id ?? null,
+      reportType: data.reportType || 'error',
     })
   } catch (error) {
     console.error('[v0] Error saving error report:', error)
@@ -35,6 +54,7 @@ export async function saveErrorReport(data: {
 
 export async function getErrorReports(page: number = 1, search: string = '') {
   await requireAdminOrModerator()
+  await ensureErrorColumns()
   
   const PER_PAGE = 20
   const offset = (page - 1) * PER_PAGE
@@ -62,6 +82,7 @@ export async function getErrorReports(page: number = 1, search: string = '') {
 
 export async function getErrorStats() {
   await requireAdminOrModerator()
+  await ensureErrorColumns()
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const [[{ total }], [{ todayCount }]] = await Promise.all([
@@ -75,11 +96,21 @@ export async function getErrorStats() {
 
 export async function markErrorAsResolved(id: number) {
   await requireAdminOrModerator()
-  await db.update(errorReports).set({ resolved: true }).where(eq(errorReports.id, id))
+  await ensureErrorColumns()
+  const [report] = await db.select({ userId: errorReports.userId, pointsAwarded: errorReports.pointsAwarded, resolved: errorReports.resolved })
+    .from(errorReports).where(eq(errorReports.id, id)).limit(1)
+  if (!report || report.resolved) return
+  await db.transaction(async (tx) => {
+    await tx.update(errorReports).set({ resolved: true, pointsAwarded: Boolean(report.userId) }).where(eq(errorReports.id, id))
+    if (report.userId && !report.pointsAwarded) {
+      await tx.update(user).set({ points: sql`${user.points} + 10` }).where(eq(user.id, report.userId))
+    }
+  })
 }
 
 export async function exportErrorsToPDF() {
   await requireAdminOrModerator()
+  await ensureErrorColumns()
   const reports = await db.select().from(errorReports).orderBy(desc(errorReports.createdAt))
   
   const doc = new PDFDocument()

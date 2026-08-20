@@ -5,7 +5,11 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Search, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { saveErrorReport } from "@/app/actions/errors"
+import { Search, ArrowLeft, ChevronLeft, ChevronRight, Lightbulb } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { getGlossaryPage, getGlossaryCategories } from "@/app/actions/glossary"
@@ -23,6 +27,13 @@ export default function GlossaryPage() {
   const [selectedCategory, setSelectedCategory] = useState("Tümü")
   const [searchTerm, setSearchTerm]     = useState("")
   const [activeSearch, setActiveSearch] = useState("")
+  const [suggestionOpen, setSuggestionOpen] = useState(false)
+  const [suggestionTerm, setSuggestionTerm] = useState("")
+  const [suggestionDefinition, setSuggestionDefinition] = useState("")
+  const [suggestionIPA, setSuggestionIPA] = useState("")
+  const [suggestionEnglish, setSuggestionEnglish] = useState("")
+  const [suggestionMessage, setSuggestionMessage] = useState<string | null>(null)
+  const [suggestionSaving, setSuggestionSaving] = useState(false)
 
   const load = (page: number, category: string, search: string) => {
     startTransition(async () => {
@@ -58,6 +69,28 @@ export default function GlossaryPage() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  const handleSuggestionSubmit = async () => {
+    if (!suggestionTerm.trim() || !suggestionDefinition.trim()) return
+    setSuggestionSaving(true)
+    setSuggestionMessage(null)
+    try {
+      await saveErrorReport({
+        reportType: "term-suggestion",
+        errorWord: suggestionTerm.trim(),
+        message: `Madde başı önerisi\nTanım: ${suggestionDefinition.trim()}\nIPA: ${suggestionIPA.trim() || "Belirtilmedi"}\nİngilizce karşılık: ${suggestionEnglish.trim() || "Belirtilmedi"}`,
+      })
+      setSuggestionMessage("Öneriniz alındı. İncelendikten sonra sözlüğe eklenebilir.")
+      setSuggestionTerm("")
+      setSuggestionDefinition("")
+      setSuggestionIPA("")
+      setSuggestionEnglish("")
+    } catch {
+      setSuggestionMessage("Öneri gönderilemedi. Lütfen tekrar deneyin.")
+    } finally {
+      setSuggestionSaving(false)
+    }
+  }
+
   const pageNumbers = useMemo(() => {
     if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1)
     const pages: (number | "...")[] = [1]
@@ -87,7 +120,12 @@ export default function GlossaryPage() {
           </Link>
 
           <div className="space-y-3">
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground">Dilbilim Terimleri Sözlüğü</h1>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <h1 className="text-3xl sm:text-4xl font-serif font-bold text-foreground">Dilbilim Terimleri Sözlüğü</h1>
+              <Button variant="outline" size="sm" onClick={() => setSuggestionOpen(true)} className="gap-2 shrink-0">
+                <Lightbulb className="h-4 w-4" />Madde Başı Öner
+              </Button>
+            </div>
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
               {totalCount > 0 ? `${totalCount} terim` : "Terimler yükleniyor…"} — Türkçe ve İngilizce karşılıklarıyla.
             </p>
@@ -187,6 +225,21 @@ export default function GlossaryPage() {
         </div>
       </main>
 
+      <Dialog open={suggestionOpen} onOpenChange={setSuggestionOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Madde Başı Öner</DialogTitle>
+            <DialogDescription>Sözlükte yer almasını istediğiniz terimi ve temel açıklamasını gönderin.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2"><Label htmlFor="suggestion-term">Terim</Label><Input id="suggestion-term" value={suggestionTerm} onChange={(event) => setSuggestionTerm(event.target.value)} placeholder="Örn. artdamaksıl" /></div>
+            <div className="space-y-2"><Label htmlFor="suggestion-definition">Tanım</Label><Textarea id="suggestion-definition" value={suggestionDefinition} onChange={(event) => setSuggestionDefinition(event.target.value)} rows={4} placeholder="Terimin kısa tanımı…" /></div>
+            <div className="grid gap-4 sm:grid-cols-2"><div className="space-y-2"><Label htmlFor="suggestion-ipa">Fonetik gösterim</Label><Input id="suggestion-ipa" value={suggestionIPA} onChange={(event) => setSuggestionIPA(event.target.value)} placeholder="/…/" /></div><div className="space-y-2"><Label htmlFor="suggestion-english">İngilizce karşılık</Label><Input id="suggestion-english" value={suggestionEnglish} onChange={(event) => setSuggestionEnglish(event.target.value)} /></div></div>
+            {suggestionMessage && <p className="text-sm text-muted-foreground" role="status">{suggestionMessage}</p>}
+          </div>
+          <DialogFooter><Button variant="outline" onClick={() => setSuggestionOpen(false)}>Kapat</Button><Button onClick={handleSuggestionSubmit} disabled={suggestionSaving || !suggestionTerm.trim() || !suggestionDefinition.trim()}>{suggestionSaving ? "Gönderiliyor…" : "Öneriyi Gönder"}</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
       <SiteFooter />
     </div>
   )
