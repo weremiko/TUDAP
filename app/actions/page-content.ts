@@ -83,14 +83,29 @@ export async function getPageSections(page: string): Promise<PageSection[]> {
     .from(pageSections)
     .where(eq(pageSections.page, page))
     .orderBy(pageSections.sortOrder)
-  if (rows.length > 0) return rows
-  return (DEFAULT_SECTIONS[page] ?? []).map((section, index) => ({
-    id: 0,
-    page,
-    ...section,
-    sortOrder: index,
-    updatedAt: new Date(),
-  }))
+  const defaults = DEFAULT_SECTIONS[page] ?? []
+  if (rows.length === 0) {
+    return defaults.map((section, index) => ({
+      id: 0,
+      page,
+      ...section,
+      sortOrder: index,
+      updatedAt: new Date(),
+    }))
+  }
+
+  const existingKeys = new Set(rows.map((row) => row.key))
+  const missingDefaults = defaults
+    .filter((section) => !existingKeys.has(section.key))
+    .map((section, index) => ({
+      id: 0,
+      page,
+      ...section,
+      sortOrder: rows.length + index,
+      updatedAt: new Date(),
+    }))
+
+  return [...rows, ...missingDefaults]
 }
 
 export async function upsertPageSection(
