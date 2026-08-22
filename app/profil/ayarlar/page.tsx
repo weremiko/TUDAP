@@ -20,7 +20,6 @@ export default function ProfileSettingsPage() {
   const [image, setImage] = useState((session?.user as { image?: string | null } | undefined)?.image ?? '')
   const [institution, setInstitution] = useState('')
   const [bio, setBio] = useState('')
-  const [profileVisibility, setProfileVisibility] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -33,7 +32,6 @@ export default function ProfileSettingsPage() {
       setImage(profile.image ?? '')
       setInstitution(profile.institution ?? '')
       setBio(profile.bio ?? '')
-      setProfileVisibility(profile.profileVisibility)
     }).catch(() => setError('Profil bilgileri yüklenemedi.'))
   }, [session?.user])
 
@@ -43,7 +41,7 @@ export default function ProfileSettingsPage() {
     setMessage(null)
     setError(null)
     try {
-      await updateProfile({ name, image, institution, bio, profileVisibility })
+      await updateProfile({ name, image, institution, bio })
       setMessage('Profil bilgileriniz güncellendi.')
       router.refresh()
     } catch (caught) {
@@ -113,10 +111,6 @@ export default function ProfileSettingsPage() {
               <textarea id="bio" value={bio} onChange={(event) => setBio(event.target.value)} maxLength={500} rows={4} placeholder="Kendinizden kısaca bahsedin…" className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" />
               <p className="text-xs text-muted-foreground text-right">{bio.length} / 500</p>
             </div>
-            <label className="flex items-start gap-3 rounded-md border border-border p-3 text-sm">
-              <input type="checkbox" checked={profileVisibility} onChange={(event) => setProfileVisibility(event.target.checked)} className="mt-0.5" />
-              <span><span className="block font-medium text-foreground">Profilimi görünür yap</span><span className="text-xs text-muted-foreground">Bu tercih ileride herkese açık profil kartlarında kullanılabilir.</span></span>
-            </label>
             {message && <p className="text-sm text-primary" role="status">{message}</p>}
             {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
             <div className="flex justify-end">

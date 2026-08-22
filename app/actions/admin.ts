@@ -3,7 +3,7 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { user, session } from '@/lib/db/schema'
-import { desc, eq, count, gt } from 'drizzle-orm'
+import { asc, desc, eq, count, gt } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { sql } from 'drizzle-orm'
@@ -101,7 +101,7 @@ export async function getPublicTeamMembers() {
   return db.select({ id: user.id, name: user.name, image: user.image, institution: user.institution, bio: user.bio, blueVerified: user.blueVerified, teamRole: user.teamRole, teamOrder: user.teamOrder })
     .from(user)
     .where(eq(user.teamVisible, true))
-    .orderBy(user.teamOrder, desc(user.createdAt))
+    .orderBy(asc(user.name))
 }
 
 export async function setUserBlueVerification(userId: string, verified: boolean) {

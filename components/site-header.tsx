@@ -63,35 +63,40 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="border-b border-border bg-background sticky top-0 z-50">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+      <div className="h-1 bg-primary" />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
 
         {/* Desktop */}
-        <div className="hidden md:flex items-center justify-between py-4">
+        <div className="hidden md:flex items-center justify-between gap-8 py-3.5">
 
-          <Link href="/" className="flex items-center gap-2 group">
-            <span className="hidden sm:inline font-serif text-lg font-bold tracking-tight text-foreground">TÜDAP</span>
+          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+            <img src="/logo.png" alt="TÜDAP Logo" className="h-9 w-9 transition-transform duration-200 group-hover:rotate-[-4deg]" />
+            <span>
+              <span className="block font-serif text-xl font-bold leading-none tracking-tight text-foreground">TÜDAP</span>
+              <span className="mt-1 block text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Türkçe Dilbilim</span>
+            </span>
           </Link>
 
-          <nav className="flex items-center gap-8">
+          <nav className="flex items-center gap-1 rounded-lg border border-border/70 bg-muted/35 p-1">
             {/* Araçlar dropdown */}
             <div className="relative">
               <button
                 onClick={() => setToolsDropdownOpen(!toolsDropdownOpen)}
-                className="flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-primary transition-colors"
+                className={`flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${toolsDropdownOpen || TOOL_LINKS.some(({ href }) => pathname === href) ? "bg-background text-primary shadow-sm" : "text-foreground hover:bg-background/80 hover:text-primary"}`}
               >
                 Araçlar
                 <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${toolsDropdownOpen ? "rotate-180" : ""}`} />
               </button>
               {toolsDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 rounded-lg border border-border bg-background shadow-lg py-2 z-50">
+                <div className="absolute top-full left-0 mt-2 w-72 rounded-lg border border-border bg-background p-1.5 shadow-xl shadow-foreground/5 z-50">
                   {TOOL_LINKS.map(({ href, label }) => (
                     <Link
                       key={href}
                       href={href}
                       onClick={() => setToolsDropdownOpen(false)}
-                      className={`block px-4 py-2.5 text-sm transition-colors ${
-                        pathname === href ? "text-primary font-medium bg-primary/5" : "text-foreground hover:text-primary hover:bg-muted/50"
+                      className={`block rounded-md px-3 py-2.5 text-sm transition-colors ${
+                        pathname === href ? "bg-primary/10 font-medium text-primary" : "text-foreground hover:bg-muted/60 hover:text-primary"
                       }`}
                     >
                       {label}
@@ -105,7 +110,7 @@ export function SiteHeader() {
               <Link
                 key={href}
                 href={href}
-                className={`text-sm font-medium transition-colors ${pathname === href ? "text-primary" : "text-foreground hover:text-primary"}`}
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${pathname === href ? "bg-background text-primary shadow-sm" : "text-foreground hover:bg-background/80 hover:text-primary"}`}
               >
                 {label}
               </Link>
@@ -113,7 +118,7 @@ export function SiteHeader() {
           </nav>
 
           {/* Auth area */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 border-l border-border pl-5">
             <LangSwitcher pathname={pathname} />
             {session?.user ? (
               <>
@@ -157,7 +162,7 @@ export function SiteHeader() {
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 text-muted-foreground"
+            className="h-9 w-9 border border-border text-muted-foreground"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Menüyü aç/kapat"
           >
@@ -167,18 +172,18 @@ export function SiteHeader() {
 
         {/* Mobile panel */}
         {mobileOpen && (
-          <nav className="md:hidden border-t border-border py-3 space-y-0.5">
-            <p className="px-2 py-1.5 text-xs uppercase tracking-widest font-medium text-muted-foreground">Araçlar</p>
+          <nav className="md:hidden border-t border-border py-4 space-y-0.5">
+            <p className="px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-semibold text-accent">Araçlar</p>
             {TOOL_LINKS.map(({ href, label }) => (
               <Link key={href} href={href} onClick={() => setMobileOpen(false)}
-                className={`block px-3 py-2 rounded text-sm transition-colors ${pathname === href ? "text-primary font-medium bg-primary/5" : "text-foreground hover:text-primary hover:bg-muted/50"}`}
+                className={`block rounded-md px-3 py-2.5 text-sm transition-colors ${pathname === href ? "bg-primary/10 font-medium text-primary" : "text-foreground hover:text-primary hover:bg-muted/50"}`}
               >{label}</Link>
             ))}
             <div className="my-2 border-t border-border" />
-            <p className="px-2 py-1.5 text-xs uppercase tracking-widest font-medium text-muted-foreground">Platform</p>
+            <p className="px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-semibold text-accent">Platform</p>
             {NAV_LINKS.map(({ href, label }) => (
               <Link key={href} href={href} onClick={() => setMobileOpen(false)}
-                className={`block px-3 py-2 rounded text-sm transition-colors ${pathname === href ? "text-primary font-medium bg-primary/5" : "text-foreground hover:text-primary hover:bg-muted/50"}`}
+                className={`block rounded-md px-3 py-2.5 text-sm transition-colors ${pathname === href ? "bg-primary/10 font-medium text-primary" : "text-foreground hover:text-primary hover:bg-muted/50"}`}
               >{label}</Link>
             ))}
             <div className="my-2 border-t border-border" />

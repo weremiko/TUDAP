@@ -27,7 +27,7 @@ export default async function ProfilePage() {
   await Promise.all([ensureProfileColumns(), ensureQueryRateColumns()])
 
   const [[profile], [{ transcriptionCount }], followSummary] = await Promise.all([
-    db.select({ name: user.name, email: user.email, image: user.image, role: user.role, points: user.points, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility, createdAt: user.createdAt })
+    db.select({ name: user.name, email: user.email, image: user.image, role: user.role, points: user.points, institution: user.institution, bio: user.bio, createdAt: user.createdAt })
       .from(user).where(eq(user.id, session.user.id)).limit(1),
     db.select({ transcriptionCount: count() }).from(queryLogs).where(eq(queryLogs.userId, session.user.id)),
     getFollowSummary(session.user.id),
@@ -70,7 +70,7 @@ export default async function ProfilePage() {
               <p className="text-sm text-muted-foreground mt-1">{profile.email}</p>
               {profile.institution && <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-3"><Building2 className="h-3.5 w-3.5" />{profile.institution}</p>}
             </div>
-            {profile.profileVisibility && <Button asChild variant="ghost" size="sm" className="gap-2 self-start sm:self-center"><Link href={`/profil/${session.user.id}`}><Copy className="h-3.5 w-3.5" />Genel profil</Link></Button>}
+            <Button asChild variant="ghost" size="sm" className="gap-2 self-start sm:self-center"><Link href={`/profil/${session.user.id}`}><Copy className="h-3.5 w-3.5" />Genel profil</Link></Button>
           </div>
           <div className="grid grid-cols-3 max-w-xl mt-8 border-t border-border pt-5">
             <div><p className="text-xl font-semibold text-foreground">{followSummary.followers}</p><p className="text-xs text-muted-foreground mt-1">Takipçi</p></div>

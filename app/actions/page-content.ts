@@ -44,8 +44,6 @@ const DEFAULT_SECTIONS: Record<string, Array<{ key: string; label: string; conte
     { key: 'eposta_adresi', label: 'E-posta Adresi', content: 'iletisim@dilbilim.org.tr' },
     { key: 'sss_1_soru', label: 'SSS 1 Soru', content: 'Bu platform ücretsiz mi?' },
     { key: 'sss_1_cevap', label: 'SSS 1 Cevap', content: 'Evet, TÜDAP tamamen ücretsizdir ve kar amacı gütmemektedir.' },
-    { key: 'sss_2_soru', label: 'SSS 2 Soru', content: 'Verilerim saklanıyor mu?' },
-    { key: 'sss_2_cevap', label: 'SSS 2 Cevap', content: 'Hayır. Girdiğiniz metinler yalnızca tarayıcınızda işlenir.' },
     { key: 'sss_3_soru', label: 'SSS 3 Soru', content: 'Hata bildirimi nasıl yapabilirim?' },
     { key: 'sss_3_cevap', label: 'SSS 3 Cevap', content: "Herhangi bir araç sayfasındaki 'Hata Bildir' butonu veya e-posta ile bildirimde bulunabilirsiniz." },
   ],

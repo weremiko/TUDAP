@@ -28,8 +28,6 @@ const FALLBACKS: Record<string, string> = {
   eposta_adresi: "iletisim@dilbilim.org.tr",
   sss_1_soru: "Bu platform ücretsiz mi?",
   sss_1_cevap: "Evet, TÜDAP tamamen ücretsizdir ve kar amacı gütmemektedir.",
-  sss_2_soru: "Verilerim saklanıyor mu?",
-  sss_2_cevap: "Hayır. Girdiğiniz metinler yalnızca tarayıcınızda işlenir.",
   sss_3_soru: "Hata bildirimi nasıl yapabilirim?",
   sss_3_cevap: "Herhangi bir araç sayfasındaki 'Hata Bildir' butonu veya e-posta ile bildirimde bulunabilirsiniz.",
 }
@@ -47,7 +45,6 @@ export default async function IletisimPage() {
 
   const faqKeys = [
     { soru: "sss_1_soru", cevap: "sss_1_cevap" },
-    { soru: "sss_2_soru", cevap: "sss_2_cevap" },
     { soru: "sss_3_soru", cevap: "sss_3_cevap" },
   ]
 

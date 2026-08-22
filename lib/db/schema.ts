@@ -14,7 +14,7 @@ export const user = pgTable('user', {
   points: integer('points').notNull().default(0),
   institution: text('institution'),
   bio: text('bio'),
-  profileVisibility: boolean('profile_visibility').notNull().default(false),
+  profileVisibility: boolean('profile_visibility').notNull().default(true),
   teamRole: text('team_role'),
   teamOrder: integer('team_order').notNull().default(0),
   teamVisible: boolean('team_visible').notNull().default(false),

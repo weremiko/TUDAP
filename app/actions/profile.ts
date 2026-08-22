@@ -18,7 +18,8 @@ export async function ensureProfileColumns() {
         ADD COLUMN IF NOT EXISTS blue_verified BOOLEAN NOT NULL DEFAULT FALSE,
         ADD COLUMN IF NOT EXISTS institution TEXT,
         ADD COLUMN IF NOT EXISTS bio TEXT,
-        ADD COLUMN IF NOT EXISTS profile_visibility BOOLEAN NOT NULL DEFAULT FALSE
+        ADD COLUMN IF NOT EXISTS profile_visibility BOOLEAN NOT NULL DEFAULT TRUE;
+      UPDATE "user" SET profile_visibility = TRUE WHERE profile_visibility IS DISTINCT FROM TRUE
     `).then(() => undefined)
   }
   await profileColumnsReady
@@ -51,7 +52,7 @@ function ensureSocialTable() {
   return socialTableReady
 }
 
-export async function updateProfile(data: { name: string; image: string; institution: string; bio: string; profileVisibility: boolean }) {
+export async function updateProfile(data: { name: string; image: string; institution: string; bio: string }) {
   const userId = await requireUser()
   await ensureProfileColumns()
   const name = data.name.trim()
@@ -74,7 +75,7 @@ export async function updateProfile(data: { name: string; image: string; institu
 
   await db
     .update(user)
-    .set({ name, image: image || null, institution: institution || null, bio: bio || null, profileVisibility: data.profileVisibility, updatedAt: new Date() })
+    .set({ name, image: image || null, institution: institution || null, bio: bio || null, profileVisibility: true, updatedAt: new Date() })
     .where(eq(user.id, userId))
 
   revalidatePath('/profil')
@@ -85,7 +86,7 @@ export async function getOwnProfile() {
   const userId = await requireUser()
   await ensureProfileColumns()
   const [profile] = await db
-    .select({ name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility, points: user.points, blueVerified: user.blueVerified })
+    .select({ name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, points: user.points, blueVerified: user.blueVerified })
     .from(user)
     .where(eq(user.id, userId))
     .limit(1)
@@ -125,10 +126,10 @@ export async function getFollowSummary(targetUserId: string) {
 export async function getPublicProfile(targetUserId: string) {
   await Promise.all([ensureProfileColumns(), ensureSocialTable()])
   const [profile] = await db
-    .select({ id: user.id, name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, profileVisibility: user.profileVisibility, blueVerified: user.blueVerified })
+    .select({ id: user.id, name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, blueVerified: user.blueVerified })
     .from(user)
     .where(eq(user.id, targetUserId))
     .limit(1)
-  if (!profile || !profile.profileVisibility) return null
+  if (!profile) return null
   return { ...profile, isVerified: profile.blueVerified || hasEduDomain(profile.email), ...(await getFollowSummary(targetUserId)) }
 }
