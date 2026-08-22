@@ -18,6 +18,7 @@ export async function ensureProfileColumns() {
         ADD COLUMN IF NOT EXISTS blue_verified BOOLEAN NOT NULL DEFAULT FALSE,
         ADD COLUMN IF NOT EXISTS institution TEXT,
         ADD COLUMN IF NOT EXISTS bio TEXT,
+        ADD COLUMN IF NOT EXISTS website_url TEXT,
         ADD COLUMN IF NOT EXISTS profile_visibility BOOLEAN NOT NULL DEFAULT TRUE;
       UPDATE "user" SET profile_visibility = TRUE WHERE profile_visibility IS DISTINCT FROM TRUE
     `).then(() => undefined)
@@ -52,13 +53,14 @@ function ensureSocialTable() {
   return socialTableReady
 }
 
-export async function updateProfile(data: { name: string; image: string; institution: string; bio: string }) {
+export async function updateProfile(data: { name: string; image: string; institution: string; bio: string; websiteUrl: string }) {
   const userId = await requireUser()
   await ensureProfileColumns()
   const name = data.name.trim()
   const image = data.image.trim()
   const institution = data.institution.trim()
   const bio = data.bio.trim()
+  const websiteUrl = data.websiteUrl.trim()
 
   if (name.length < 2 || name.length > 80) {
     throw new Error('Ad Soyad 2 ile 80 karakter arasında olmalıdır')
@@ -72,10 +74,16 @@ export async function updateProfile(data: { name: string; image: string; institu
   if (institution.length > 120 || bio.length > 500) {
     throw new Error('Kurum veya biyografi alanı çok uzun')
   }
+  if (websiteUrl.length > 500) {
+    throw new Error('Profil bağlantısı çok uzun')
+  }
+  if (websiteUrl && !/^https?:\/\//i.test(websiteUrl)) {
+    throw new Error('Profil bağlantısı http:// veya https:// ile başlamalıdır')
+  }
 
   await db
     .update(user)
-    .set({ name, image: image || null, institution: institution || null, bio: bio || null, profileVisibility: true, updatedAt: new Date() })
+    .set({ name, image: image || null, institution: institution || null, bio: bio || null, websiteUrl: websiteUrl || null, profileVisibility: true, updatedAt: new Date() })
     .where(eq(user.id, userId))
 
   revalidatePath('/profil')
@@ -86,7 +94,7 @@ export async function getOwnProfile() {
   const userId = await requireUser()
   await ensureProfileColumns()
   const [profile] = await db
-    .select({ name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, points: user.points, blueVerified: user.blueVerified })
+    .select({ name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, websiteUrl: user.websiteUrl, points: user.points, blueVerified: user.blueVerified })
     .from(user)
     .where(eq(user.id, userId))
     .limit(1)
@@ -126,7 +134,7 @@ export async function getFollowSummary(targetUserId: string) {
 export async function getPublicProfile(targetUserId: string) {
   await Promise.all([ensureProfileColumns(), ensureSocialTable()])
   const [profile] = await db
-    .select({ id: user.id, name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, blueVerified: user.blueVerified })
+    .select({ id: user.id, name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, websiteUrl: user.websiteUrl, blueVerified: user.blueVerified })
     .from(user)
     .where(eq(user.id, targetUserId))
     .limit(1)

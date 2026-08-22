@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import Link from 'next/link'
-import { Settings, Mail, Shield, Building2, CalendarDays, Sparkles, Users, FileText, Copy, BadgeCheck, PenLine } from 'lucide-react'
+import { Settings, Mail, Building2, CalendarDays, Sparkles, Users, FileText, Copy, BadgeCheck, PenLine, ExternalLink } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Profil — TÜDAP',
@@ -27,7 +27,7 @@ export default async function ProfilePage() {
   await Promise.all([ensureProfileColumns(), ensureQueryRateColumns()])
 
   const [[profile], [{ transcriptionCount }], followSummary] = await Promise.all([
-    db.select({ name: user.name, email: user.email, image: user.image, role: user.role, points: user.points, institution: user.institution, bio: user.bio, createdAt: user.createdAt })
+    db.select({ name: user.name, email: user.email, image: user.image, role: user.role, points: user.points, institution: user.institution, bio: user.bio, websiteUrl: user.websiteUrl, blueVerified: user.blueVerified, createdAt: user.createdAt })
       .from(user).where(eq(user.id, session.user.id)).limit(1),
     db.select({ transcriptionCount: count() }).from(queryLogs).where(eq(queryLogs.userId, session.user.id)),
     getFollowSummary(session.user.id),
@@ -51,12 +51,9 @@ export default async function ProfilePage() {
             <p className="text-xs uppercase tracking-[0.2em] text-accent font-medium">Hesap merkezi</p>
             <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground mt-2">Profilim</h1>
           </div>
-          <Button asChild variant="outline" size="sm" className="gap-2 shrink-0">
-            <Link href="/profil/ayarlar"><Settings className="h-4 w-4" />Profili düzenle</Link>
-          </Button>
         </div>
 
-        <section className="border-y border-border py-7 md:py-9">
+        <section className="overflow-hidden rounded-xl border border-border bg-muted/25 p-6 md:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center gap-5 md:gap-7">
             <Avatar className="h-24 w-24 md:h-28 md:w-28 border-4 border-background ring-1 ring-border">
               <AvatarImage src={profile.image ?? undefined} alt={profile.name} />
@@ -70,8 +67,12 @@ export default async function ProfilePage() {
               <p className="text-sm text-muted-foreground mt-1">{profile.email}</p>
               {profile.institution && <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-3"><Building2 className="h-3.5 w-3.5" />{profile.institution}</p>}
             </div>
-            <Button asChild variant="ghost" size="sm" className="gap-2 self-start sm:self-center"><Link href={`/profil/${session.user.id}`}><Copy className="h-3.5 w-3.5" />Genel profil</Link></Button>
+            <div className="flex flex-wrap gap-2 self-start sm:self-center">
+              <Button asChild variant="outline" size="sm" className="gap-2"><Link href={`/profil/${session.user.id}`}><Copy className="h-3.5 w-3.5" />Genel profil</Link></Button>
+              <Button asChild size="sm" className="gap-2"><Link href="/profil/ayarlar"><Settings className="h-3.5 w-3.5" />Düzenle</Link></Button>
+            </div>
           </div>
+          {profile.websiteUrl && <a href={profile.websiteUrl} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm text-primary hover:underline"><ExternalLink className="h-4 w-4" />{profile.websiteUrl}</a>}
           <div className="grid grid-cols-3 max-w-xl mt-8 border-t border-border pt-5">
             <div><p className="text-xl font-semibold text-foreground">{followSummary.followers}</p><p className="text-xs text-muted-foreground mt-1">Takipçi</p></div>
             <div><p className="text-xl font-semibold text-foreground">{followSummary.following}</p><p className="text-xs text-muted-foreground mt-1">Takip</p></div>
@@ -79,8 +80,8 @@ export default async function ProfilePage() {
           </div>
         </section>
 
-        <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-10 md:gap-14 pt-9">
-          <section>
+        <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-6 md:gap-8 pt-8">
+          <section className="rounded-xl border border-border bg-background p-6 md:p-7">
             <div className="flex items-center gap-2 mb-5"><Sparkles className="h-4 w-4 text-accent" /><h2 className="text-sm uppercase tracking-[0.16em] font-semibold text-foreground">Hakkımda</h2></div>
             {profile.bio ? <p className="text-sm leading-7 text-muted-foreground max-w-xl">{profile.bio}</p> : <p className="text-sm text-muted-foreground">Henüz bir biyografi eklemediniz. <Link href="/profil/ayarlar" className="text-primary hover:underline">Profilinizi tamamlayın.</Link></p>}
             <dl className="grid sm:grid-cols-2 gap-x-8 gap-y-5 mt-8 pt-6 border-t border-border">
@@ -88,7 +89,7 @@ export default async function ProfilePage() {
               <div><dt className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground"><CalendarDays className="h-3.5 w-3.5" />Üyelik</dt><dd className="text-sm text-foreground mt-2">{profile.createdAt.toLocaleDateString('tr-TR')}</dd></div>
             </dl>
           </section>
-          <aside className="border-l-0 md:border-l border-border md:pl-8">
+          <aside className="rounded-xl border border-border bg-primary/[0.04] p-6 md:p-7">
             <div className="flex items-center gap-2 mb-5"><FileText className="h-4 w-4 text-primary" /><h2 className="text-sm uppercase tracking-[0.16em] font-semibold text-foreground">Katkı özeti</h2></div>
             <div className="space-y-5">
               <div><p className="text-3xl font-serif font-bold text-foreground">{transcriptionCount.toLocaleString('tr-TR')}</p><p className="text-xs text-muted-foreground mt-1">Kayıtlı transkripsiyon</p></div>

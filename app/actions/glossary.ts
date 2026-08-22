@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db'
 import { glossaryEntries, user } from '@/lib/db/schema'
-import { eq, ilike, or, desc, count, and } from 'drizzle-orm'
+import { eq, ilike, or, desc, count, and, sql } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
@@ -25,10 +25,19 @@ export async function getGlossaryPage(page: number, category: string, search: st
     : undefined
   const where = catClause && srchClause ? and(catClause, srchClause) : (catClause ?? srchClause)
 
+  const relevanceOrder = search
+    ? sql`CASE
+        WHEN lower(${glossaryEntries.term}) = lower(${search}) THEN 0
+        WHEN lower(${glossaryEntries.term}) LIKE lower(${`${search}%`}) THEN 1
+        WHEN lower(${glossaryEntries.term}) LIKE lower(${`%${search}%`}) THEN 2
+        ELSE 3
+      END`
+    : glossaryEntries.term
+
   const [rows, [{ total }]] = await Promise.all([
     db.select().from(glossaryEntries)
       .where(where)
-      .orderBy(glossaryEntries.term)
+      .orderBy(relevanceOrder, glossaryEntries.term)
       .limit(PER_PAGE)
       .offset(offset),
     db.select({ total: count() }).from(glossaryEntries).where(where),

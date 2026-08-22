@@ -7,7 +7,7 @@ import { ProfileFollowButton } from '@/components/profile-follow-button'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { BadgeCheck, Building2, CalendarDays, Link2, Sparkles, Users } from 'lucide-react'
+import { BadgeCheck, Building2, CalendarDays, ExternalLink, Link2, Sparkles, Users } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Kullanıcı Profili — TÜDAP', robots: { index: false } }
 
@@ -38,6 +38,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             <div className="min-w-0 flex-1">
               <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground break-words flex items-center gap-2">{profile.name}{profile.isVerified && <BadgeCheck className="h-5 w-5 text-primary" aria-label="Doğrulanmış profil" />}</h2>
               {profile.institution && <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-3"><Building2 className="h-3.5 w-3.5" />{profile.institution}</p>}
+              {profile.websiteUrl && <a href={profile.websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm text-primary hover:underline mt-3"><ExternalLink className="h-3.5 w-3.5" />Web sitesini ziyaret et</a>}
               <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2"><Link2 className="h-3.5 w-3.5" />TÜDAP topluluk profili</p>
             </div>
             {canFollow && <ProfileFollowButton targetUserId={profile.id} initialFollowing={profile.isFollowing} />}
