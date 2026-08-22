@@ -47,7 +47,25 @@ function ensureSocialTable() {
         created_at TIMESTAMP NOT NULL DEFAULT NOW(),
         PRIMARY KEY (follower_id, following_id),
         CHECK (follower_id <> following_id)
+      );
+      CREATE TABLE IF NOT EXISTS app_migrations (
+        key TEXT PRIMARY KEY,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+      WITH seeded AS (
+        INSERT INTO app_migrations (key)
+        SELECT 'initial-admin-follows'
+        WHERE EXISTS (SELECT 1 FROM "user" WHERE role = 'admin')
+        ON CONFLICT (key) DO NOTHING
+        RETURNING key
       )
+      INSERT INTO user_follows (follower_id, following_id)
+      SELECT follower.id, admin.id
+      FROM "user" AS follower
+      CROSS JOIN "user" AS admin
+      CROSS JOIN seeded
+      WHERE admin.role = 'admin' AND follower.id <> admin.id
+      ON CONFLICT (follower_id, following_id) DO NOTHING
     `).then(() => undefined)
   }
   return socialTableReady

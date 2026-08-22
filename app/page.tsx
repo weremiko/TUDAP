@@ -114,24 +114,6 @@ export default async function Home() {
 
       <HomeRoadmap />
 
-      {/* Stats strip */}
-      <section className="border-y border-border bg-muted/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
-            {[
-              ["3", "Aktif Araç"],
-              ["700+", "Dilbilim Terimi"],
-              ["%100", "Ücretsiz"],
-            ].map(([val, label]) => (
-              <div key={label}>
-                <p className="text-2xl md:text-3xl font-serif font-bold text-foreground">{val}</p>
-                <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wide">{label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Tool cards */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-16 sm:py-20">
         <div className="mb-10 space-y-1">

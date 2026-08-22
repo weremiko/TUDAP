@@ -113,9 +113,9 @@ export default function GlossaryPage() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-8 lg:py-12">
         <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8">
 
-          <div className="rounded-lg border border-amber-200/50 bg-amber-50/50 p-4">
-            <p className="text-sm text-amber-900">
-              <span className="font-semibold">Beta Sürümü:</span> Bu araç aktif geliştirme aşamasındadır. Akademik çalışmalar için uzman denetiminden geçirerek kullanınız.
+          <div className="rounded-lg border border-primary/20 bg-primary/[0.04] p-4">
+            <p className="text-sm text-foreground">
+              <span className="font-semibold">Akademik Açık Erişim Sürümü:</span> Bu araç aktif geliştirme aşamasındadır ve %100 doğruluk garanti etmez. Akademik çalışmalar için sonuçları uzman denetiminden geçirerek kullanınız.
             </p>
           </div>
 
