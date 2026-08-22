@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { TreePine, FileText, BarChart3 } from "lucide-react"
+import { ArrowRight, TreePine, FileText, BarChart3 } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { HomeTabs } from "@/components/home-tabs"
