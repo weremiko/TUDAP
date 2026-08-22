@@ -161,15 +161,24 @@ export async function submitBlogApplication(data: { title: string; content: stri
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) throw new Error('Oturum açmanız gerekiyor')
   await ensureSubmissionColumn()
-  if (!data.title.trim() || !data.content.trim()) throw new Error('Başlık ve içerik zorunludur')
+  if (typeof data.title !== 'string' || typeof data.content !== 'string' || typeof data.excerpt !== 'string' ||
+    (typeof data.tags !== 'undefined' && typeof data.tags !== 'string')) throw new Error('Geçersiz başvuru verisi')
+  const title = data.title.trim()
+  const content = data.content.trim()
+  const excerpt = data.excerpt.trim()
+  const tags = data.tags?.trim() || ''
+  if (!title || !content) throw new Error('Başlık ve içerik zorunludur')
+  if (title.length > 200 || content.length > 50_000 || excerpt.length > 500 || tags.length > 500) {
+    throw new Error('Başvuru alanlarından biri çok uzun')
+  }
   const [author] = await db.select({ name: user.name }).from(user).where(eq(user.id, session.user.id)).limit(1)
   if (!author) throw new Error('Kullanıcı bulunamadı')
-  let slug = generateSlug(data.title)
+  let slug = generateSlug(title)
   const existing = await db.select({ id: blogPosts.id }).from(blogPosts).where(eq(blogPosts.slug, slug)).limit(1)
   if (existing.length > 0) slug = `${slug}-${Date.now()}`
   const [post] = await db.insert(blogPosts).values({
-    title: data.title.trim(), slug, content: data.content.trim(), excerpt: data.excerpt.trim(),
-    authorId: session.user.id, authorName: author.name, tags: data.tags?.trim() || '',
+    title, slug, content, excerpt,
+    authorId: session.user.id, authorName: author.name, tags,
     published: false, submissionStatus: 'pending',
   }).returning()
   revalidatePath('/admin/blog')

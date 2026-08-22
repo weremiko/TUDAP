@@ -1,11 +1,9 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono, Lora } from "next/font/google"
+import { Inter } from "next/font/google"
 import "./globals.css"
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
-const lora = Lora({ subsets: ["latin"], variable: "--font-lora" })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 const BASE = "https://dilbilim.org.tr"
 
@@ -95,7 +93,7 @@ const structuredData = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="tr" className={`${geist.variable} ${geistMono.variable} ${lora.variable} bg-background`}>
+    <html lang="tr" className={`${inter.variable} bg-background`}>
       <head>
         {structuredData.map((schema, i) => (
           <script

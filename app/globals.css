@@ -1,3 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.cdnfonts.com/css/waldenburg");
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -78,10 +81,9 @@
 }
 
 @theme inline {
-  /* Serif font for headings to match academic aesthetic */
-  --font-sans: "Geist", "Geist Fallback";
-  --font-serif: "Lora", "Georgia", serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  --font-sans: "Inter", "Segoe UI", sans-serif;
+  --font-serif: "Waldenburg", "Georgia", serif;
+  --font-mono: "SFMono-Regular", "Consolas", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -124,7 +126,20 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    font-family: "Inter", "Segoe UI", sans-serif;
+  }
   body {
     @apply bg-background text-foreground;
+    font-family: "Inter", "Segoe UI", sans-serif;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Waldenburg", "Georgia", serif;
+    letter-spacing: -0.02em;
   }
 }

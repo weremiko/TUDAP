@@ -37,13 +37,20 @@ export async function saveErrorReport(data: {
   reportType?: 'error' | 'term-suggestion'
 }) {
   try {
+    const message = typeof data.message === 'string' ? data.message.trim() : ''
+    const userEmail = typeof data.userEmail === 'string' ? data.userEmail.trim() : ''
+    const url = typeof data.url === 'string' ? data.url.trim() : ''
+    const errorWord = typeof data.errorWord === 'string' ? data.errorWord.trim() : ''
+    if (!message || message.length > 5000 || userEmail.length > 320 || url.length > 2048 || errorWord.length > 500) {
+      throw new Error('Hata raporu alanları geçersiz veya çok uzun')
+    }
     await ensureErrorColumns()
     const session = await auth.api.getSession({ headers: await headers() })
     await db.insert(errorReports).values({
-      message: data.message || '',
-      userEmail: data.userEmail || 'anonymous',
-      url: data.url || '',
-      errorWord: data.errorWord || '',
+      message,
+      userEmail: userEmail || 'anonymous',
+      url,
+      errorWord,
       userId: session?.user?.id ?? null,
       reportType: data.reportType || 'error',
     })
