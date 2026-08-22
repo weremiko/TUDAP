@@ -3,7 +3,7 @@
 import { db } from '@/lib/db'
 import { user, userFollows } from '@/lib/db/schema'
 import { auth } from '@/lib/auth'
-import { eq, and, count } from 'drizzle-orm'
+import { eq, and, count, or, ne } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { sql } from 'drizzle-orm'
@@ -19,9 +19,18 @@ export async function ensureProfileColumns() {
         ADD COLUMN IF NOT EXISTS institution TEXT,
         ADD COLUMN IF NOT EXISTS bio TEXT,
         ADD COLUMN IF NOT EXISTS website_url TEXT,
+        ADD COLUMN IF NOT EXISTS profile_slug TEXT,
         ADD COLUMN IF NOT EXISTS profile_visibility BOOLEAN NOT NULL DEFAULT TRUE;
       UPDATE "user" SET profile_visibility = TRUE WHERE profile_visibility IS DISTINCT FROM TRUE
-    `).then(() => undefined)
+    `).then(async () => {
+      const users = await db.select({ id: user.id, name: user.name, profileSlug: user.profileSlug }).from(user)
+      for (const account of users) {
+        if (!account.profileSlug) {
+          const profileSlug = await createUniqueProfileSlug(account.name, account.id)
+          await db.update(user).set({ profileSlug }).where(eq(user.id, account.id))
+        }
+      }
+    })
   }
   await profileColumnsReady
 }
@@ -101,7 +110,7 @@ export async function updateProfile(data: { name: string; image: string; institu
 
   await db
     .update(user)
-    .set({ name, image: image || null, institution: institution || null, bio: bio || null, websiteUrl: websiteUrl || null, profileVisibility: true, updatedAt: new Date() })
+    .set({ name, profileSlug: await createUniqueProfileSlug(name, userId), image: image || null, institution: institution || null, bio: bio || null, websiteUrl: websiteUrl || null, profileVisibility: true, updatedAt: new Date() })
     .where(eq(user.id, userId))
 
   revalidatePath('/profil')
@@ -112,7 +121,7 @@ export async function getOwnProfile() {
   const userId = await requireUser()
   await ensureProfileColumns()
   const [profile] = await db
-    .select({ name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, websiteUrl: user.websiteUrl, points: user.points, blueVerified: user.blueVerified })
+    .select({ id: user.id, name: user.name, profileSlug: user.profileSlug, email: user.email, image: user.image, institution: user.institution, bio: user.bio, websiteUrl: user.websiteUrl, points: user.points, blueVerified: user.blueVerified })
     .from(user)
     .where(eq(user.id, userId))
     .limit(1)
@@ -152,10 +161,34 @@ export async function getFollowSummary(targetUserId: string) {
 export async function getPublicProfile(targetUserId: string) {
   await Promise.all([ensureProfileColumns(), ensureSocialTable()])
   const [profile] = await db
-    .select({ id: user.id, name: user.name, email: user.email, image: user.image, institution: user.institution, bio: user.bio, websiteUrl: user.websiteUrl, blueVerified: user.blueVerified })
+    .select({ id: user.id, name: user.name, profileSlug: user.profileSlug, email: user.email, image: user.image, institution: user.institution, bio: user.bio, websiteUrl: user.websiteUrl, blueVerified: user.blueVerified })
     .from(user)
-    .where(eq(user.id, targetUserId))
+    .where(or(eq(user.profileSlug, targetUserId), eq(user.id, targetUserId)))
     .limit(1)
   if (!profile) return null
   return { ...profile, isVerified: profile.blueVerified || hasEduDomain(profile.email), ...(await getFollowSummary(targetUserId)) }
+}
+
+function profileSlugBase(name: string) {
+  return name.trim().toLocaleLowerCase('tr-TR')
+    .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+    .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'profil'
+}
+
+async function createUniqueProfileSlug(name: string, excludeUserId?: string) {
+  const base = profileSlugBase(name)
+  let candidate = base
+  let suffix = 2
+  while (true) {
+    const [existing] = await db.select({ id: user.id }).from(user).where(
+      excludeUserId
+        ? and(eq(user.profileSlug, candidate), ne(user.id, excludeUserId))
+        : eq(user.profileSlug, candidate)
+    ).limit(1)
+    if (!existing) return candidate
+    candidate = `${base}-${suffix}`
+    suffix += 1
+  }
 }

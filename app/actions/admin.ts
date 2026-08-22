@@ -7,6 +7,7 @@ import { asc, desc, eq, count, gt } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { sql } from 'drizzle-orm'
+import { ensureProfileColumns } from '@/app/actions/profile'
 
 let verificationColumnsReady: Promise<void> | null = null
 function ensureVerificationColumn() {
@@ -97,8 +98,8 @@ export async function setUserTeamMember(userId: string, data: { role: 'founder' 
 }
 
 export async function getPublicTeamMembers() {
-  await ensureVerificationColumn()
-  return db.select({ id: user.id, name: user.name, image: user.image, institution: user.institution, bio: user.bio, blueVerified: user.blueVerified, teamRole: user.teamRole, teamOrder: user.teamOrder })
+  await Promise.all([ensureVerificationColumn(), ensureProfileColumns()])
+  return db.select({ id: user.id, name: user.name, profileSlug: user.profileSlug, image: user.image, institution: user.institution, bio: user.bio, blueVerified: user.blueVerified, teamRole: user.teamRole, teamOrder: user.teamOrder })
     .from(user)
     .where(eq(user.teamVisible, true))
     .orderBy(asc(user.name))

@@ -68,7 +68,7 @@ export default async function ProfilePage() {
               {profile.institution && <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-3"><Building2 className="h-3.5 w-3.5" />{profile.institution}</p>}
             </div>
             <div className="flex flex-wrap gap-2 self-start sm:self-center">
-              <Button asChild variant="outline" size="sm" className="gap-2"><Link href={`/profil/${session.user.id}`}><Copy className="h-3.5 w-3.5" />Genel profil</Link></Button>
+              <Button asChild variant="outline" size="sm" className="gap-2"><Link href={`/profil/${profile.profileSlug ?? profile.id}`}><Copy className="h-3.5 w-3.5" />Genel profil</Link></Button>
               <Button asChild size="sm" className="gap-2"><Link href="/profil/ayarlar"><Settings className="h-3.5 w-3.5" />Düzenle</Link></Button>
             </div>
           </div>
