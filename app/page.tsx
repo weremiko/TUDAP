@@ -1,9 +1,13 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Languages, BookText, TreePine, FileText, BarChart3, ArrowRight, Lock, Newspaper, Calendar } from "lucide-react"
+import { TreePine, FileText, BarChart3 } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { HomeTabs } from "@/components/home-tabs"
+import { HomeBlogSlider } from "@/components/home-blog-slider"
+import { HomeGlossarySearch } from "@/components/home-glossary-search"
+import { HomeRoadmap } from "@/components/home-roadmap"
+import { getBlogPosts } from "@/app/actions/blog"
 import type { Metadata } from "next"
 
 const BASE = "https://dilbilim.org.tr"
@@ -67,50 +71,9 @@ const homepageJsonLd = [
   },
 ]
 
-const TOOLS = [
-  {
-    href: "/cevirici",
-    icon: Languages,
-    color: "text-primary",
-    bg: "bg-primary/10 group-hover:bg-primary/20",
-    title: "Sesbilimsel Abece Çeviricisi",
-    desc: "Türkçe metinleri IPA formatına çevirin. Geniş ve dar transkripsiyon seçenekleri ile akademik düzeyde çıktı.",
-    badge: "Aktif",
-    disabled: false,
-  },
-  {
-    href: "/terim-sozlugu",
-    icon: BookText,
-    color: "text-chart-2",
-    bg: "bg-chart-2/10 group-hover:bg-chart-2/20",
-    title: "Dilbilim Terimleri Sözlüğü",
-    desc: "700+ terim, Türkçe örnekler ve akademik açıklamalar. Sesbilim, sözdizimi, anlambilim ve daha fazlası. Yönetici panelinden dinamik ekleme.",
-    badge: "Aktif",
-    disabled: false,
-  },
-  {
-    href: "/blog",
-    icon: Newspaper,
-    color: "text-chart-3",
-    bg: "bg-chart-3/10 group-hover:bg-chart-3/20",
-    title: "Blog",
-    desc: "Dilbilim araştırmaları, akademik yazılar ve platform güncellemeleri. Uzman yazılar ve son gelişmeler hakkında bilgi.",
-    badge: "Aktif",
-    disabled: false,
-  },
-  {
-    href: "/ajanda",
-    icon: Calendar,
-    color: "text-chart-4",
-    bg: "bg-chart-4/10 group-hover:bg-chart-4/20",
-    title: "Türkiye Dilbilim Ajandası",
-    desc: "Dilbilim alanında düzenlenen seminerler, konferanslar, çalıştaylar ve diğer etkinlikleri takip edin.",
-    badge: "Aktif",
-    disabled: false,
-  },
-]
+export default async function Home() {
+  const { posts: latestPosts } = await getBlogPosts(1, 6, true)
 
-export default function Home() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {homepageJsonLd.map((schema, i) => (
@@ -149,6 +112,8 @@ export default function Home() {
         </div>
       </section>
 
+      <HomeRoadmap />
+
       {/* Stats strip */}
       <section className="border-y border-border bg-muted/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-8">
@@ -173,55 +138,11 @@ export default function Home() {
           <p className="text-xs uppercase tracking-widest text-muted-foreground">Araçlar</p>
           <h2 className="text-2xl font-serif font-bold text-foreground">Neler yapabilirsiniz?</h2>
         </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {TOOLS.map(({ href, icon: Icon, color, bg, title, desc, badge, disabled }) =>
-            disabled ? (
-              <div key={href} className="opacity-50 cursor-not-allowed">
-                <Card className="p-6 h-full border-dashed border-border">
-                  <div className="space-y-4">
-                    <div className={`w-11 h-11 rounded-xl ${bg.split(" ")[0]} flex items-center justify-center`}>
-                      <Icon className={`h-5 w-5 ${color}`} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <h3 className="text-base font-semibold text-foreground">{title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Lock className="h-3 w-3" />
-                      Yakında kullanılabilir
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            ) : (
-              <Link key={href} href={href} className="group">
-                <Card className="p-6 h-full border-border hover:border-primary/40 hover:shadow-md transition-all duration-200">
-                  <div className="space-y-4">
-                    <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center transition-colors`}>
-                      <Icon className={`h-5 w-5 ${color}`} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-base font-semibold text-foreground">{title}</h3>
-                        {badge && (
-                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-accent/15 text-accent border border-accent/20">
-                            {badge}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                      Aracı aç <ArrowRight className="h-3 w-3" />
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            )
-          )}
-        </div>
+        <HomeTabs />
       </section>
+
+      <HomeBlogSlider posts={latestPosts} />
+      <HomeGlossarySearch />
 
       <SiteFooter />
     </div>

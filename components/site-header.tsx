@@ -70,12 +70,9 @@ export function SiteHeader() {
         {/* Desktop */}
         <div className="hidden md:flex items-center justify-between gap-8 py-3.5">
 
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <img src="/logo.png" alt="TÜDAP Logo" className="h-9 w-9 transition-transform duration-200 group-hover:rotate-[-4deg]" />
-            <span>
-              <span className="block font-serif text-xl font-bold leading-none tracking-tight text-foreground">TÜDAP</span>
-              <span className="mt-1 block text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Türkçe Dilbilim</span>
-            </span>
+          <Link href="/" className="group shrink-0">
+            <span className="block font-serif text-xl font-bold leading-none tracking-tight text-foreground">TÜDAP</span>
+            <span className="mt-1 block text-[9px] uppercase tracking-[0.12em] text-muted-foreground">Türkçe Dilbilim Araştırma Platformu</span>
           </Link>
 
           <nav className="flex items-center gap-1 rounded-lg border border-border/70 bg-muted/35 p-1">
@@ -155,9 +152,9 @@ export function SiteHeader() {
 
         {/* Mobile */}
         <div className="md:hidden flex items-center justify-between py-3.5">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="TÜDAP Logo" className="h-8 w-8" />
-            <span className="font-serif text-base font-bold text-foreground">TÜDAP</span>
+          <Link href="/" className="block">
+            <span className="block font-serif text-base font-bold leading-none text-foreground">TÜDAP</span>
+            <span className="mt-1 block max-w-[230px] text-[8px] uppercase tracking-[0.08em] text-muted-foreground">Türkçe Dilbilim Araştırma Platformu</span>
           </Link>
           <Button
             variant="ghost"

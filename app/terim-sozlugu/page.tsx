@@ -48,7 +48,12 @@ export default function GlossaryPage() {
     })
   }
 
-  useEffect(() => { load(1, "Tümü", "") }, [])
+  useEffect(() => {
+    const initialSearch = new URLSearchParams(window.location.search).get("search") ?? ""
+    setSearchTerm(initialSearch)
+    setActiveSearch(initialSearch)
+    load(1, "Tümü", initialSearch)
+  }, [])
 
   const handleSearch = () => {
     setActiveSearch(searchTerm)
