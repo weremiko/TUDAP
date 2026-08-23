@@ -157,6 +157,20 @@ export const events = pgTable('events', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
+export const announcements = pgTable('announcements', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  content: text('content').notNull().default(''),
+  linkLabel: text('link_label'),
+  linkUrl: text('link_url'),
+  startsAt: timestamp('starts_at').notNull(),
+  endsAt: timestamp('ends_at'),
+  active: boolean('active').notNull().default(true),
+  createdById: text('created_by_id').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
 // ---
 // Add your app tables below. Always include a plain `userId` column so queries
 // can be scoped per user — the security model depends on this column existing,

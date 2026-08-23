@@ -17,6 +17,7 @@ import {
   Newspaper,
   Calendar,
   FileEdit,
+  Megaphone,
 } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
@@ -31,6 +32,7 @@ const allNavItems = [
   { label: "Blog",            href: "/admin/blog",           icon: Newspaper,      roles: ['admin', 'moderator'] },
   { label: "Ajanda",          href: "/admin/ajanda",         icon: Calendar,       roles: ['admin', 'moderator'] },
   { label: "Sayfalar",        href: "/admin/sayfalar",       icon: FileEdit,       roles: ['admin', 'moderator'] },
+  { label: "Duyurular",       href: "/admin/duyurular",      icon: Megaphone,      roles: ['admin', 'moderator'] },
   { label: "Sorgu Logları",   href: "/admin/loglar",         icon: ClipboardList,  roles: ['admin'] },
   { label: "Hata Raporları",  href: "/admin/hatalar",      icon: AlertTriangle,   roles: ['admin', 'moderator'] },
 ]

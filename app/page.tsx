@@ -8,6 +8,8 @@ import { HomeBlogSlider } from "@/components/home-blog-slider"
 import { HomeGlossarySearch } from "@/components/home-glossary-search"
 import { HomeRoadmap } from "@/components/home-roadmap"
 import { getBlogPosts } from "@/app/actions/blog"
+import { getActiveAnnouncement } from "@/app/actions/announcements"
+import { AnnouncementPopup } from "@/components/announcement-popup"
 import type { Metadata } from "next"
 
 const BASE = "https://dilbilim.org.tr"
@@ -72,7 +74,10 @@ const homepageJsonLd = [
 ]
 
 export default async function Home() {
-  const { posts: latestPosts } = await getBlogPosts(1, 6, true)
+  const [{ posts: latestPosts }, announcement] = await Promise.all([
+    getBlogPosts(1, 6, true),
+    getActiveAnnouncement(),
+  ])
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -80,6 +85,7 @@ export default async function Home() {
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       ))}
       <SiteHeader />
+      <AnnouncementPopup announcement={announcement} />
 
       {/* Hero */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl pt-20 sm:pt-28 pb-16 sm:pb-20">
