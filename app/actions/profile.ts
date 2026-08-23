@@ -131,15 +131,16 @@ export async function getOwnProfile() {
 export async function toggleFollow(targetUserId: string) {
   const userId = await requireUser()
   await ensureSocialTable()
-  if (userId === targetUserId) throw new Error('Kendi profilinizi takip edemezsiniz')
-  const [target] = await db.select({ id: user.id }).from(user).where(eq(user.id, targetUserId)).limit(1)
+  const [target] = await db.select({ id: user.id }).from(user)
+    .where(or(eq(user.id, targetUserId), eq(user.profileSlug, targetUserId))).limit(1)
   if (!target) throw new Error('Kullanıcı bulunamadı')
-  const [existing] = await db.select().from(userFollows).where(and(eq(userFollows.followerId, userId), eq(userFollows.followingId, targetUserId))).limit(1)
+  if (userId === target.id) throw new Error('Kendi profilinizi takip edemezsiniz')
+  const [existing] = await db.select().from(userFollows).where(and(eq(userFollows.followerId, userId), eq(userFollows.followingId, target.id))).limit(1)
   if (existing) {
-    await db.delete(userFollows).where(and(eq(userFollows.followerId, userId), eq(userFollows.followingId, targetUserId)))
+    await db.delete(userFollows).where(and(eq(userFollows.followerId, userId), eq(userFollows.followingId, target.id)))
     return false
   }
-  await db.insert(userFollows).values({ followerId: userId, followingId: targetUserId })
+  await db.insert(userFollows).values({ followerId: userId, followingId: target.id })
   return true
 }
 
@@ -166,7 +167,7 @@ export async function getPublicProfile(targetUserId: string) {
     .where(or(eq(user.profileSlug, targetUserId), eq(user.id, targetUserId)))
     .limit(1)
   if (!profile) return null
-  return { ...profile, isVerified: profile.blueVerified || hasEduDomain(profile.email), ...(await getFollowSummary(targetUserId)) }
+  return { ...profile, isVerified: profile.blueVerified || hasEduDomain(profile.email), ...(await getFollowSummary(profile.id)) }
 }
 
 function profileSlugBase(name: string) {
