@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect("/sign-in")
+  if (!session?.user) redirect("https://egm.gov.tr")
 
   const [currentUser] = await db
     .select({ role: user.role })
@@ -23,7 +23,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .where(eq(user.id, session.user.id))
     .limit(1)
 
-  if (!currentUser || (currentUser.role !== "admin" && currentUser.role !== "moderator")) redirect("/")
+  if (!currentUser || (currentUser.role !== "admin" && currentUser.role !== "moderator")) redirect("https://egm.gov.tr")
 
   return <AdminShell userRole={currentUser.role}>{children}</AdminShell>
 }
