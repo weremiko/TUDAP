@@ -95,6 +95,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="tr" className={`${inter.variable} bg-background`}>
       <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1996929774645844"
+          crossOrigin="anonymous"
+        />
         {structuredData.map((schema, i) => (
           <script
             key={i}
