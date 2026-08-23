@@ -3,8 +3,8 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 
 export const metadata: Metadata = {
-  title: "About — TÜDAP",
-  description: "About TÜDAP — Turkish Linguistics Platform. Learn about the project's purpose, features and academic foundation.",
+  title: "About — Turkish Linguistics Research Platform | TÜDAP",
+  description: "Learn about TÜDAP, a Turkish linguistics research platform for IPA transcription, terminology, academic writing and events.",
   alternates: {
     canonical: "https://dilbilim.org.tr/en/about",
     languages: { "tr": "https://dilbilim.org.tr/hakkinda" },
@@ -25,10 +25,10 @@ export default function AboutPage() {
           <div>
             <h2 className="text-base font-semibold text-foreground mb-3">About the Project</h2>
             <p>
-              TÜDAP (Türkçe Dilbilim Platformu — Turkish Linguistics Platform) was developed to address
-              the lack of digital resources in the field of linguistics. The project started from the idea
-              of a Turkish IPA converter and has since grown into a comprehensive platform covering phonetic
-              transcription, terminology dictionary and an academic events agenda.
+              TÜDAP (Türkçe Dilbilim Araştırma Platformu — Turkish Linguistics Research Platform) was created
+              to make reliable digital resources for Turkish linguistics easier to access. What began as a
+              Turkish IPA transcription tool has grown into a research-oriented platform connecting tools,
+              terminology, academic writing and events in one place.
             </p>
             <p className="mt-3 italic text-right text-xs">— The TÜDAP Team</p>
           </div>
@@ -37,12 +37,12 @@ export default function AboutPage() {
             <h2 className="text-base font-semibold text-foreground mb-3">Features</h2>
             <ul className="space-y-2 list-none">
               {[
-                "IPA phonetic transcription — broad transcription based on Turkish phonology",
-                "700+ linguistics terminology dictionary — with Turkish examples and academic definitions",
+                "IPA phonetic transcription — broad and narrow options informed by Turkish phonology",
+                "Linguistics terminology dictionary — Turkish examples, definitions and English equivalents",
                 "Academic blog — research articles and platform updates",
                 "Turkish Linguistics Agenda — seminars, conferences and workshops",
-                "Audio playback and file download",
-                "Completely free, no usage limit for registered users",
+                "Public community profiles and contribution features",
+                "Audio playback, local draft recovery and file download",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2">
                   <span className="text-primary mt-0.5 shrink-0">–</span>
@@ -73,9 +73,10 @@ export default function AboutPage() {
           <div>
             <h2 className="text-base font-semibold text-foreground mb-3">Academic Foundation</h2>
             <p>
-              The IPA transcription system is based on academic rules grounded in the phonological properties
-              of Turkish. Phonetic phenomena such as palatalization, word-final devoicing, vowel lengthening
-              and consonant assimilation are processed automatically.
+              The IPA transcription system is based on rules informed by the phonological properties of
+              Turkish. Phenomena such as palatalization, word-final devoicing, vowel lengthening and
+              consonant assimilation are processed automatically. The tool is actively developed and
+              should be reviewed by an expert before academic publication or high-impact use.
             </p>
           </div>
 

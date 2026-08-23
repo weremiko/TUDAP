@@ -5,9 +5,9 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 
 export const metadata: Metadata = {
-  title: "TÜDAP — Turkish Linguistics Platform",
+  title: "TÜDAP — Turkish Linguistics Research Platform",
   description:
-    "IPA phonetic transcription for Turkish, linguistics terminology dictionary, academic blog and events agenda. A free digital platform for linguists and researchers.",
+    "Turkish Linguistics Research Platform: IPA phonetic transcription, linguistics terminology dictionary, academic blog and events agenda.",
   keywords: [
     "Turkish linguistics", "IPA transcription", "Turkish phonetics", "phonemic transcription",
     "linguistics terminology", "TÜDAP", "dilbilim.org.tr", "Turkish phonology",
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
     languages: { "tr": "https://dilbilim.org.tr" },
   },
   openGraph: {
-    title: "TÜDAP — Turkish Linguistics Platform",
-    description: "IPA phonetic transcription, linguistics dictionary, blog and events for Turkish.",
+    title: "TÜDAP — Turkish Linguistics Research Platform",
+    description: "IPA phonetic transcription, linguistics dictionary, academic blog and events for Turkish.",
     url: "https://dilbilim.org.tr/en",
     siteName: "TÜDAP",
     locale: "en_US",
@@ -75,15 +75,15 @@ export default function EnHomePage() {
         <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pt-20 pb-16">
           <div className="max-w-3xl">
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-widest text-accent font-medium">Turkish Linguistics Platform</p>
+              <p className="text-xs uppercase tracking-widest text-accent font-medium">Turkish Linguistics Research Platform</p>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground tracking-tight leading-[1.08] text-balance">
                 Turkish Linguistics
                 <br />
-                Platform
+                Research Platform
               </h1>
             </div>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl">
-              Free academic tools for Turkish linguistics research. IPA phonetic transcription, terminology dictionary, blog and events agenda — all in one place.
+              Open academic tools for Turkish linguistics research. Explore IPA transcription, terminology, research writing and events in one place.
             </p>
             <div className="mt-8 flex items-center gap-4">
               <Link

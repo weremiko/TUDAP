@@ -18,10 +18,6 @@ const FAQ = [
     a: "Yes, TÜDAP is completely free and non-commercial.",
   },
   {
-    q: "Is my data stored?",
-    a: "No. The text you enter is only processed in your browser; no data is stored on our servers.",
-  },
-  {
     q: "How can I report a bug?",
     a: "You can use the 'Report Error' button on any tool page or send an email to the address below.",
   },
