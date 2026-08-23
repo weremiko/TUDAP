@@ -9,7 +9,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { BadgeCheck, Building2, CalendarDays, ExternalLink, Link2, Sparkles, Users } from 'lucide-react'
 
-export const metadata: Metadata = { title: 'Kullanıcı Profili — TÜDAP', robots: { index: false } }
+export const metadata: Metadata = { title: 'Kullanıcı Profili — TÜDAP', description: 'TÜDAP Türkçe Dilbilim Araştırma Platformu topluluk üyesi profili.', robots: { index: true, follow: true } }
 
 export default async function PublicProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params

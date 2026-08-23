@@ -6,8 +6,22 @@ import { desc, count, eq, gte, sql } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import PDFDocument from 'pdfkit'
+import { createMathChallenge, validateMathChallenge } from '@/lib/math-challenge'
 
 let errorColumnsReady: Promise<void> | null = null
+const reportAttempts = new Map<string, { count: number; resetAt: number }>()
+export async function getErrorReportChallenge() {
+  return createMathChallenge()
+}
+
+function reportRateAllowed(identifier: string) {
+  const now = Date.now()
+  const current = reportAttempts.get(identifier)
+  const window = current && current.resetAt > now ? current : { count: 0, resetAt: now + 60_000 }
+  window.count += 1
+  reportAttempts.set(identifier, window)
+  return window.count <= 5
+}
 
 function ensureErrorColumns() {
   if (!errorColumnsReady) {
@@ -35,8 +49,17 @@ export async function saveErrorReport(data: {
   url?: string
   errorWord?: string
   reportType?: 'error' | 'term-suggestion'
+  challenge?: string
+  challengeSignature?: string
+  challengeAnswer?: string
 }) {
   try {
+    const requestHeaders = await headers()
+    const identifier = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anonymous'
+    if (!reportRateAllowed(identifier)) throw new Error('Çok fazla hata raporu gönderildi')
+    if (!data.challenge || !data.challengeSignature || !data.challengeAnswer || !validateChallenge(data.challenge, data.challengeSignature, data.challengeAnswer)) {
+      throw new Error('İnsan doğrulaması başarısız')
+    }
     const message = typeof data.message === 'string' ? data.message.trim() : ''
     const userEmail = typeof data.userEmail === 'string' ? data.userEmail.trim() : ''
     const url = typeof data.url === 'string' ? data.url.trim() : ''
@@ -56,6 +79,7 @@ export async function saveErrorReport(data: {
     })
   } catch (error) {
     console.error('[v0] Error saving error report:', error)
+    throw error
   }
 }
 

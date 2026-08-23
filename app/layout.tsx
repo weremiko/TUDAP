@@ -10,11 +10,11 @@ const BASE = "https://dilbilim.org.tr"
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   title: {
-    default: "TÜDAP — Türkçe Dilbilim Platformu",
+    default: "TÜDAP — Türkçe Dilbilim Araştırma Platformu",
     template: "%s | TÜDAP",
   },
   description:
-    "Türkiye Türkçesine özgü IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik blog ve etkinlik ajandası. Dilbilimciler ve araştırmacılar için ücretsiz dijital platform.",
+    "Türkçe Dilbilim Araştırma Platformu: Türkiye Türkçesine özgü IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik blog ve etkinlik ajandası.",
   keywords: [
     "türkçe dilbilim", "IPA çevirici", "fonetik transkripsiyon", "türkçe IPA",
     "dilbilim terimleri sözlüğü", "sesbilim", "sözdizimi", "anlambilim",
@@ -30,13 +30,13 @@ export const metadata: Metadata = {
     locale: "tr_TR",
     url: BASE,
     siteName: "TÜDAP",
-    title: "TÜDAP — Türkçe Dilbilim Platformu",
+    title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu",
     description: "Türkiye Türkçesine özgü IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, blog ve etkinlik ajandası.",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "TÜDAP — Türkçe Dilbilim Platformu" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TÜDAP — Türkçe Dilbilim Platformu",
+    title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu",
     description: "Türkçe dilbilim araştırmaları için ücretsiz araçlar, blog ve etkinlik ajandası.",
     images: ["/og-image.png"],
   },
@@ -54,7 +54,7 @@ const org = {
   "@type": "Organization",
   "@id": `${BASE}/#organization`,
   name: "TÜDAP",
-  alternateName: "Türkçe Dilbilim Platformu",
+  alternateName: "Türkçe Dilbilim Araştırma Platformu",
   url: BASE,
   logo: {
     "@type": "ImageObject",
@@ -74,10 +74,10 @@ const structuredData = [
     "@type": "WebSite",
     "@id": `${BASE}/#website`,
     name: "TÜDAP",
-    alternateName: "Türkçe Dilbilim Platformu",
+    alternateName: "Türkçe Dilbilim Araştırma Platformu",
     url: BASE,
     inLanguage: ["tr", "en"],
-    description: "Türkçe Dilbilim Platformu — IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik blog ve etkinlik ajandası.",
+    description: "Türkçe Dilbilim Araştırma Platformu — IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik blog ve etkinlik ajandası.",
     potentialAction: {
       "@type": "SearchAction",
       target: { "@type": "EntryPoint", urlTemplate: `${BASE}/terim-sozlugu?q={search_term_string}` },

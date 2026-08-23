@@ -14,7 +14,7 @@ import { turkishToIPA } from "@/lib/turkish-to-ipa"
 import { sanitizeInput } from "@/lib/sanitize"
 import { useLocalStorage } from "@/hooks/use-local-storage"
 import { saveQueryLog, checkQueryLimit } from "@/app/actions/logs"
-import { saveErrorReport } from "@/app/actions/errors"
+import { getErrorReportChallenge, saveErrorReport } from "@/app/actions/errors"
 import { getCustomTranscriptions } from "@/app/actions/transcriptions"
 import { useSession } from "@/lib/auth-client"
 import { SiteHeader } from "@/components/site-header"
@@ -204,6 +204,8 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
   const [errorNote,          setErrorNote]           = useState("")
   const [errorWord,          setErrorWord]           = useState("")
   const [showErrorForm,      setShowErrorForm]       = useState(false)
+  const [reportChallenge,    setReportChallenge]     = useState<{ challenge: string; question: string; signature: string } | null>(null)
+  const [reportAnswer,       setReportAnswer]        = useState("")
 
   const sessionRestoredRef = useRef(false)
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
@@ -361,17 +363,31 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
       toast({ title: t.toastReportEmpty.title, description: t.toastReportEmpty.desc, variant: "destructive" })
       return
     }
+    if (!reportChallenge || !reportAnswer.trim()) {
+      toast({ title: "İnsan doğrulaması gerekli", description: "Lütfen matematik sorusunu yanıtlayın.", variant: "destructive" })
+      return
+    }
     
-    await saveErrorReport({
-      message: note,
-      userEmail: session?.user?.email || 'anonymous',
-      url: typeof window !== 'undefined' ? window.location.href : '',
-      errorWord: errorWord.trim(),
-    })
+    try {
+      await saveErrorReport({
+        message: note,
+        userEmail: session?.user?.email || 'anonymous',
+        url: typeof window !== 'undefined' ? window.location.href : '',
+        errorWord: errorWord.trim(),
+        challenge: reportChallenge.challenge,
+        challengeSignature: reportChallenge.signature,
+        challengeAnswer: reportAnswer,
+      })
+    } catch (error) {
+      toast({ title: "Rapor gönderilemedi", description: error instanceof Error ? error.message : "Lütfen tekrar deneyin.", variant: "destructive" })
+      return
+    }
     
     setShowErrorForm(false)
     setErrorNote("")
     setErrorWord("")
+    setReportAnswer("")
+    setReportChallenge(null)
     toast({ title: t.toastReportSent.title, description: t.toastReportSent.desc })
   }
 
@@ -531,7 +547,7 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
                 <div className="ml-auto flex items-center gap-2">
                   {!showErrorForm ? (
                     <Button
-                      onClick={() => setShowErrorForm(true)}
+                      onClick={async () => { setShowErrorForm(true); setReportChallenge(await getErrorReportChallenge()) }}
                       disabled={!outputText}
                       variant="ghost" size="sm"
                       className="text-xs text-destructive/70 hover:text-destructive hover:bg-destructive/10"
@@ -549,6 +565,18 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
                         placeholder={t.reportWord}
                         className="h-7 text-xs px-2 rounded border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                       />
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">{reportChallenge?.question ?? "Soru yükleniyor..."}</span>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={reportAnswer}
+                          onChange={(e) => setReportAnswer(e.target.value)}
+                          placeholder="Cevap"
+                          aria-label="Matematik sorusunun cevabı"
+                          className="h-7 w-20 text-xs px-2 rounded border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                      </div>
                       <input
                         type="text"
                         value={errorNote}
