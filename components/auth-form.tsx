@@ -51,7 +51,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     setLoading(true)
 
     const { error } = isSignUp
-      ? await authClient.signUp.email({ email, password, name, challenge: challenge.challenge, challengeSignature: challenge.signature, challengeAnswer } as never)
+      ? await authClient.signUp.email({ email, password, name, emailConfirmation, passwordConfirmation, challenge: challenge.challenge, challengeSignature: challenge.signature, challengeAnswer } as never)
       : await authClient.signIn.email({ email, password, challenge: challenge.challenge, challengeSignature: challenge.signature, challengeAnswer } as never)
 
     setLoading(false)
