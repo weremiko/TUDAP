@@ -19,6 +19,7 @@ import { getCustomTranscriptions } from "@/app/actions/transcriptions"
 import { useSession } from "@/lib/auth-client"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { CiteThisTool } from "@/components/cite-this-tool"
 
 const MAX_WORDS = 3
 
@@ -656,6 +657,8 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
               </div>
             </div>
           </div>
+
+          <CiteThisTool />
 
         </div>
       </main>
