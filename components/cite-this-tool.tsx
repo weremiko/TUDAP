@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Check, Copy, Quote } from "lucide-react"
+import { Check, ChevronDown, Copy, Quote } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -23,6 +23,7 @@ const citations: Record<CitationFormat, string> = {
 export function CiteThisTool() {
   const [activeFormat, setActiveFormat] = useState<CitationFormat>("apa")
   const [copied, setCopied] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
   const activeCitation = citations[activeFormat]
 
@@ -37,7 +38,23 @@ export function CiteThisTool() {
   }
 
   return (
-    <section className="rounded-2xl border border-border bg-card shadow-sm">
+    <div className="relative">
+      <Button
+        variant="ghost"
+        size="sm"
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        aria-expanded={isOpen}
+        aria-controls="cite-this-tool-panel"
+        className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+      >
+        <Quote className="h-4 w-4" />
+        <span className="hidden sm:inline">Akademik Atıf</span>
+        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+      </Button>
+
+      {isOpen && (
+      <section id="cite-this-tool-panel" className="absolute right-0 top-full z-20 mt-2 w-[calc(100vw-2rem)] max-w-[640px] rounded-2xl border border-border bg-card shadow-lg sm:w-[640px]">
       <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-muted/40 text-foreground">
@@ -92,6 +109,8 @@ export function CiteThisTool() {
           </div>
         </div>
       </div>
-    </section>
+      </section>
+      )}
+    </div>
   )
 }

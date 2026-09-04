@@ -501,6 +501,7 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
                 <BookOpen className="h-4 w-4" />
                 <span className="hidden sm:inline">{showReference ? t.refClose : t.refOpen}</span>
               </Button>
+              <CiteThisTool />
             </div>
 
           </div>
@@ -657,8 +658,6 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
               </div>
             </div>
           </div>
-
-          <CiteThisTool />
 
         </div>
       </main>
