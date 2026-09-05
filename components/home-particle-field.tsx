@@ -24,9 +24,15 @@ const VERTEX_SHADER = `
     position.z += waveA + waveB + waveC;
     position.y += sin(position.x * 1.5 + uTime * 0.35) * 0.035;
 
-    vec4 projected = vec4(position, 1.0);
-    gl_Position = projected;
-    gl_PointSize = uPointSize * (1.2 + position.z * 0.12) * (uResolution.y / 900.0);
+    float cameraDepth = 3.6 - position.z;
+    float perspective = 2.25 / cameraDepth;
+    gl_Position = vec4(
+      position.x * perspective * 3.1,
+      position.y * perspective * 2.35,
+      position.z / 4.0,
+      1.0
+    );
+    gl_PointSize = uPointSize * perspective * (uResolution.y / 900.0);
     vColor = aColor;
     vDepth = 1.0 - smoothstep(-1.0, 1.0, position.z);
   }
@@ -40,7 +46,7 @@ const FRAGMENT_SHADER = `
   void main() {
     vec2 point = gl_PointCoord - vec2(0.5);
     float distanceFromCenter = length(point);
-    float glow = 1.0 - smoothstep(0.08, 0.5, distanceFromCenter);
+    float glow = 1.0 - smoothstep(0.02, 0.5, distanceFromCenter);
     if (glow <= 0.01) discard;
     gl_FragColor = vec4(vColor, glow * (0.42 + vDepth * 0.38));
   }
@@ -168,7 +174,7 @@ export function HomeParticleField({ className = "" }: ParticleFieldProps) {
       gl.clear(gl.COLOR_BUFFER_BIT)
       gl.useProgram(program)
       gl.uniform1f(timeLocation, elapsed)
-      gl.uniform1f(pointSizeLocation, window.innerWidth < 640 ? 3.4 : 4.2)
+      gl.uniform1f(pointSizeLocation, window.innerWidth < 640 ? 6.0 : 8.0)
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height)
       gl.drawArrays(gl.POINTS, 0, PARTICLE_COUNT)
       animationFrame = window.requestAnimationFrame(render)
@@ -196,7 +202,7 @@ export function HomeParticleField({ className = "" }: ParticleFieldProps) {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className={`pointer-events-none absolute inset-0 h-full w-full opacity-80 ${className}`}
+      className={`pointer-events-none absolute inset-0 h-full w-full opacity-100 ${className}`}
     />
   )
 }
