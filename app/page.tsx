@@ -7,6 +7,7 @@ import { HomeTabs } from "@/components/home-tabs"
 import { HomeBlogSlider } from "@/components/home-blog-slider"
 import { HomeGlossarySearch } from "@/components/home-glossary-search"
 import { HomeRoadmap } from "@/components/home-roadmap"
+import { HomeParticleField } from "@/components/home-particle-field"
 import { getBlogPosts } from "@/app/actions/blog"
 import { getActiveAnnouncement } from "@/app/actions/announcements"
 import { AnnouncementPopup } from "@/components/announcement-popup"
@@ -88,8 +89,11 @@ export default async function Home() {
       <AnnouncementPopup announcement={announcement} />
 
       {/* Hero */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl pt-20 sm:pt-28 pb-16 sm:pb-20">
-        <div className="max-w-3xl space-y-8">
+      <section className="relative isolate min-h-[560px] overflow-hidden border-b border-border/60 bg-background/80">
+        <HomeParticleField />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_35%,rgba(255,255,255,0.92),transparent_42%),linear-gradient(90deg,rgba(255,255,255,0.82),rgba(255,255,255,0.25)_70%,transparent)] dark:bg-[radial-gradient(circle_at_15%_35%,rgba(12,18,40,0.92),transparent_48%),linear-gradient(90deg,rgba(12,18,40,0.86),rgba(12,18,40,0.22)_70%,transparent)]" />
+        <div className="relative z-10 container mx-auto flex min-h-[560px] items-center px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+          <div className="max-w-3xl space-y-8">
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-widest text-accent font-medium">Türkçe Dilbilim Platformu</p>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground tracking-tight leading-[1.08] text-balance">
@@ -114,6 +118,7 @@ export default async function Home() {
                 Platform Hakkında
               </Button>
             </Link>
+          </div>
           </div>
         </div>
       </section>
