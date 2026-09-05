@@ -89,20 +89,20 @@ export default async function Home() {
       <AnnouncementPopup announcement={announcement} />
 
       {/* Hero */}
-      <section className="relative isolate min-h-[560px] overflow-hidden border-b border-slate-800 bg-[#071426]">
-        <HomeParticleField />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_48%,transparent_12%,rgba(7,20,38,0.16)_56%,rgba(7,20,38,0.72)_100%),linear-gradient(90deg,rgba(7,20,38,0.58),rgba(7,20,38,0.18)_55%,rgba(7,20,38,0.5))]" />
+      <section className="relative isolate min-h-[560px] overflow-hidden border-b border-[#ded8cc] bg-[#f4f1e9]">
+        <HomeParticleField className="opacity-65" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_48%,rgba(244,241,233,0.02),rgba(244,241,233,0.38)_44%,rgba(244,241,233,0.88)_82%),linear-gradient(90deg,rgba(244,241,233,0.98)_0%,rgba(244,241,233,0.9)_31%,rgba(244,241,233,0.38)_64%,rgba(244,241,233,0.08)_100%)]" />
         <div className="relative z-10 container mx-auto flex min-h-[560px] items-center px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
-          <div className="mx-auto w-full max-w-5xl space-y-8 lg:pl-[12%]">
+          <div className="w-full max-w-6xl space-y-8">
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-widest text-cyan-300 font-medium">Türkçe Dilbilim Platformu</p>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-white tracking-tight leading-[1.08] text-balance">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#8c5d38] font-medium">Türkçe Dilbilim Platformu</p>
+            <h1 className="max-w-2xl text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-[#171612] tracking-tight leading-[1.05] text-balance">
               Türkçe Dilbilim
               <br />
               Platformu
             </h1>
           </div>
-          <p className="text-lg text-slate-300 leading-relaxed max-w-2xl">
+          <p className="max-w-xl text-lg text-[#5d5a53] leading-relaxed">
             Türkiye Türkçesine özgü fonetik transkripsiyon, sözdizimsel analiz ve terminoloji araçları.
             Akademik çalışmalar ve dilbilim eğitimi için geliştirilmiş dijital platform.
           </p>
@@ -114,7 +114,7 @@ export default async function Home() {
               </Button>
             </Link>
             <Link href="/hakkinda">
-              <Button variant="outline" size="lg" className="h-11 border-slate-500 bg-white/5 px-7 text-sm font-medium text-white hover:bg-white/10 hover:text-white">
+              <Button variant="outline" size="lg" className="h-11 border-[#aaa398] bg-transparent px-7 text-sm font-medium text-[#24221e] hover:bg-white/60 hover:text-[#171612]">
                 Platform Hakkında
               </Button>
             </Link>

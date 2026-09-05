@@ -202,7 +202,7 @@ export function HomeParticleField({ className = "" }: ParticleFieldProps) {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className={`pointer-events-none absolute inset-0 h-full w-full opacity-100 ${className}`}
+      className={`pointer-events-none absolute inset-0 h-full w-full ${className}`}
     />
   )
 }
