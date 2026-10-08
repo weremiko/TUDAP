@@ -1,8 +1,8 @@
 "use client"
 
 import { useId, useState } from "react"
-import { upload } from "@vercel/blob/client"
-import { X } from "lucide-react"
+import { uploadPresigned } from "@vercel/blob/client"
+import { Check, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { MEDIA_UPLOAD_RULES, type ContentType, formatFileSize } from "@/lib/content-media"
@@ -47,16 +47,20 @@ export function ContentMediaUpload({
     onUploadingChange(true)
     setProgress(0)
     try {
-      const blob = await upload(`content/${Date.now()}-${safeName}`, file, {
-        access: "public",
+      const blob = await uploadPresigned(`content/${Date.now()}-${safeName}`, file, {
+        access: "private",
         handleUploadUrl: "/api/content-upload",
         clientPayload: JSON.stringify({ contentType }),
         multipart: file.size > 5 * 1024 * 1024,
         onUploadProgress: ({ percentage }) => setProgress(Math.round(percentage)),
       })
-      onMediaUrlChange(blob.url)
+      onMediaUrlChange(blob.pathname)
     } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : "Dosya yüklenemedi.")
+      const message = uploadError instanceof Error ? uploadError.message : "Dosya yüklenemedi."
+      const lowerMessage = message.toLowerCase()
+      setError(lowerMessage.includes("token") || lowerMessage.includes("presigned url")
+        ? "Private Blob bağlantısı eksik. Vercel projesine bu store'u bağlayıp BLOB_STORE_ID, VERCEL_OIDC_TOKEN ve BLOB_WEBHOOK_PUBLIC_KEY değişkenlerini etkinleştirin."
+        : message)
     } finally {
       setUploading(false)
       onUploadingChange(false)
@@ -84,7 +88,7 @@ export function ContentMediaUpload({
       {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
       {mediaUrl && (
         <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
-          <a href={mediaUrl} target="_blank" rel="noopener noreferrer" className="min-w-0 truncate text-sm text-primary hover:underline">Yüklenmiş dosyayı görüntüle</a>
+          <span className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground"><Check className="h-4 w-4 shrink-0 text-emerald-600" />Dosya yüklendi; kaydedince içerikle ilişkilendirilir.</span>
           <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => onMediaUrlChange("")} aria-label="Yüklenen dosyayı kaldır" disabled={uploading}>
             <X className="h-4 w-4" />
           </Button>

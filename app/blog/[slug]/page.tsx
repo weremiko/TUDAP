@@ -4,6 +4,7 @@ import Link from "next/link"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { getBlogPostBySlug } from "@/app/actions/blog"
+import { getContentMediaUrl } from "@/lib/content-media"
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -115,9 +116,10 @@ export default async function BlogPostPage({ params }: Props) {
   const wordCount = post.content.split(/\s+/).filter(Boolean).length
   const readTime = Math.ceil(wordCount / 200)
   const embedUrl = getMediaEmbed(post.contentType, post.mediaUrl)
+  const mediaSrc = post.mediaUrl ? getContentMediaUrl(post.mediaUrl) : null
   const directVideo = post.contentType === 'video' && post.mediaUrl && /\.(mp4|webm|ogg)(?:$|\?)/i.test(post.mediaUrl)
   const directAudio = post.contentType === 'audio' && post.mediaUrl && /\.(mp3|wav|ogg|m4a|aac)(?:$|\?)/i.test(post.mediaUrl)
-  const directDocument = post.contentType === 'document' && post.mediaUrl && /\.pdf(?:$|\?)/i.test(post.mediaUrl)
+  const directDocument = (post.contentType === 'document' || post.contentType === 'slides') && post.mediaUrl && /\.pdf(?:$|\?)/i.test(post.mediaUrl)
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -189,15 +191,15 @@ export default async function BlogPostPage({ params }: Props) {
         {post.mediaUrl && (
           <section className="mb-10 overflow-hidden rounded-lg border border-border bg-muted/20">
             {directVideo ? (
-              <video className="aspect-video w-full bg-black" src={post.mediaUrl} controls preload="metadata" />
+              <video className="aspect-video w-full bg-black" src={mediaSrc ?? undefined} controls preload="metadata" />
             ) : directAudio ? (
-              <audio className="w-full p-5" src={post.mediaUrl} controls preload="metadata" />
+              <audio className="w-full p-5" src={mediaSrc ?? undefined} controls preload="metadata" />
             ) : directDocument ? (
-              <iframe className="aspect-[3/4] w-full" src={post.mediaUrl} title={post.title} />
+              <iframe className="aspect-[3/4] w-full" src={mediaSrc ?? undefined} title={post.title} />
             ) : embedUrl ? (
               <iframe className="aspect-video w-full" src={embedUrl} title={post.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
             ) : (
-              <a href={post.mediaUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-4 p-5 text-sm font-medium text-primary hover:underline">
+              <a href={mediaSrc ?? undefined} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-4 p-5 text-sm font-medium text-primary hover:underline">
                 {post.contentType === 'video' ? 'Videoyu aç' : post.contentType === 'slides' ? 'Slayt sunumunu aç' : post.contentType === 'audio' ? 'Podcast’i aç' : 'Belgeyi aç'}<span aria-hidden="true">↗</span>
               </a>
             )}

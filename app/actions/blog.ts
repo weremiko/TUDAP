@@ -8,6 +8,7 @@ import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { sql } from 'drizzle-orm'
 import { recordModeratorAction } from '@/lib/moderator-audit'
+import { isContentType, isUploadedContentPath, type ContentType } from '@/lib/content-media'
 
 let submissionColumnReady: Promise<void> | null = null
 function ensureSubmissionColumn() {
@@ -42,14 +43,12 @@ function generateSlug(title: string): string {
     .replace(/-+/g, '-')
 }
 
-type ContentType = 'article' | 'video' | 'slides' | 'audio' | 'document'
-
 function validateContentMedia(contentType: ContentType | undefined, rawMediaUrl: string | undefined) {
   const type = contentType ?? 'article'
   const mediaUrl = rawMediaUrl?.trim() || ''
-  if (!['article', 'video', 'slides'].includes(type)) throw new Error('Geçersiz içerik türü')
+  if (!isContentType(type)) throw new Error('Geçersiz içerik türü')
   if (mediaUrl.length > 2048) throw new Error('Medya bağlantısı çok uzun')
-  if (mediaUrl) {
+  if (mediaUrl && !isUploadedContentPath(mediaUrl)) {
     try {
       if (new URL(mediaUrl).protocol !== 'https:') throw new Error()
     } catch {

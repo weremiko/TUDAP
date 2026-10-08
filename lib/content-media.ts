@@ -35,3 +35,15 @@ export function formatFileSize(bytes: number) {
   if (bytes >= 1024 * 1024) return `${Math.round(bytes / (1024 * 1024))} MB`
   return `${Math.round(bytes / 1024)} KB`
 }
+
+export function isUploadedContentPath(value: string) {
+  return value.startsWith('content/') &&
+    value.length <= 300 &&
+    /^[a-zA-Z0-9._/-]+$/.test(value) &&
+    !value.split('/').some((segment) => !segment || segment === '.' || segment === '..')
+}
+
+export function getContentMediaUrl(mediaUrl: string) {
+  if (!isUploadedContentPath(mediaUrl)) return mediaUrl
+  return `/api/content-media?pathname=${encodeURIComponent(mediaUrl)}`
+}

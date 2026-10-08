@@ -19,7 +19,7 @@ const SECTIONS = [
   },
   {
     title: "İçerik Başvuruları ve Medya Dosyaları",
-    body: "Üyelerin gönderdiği içerik başvurularındaki başlık, açıklama, metin ve hesap bilgileri başvuruyu değerlendirmek için saklanır. Yüklenen video, podcast ve PDF dosyaları Vercel Blob üzerinde herkese açık bir URL ile depolanır. Başvuru onaylanana kadar içerik listesinde gösterilmez; ancak URL'ye sahip kişiler dosyaya erişebilir. Yalnızca yayımlanmasını istediğiniz dosyaları yükleyin.",
+    body: "Üyelerin gönderdiği içerik başvurularındaki başlık, açıklama, metin ve hesap bilgileri başvuruyu değerlendirmek için saklanır. Video, podcast ve PDF dosyaları private Vercel Blob depolamasında tutulur. Dosyalar yalnızca yayımlanmış içeriklerde veya başvuruyu yapan üye ve yetkili moderatörler tarafından görüntülenebilir; medya bağlantıları kısa ömürlü imzalı erişimle sunulur.",
   },
   {
     title: "Çerezler ve Yerel Depolama",
@@ -31,7 +31,7 @@ const SECTIONS = [
   },
   {
     title: "Veri Saklama ve Güvenliği",
-    body: "Sorgu günlükleri, hesap bilgileri ve başvuru kayıtları Neon Postgres veritabanında depolanır. Uygulama verilerine erişim yetkilendirme ile sınırlandırılır; herkese açık medya dosyalarına URL'si olan kişiler erişebilir. Tüm bağlantılar HTTPS üzerinden şifrelenir.",
+    body: "Sorgu günlükleri, hesap bilgileri ve başvuru kayıtları Neon Postgres veritabanında depolanır. Uygulama verilerine erişim yetkilendirme ile sınırlandırılır; medya dosyaları private Blob depolamasında tutulur ve erişim her istekte içerik yayını veya kullanıcı rolüne göre denetlenir. Tüm bağlantılar HTTPS üzerinden şifrelenir.",
   },
   {
     title: "Çocukların Gizliliği",

@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { Plus, Pencil, Trash2, Globe, EyeOff, ExternalLink, RefreshCw, FileText } from "lucide-react"
 import { getAdminBlogPostsByStatus, deleteBlogPost, toggleBlogPostPublished, setBlogSubmissionStatus } from "@/app/actions/blog"
+import { getContentMediaUrl } from "@/lib/content-media"
 
 interface Post {
   id: number
@@ -24,6 +25,7 @@ interface Post {
   createdAt: Date
   updatedAt: Date
   contentType?: string
+  mediaUrl?: string | null
 }
 
 export default function AdminBlogPage() {
@@ -138,6 +140,7 @@ export default function AdminBlogPage() {
                     {post.excerpt && (
                       <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{post.excerpt}</p>
                     )}
+                    {post.mediaUrl && <a href={getContentMediaUrl(post.mediaUrl)} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex text-xs font-medium text-primary hover:underline">Medya önizlemesi</a>}
                     <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
                       <span>{post.authorName}</span>
                       <span>{new Date(post.createdAt).toLocaleDateString("tr-TR")}</span>
