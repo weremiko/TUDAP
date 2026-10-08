@@ -7,6 +7,7 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { sql } from 'drizzle-orm'
+import { recordModeratorAction } from '@/lib/moderator-audit'
 
 let announcementsTableReady: Promise<void> | null = null
 
@@ -84,23 +85,26 @@ export async function createAnnouncement(data: {
   const endsAt = data.endsAt ? new Date(data.endsAt) : null
   if (Number.isNaN(startsAt.getTime()) || endsAt && Number.isNaN(endsAt.getTime()) || endsAt && endsAt <= startsAt) throw new Error('Duyuru tarihleri geçersiz')
   const [announcement] = await db.insert(announcements).values({ title, content, linkLabel, linkUrl: linkUrl || null, startsAt, endsAt, active: data.active, createdById: userId }).returning()
+  await recordModeratorAction(userId, 'create', 'announcement', announcement.id, title)
   revalidatePath('/')
   revalidatePath('/admin/duyurular')
   return announcement
 }
 
 export async function toggleAnnouncement(id: number, active: boolean) {
-  await requireAdminOrModerator()
+  const userId = await requireAdminOrModerator()
   await ensureAnnouncementsTable()
   await db.update(announcements).set({ active, updatedAt: new Date() }).where(eq(announcements.id, id))
+  await recordModeratorAction(userId, active ? 'activate' : 'deactivate', 'announcement', id)
   revalidatePath('/')
   revalidatePath('/admin/duyurular')
 }
 
 export async function deleteAnnouncement(id: number) {
-  await requireAdminOrModerator()
+  const userId = await requireAdminOrModerator()
   await ensureAnnouncementsTable()
   await db.delete(announcements).where(eq(announcements.id, id))
+  await recordModeratorAction(userId, 'delete', 'announcement', id)
   revalidatePath('/')
   revalidatePath('/admin/duyurular')
 }

@@ -1,140 +1,82 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Languages, BookText, ArrowRight, Calendar, Newspaper } from "lucide-react"
+import { ArrowRight, ArrowUpRight, BookOpenText, CalendarDays, FileStack, Languages } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { HomeParticleField } from "@/components/home-particle-field"
+
+const BASE = "https://dilbilim.org.tr"
 
 export const metadata: Metadata = {
   title: "TÜDAP — Turkish Linguistics Research Platform",
-  description:
-    "Turkish Linguistics Research Platform: IPA phonetic transcription, linguistics terminology dictionary, academic blog and events agenda.",
-  keywords: [
-    "Turkish linguistics", "IPA transcription", "Turkish phonetics", "phonemic transcription",
-    "linguistics terminology", "TÜDAP", "dilbilim.org.tr", "Turkish phonology",
-  ],
-  alternates: {
-    canonical: "https://dilbilim.org.tr/en",
-    languages: { "tr": "https://dilbilim.org.tr" },
-  },
+  description: "Open research tools and resources for Turkish linguistics: IPA transcription, terminology, scholarly content and academic events.",
+  keywords: ["Turkish linguistics", "IPA transcription", "Turkish phonetics", "linguistics terminology", "TÜDAP", "Turkish phonology"],
+  alternates: { canonical: `${BASE}/en`, languages: { tr: BASE } },
   openGraph: {
     title: "TÜDAP — Turkish Linguistics Research Platform",
-    description: "IPA phonetic transcription, linguistics dictionary, academic blog and events for Turkish.",
-    url: "https://dilbilim.org.tr/en",
+    description: "Open tools and shared resources for research on Turkish.",
+    url: `${BASE}/en`,
     siteName: "TÜDAP",
     locale: "en_US",
     type: "website",
   },
 }
 
-const TOOLS = [
-  {
-    href: "/cevirici",
-    icon: Languages,
-    color: "text-chart-1",
-    bg: "bg-chart-1/10 group-hover:bg-chart-1/20",
-    title: "Phonetic Transcription Tool",
-    desc: "Convert Turkish text into IPA notation. Academic broad transcription based on Turkish phonological properties.",
-    badge: "Active",
-  },
-  {
-    href: "/terim-sozlugu",
-    icon: BookText,
-    color: "text-chart-2",
-    bg: "bg-chart-2/10 group-hover:bg-chart-2/20",
-    title: "Linguistics Terminology Dictionary",
-    desc: "700+ terms with Turkish examples and academic explanations. Phonology, syntax, semantics and more.",
-    badge: "Active",
-  },
-  {
-    href: "/blog",
-    icon: Newspaper,
-    color: "text-chart-3",
-    bg: "bg-chart-3/10 group-hover:bg-chart-3/20",
-    title: "Blog",
-    desc: "Linguistics research, academic articles and platform updates. Expert writing on current developments.",
-    badge: "Active",
-  },
-  {
-    href: "/ajanda",
-    icon: Calendar,
-    color: "text-chart-4",
-    bg: "bg-chart-4/10 group-hover:bg-chart-4/20",
-    title: "Turkish Linguistics Agenda",
-    desc: "Follow seminars, conferences, workshops and other linguistics events held in Turkey.",
-    badge: "Active",
-  },
+const RESOURCES = [
+  { href: "/en/transcriber", icon: Languages, index: "01", title: "Phonetic transcription", detail: "Turn Turkish text into IPA, with broad and narrow transcription options.", access: "English interface" },
+  { href: "/terim-sozlugu", icon: BookOpenText, index: "02", title: "Terminology dictionary", detail: "Browse a growing collection of linguistics terms, definitions and English equivalents.", access: "Turkish interface" },
+  { href: "/blog", icon: FileStack, index: "03", title: "Research contents", detail: "Articles and media shared by the Turkish linguistics community.", access: "Mostly Turkish" },
+  { href: "/ajanda", icon: CalendarDays, index: "04", title: "Events agenda", detail: "Seminars, conferences and workshops taking place across Türkiye.", access: "Turkish interface" },
 ]
 
 export default function EnHomePage() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
       <main className="flex-1">
-
-        {/* Hero */}
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pt-20 pb-16">
-          <div className="max-w-3xl">
-            <div className="space-y-2">
-              <p className="text-xs uppercase tracking-widest text-accent font-medium">Turkish Linguistics Research Platform</p>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground tracking-tight leading-[1.08] text-balance">
-                Turkish Linguistics
-                <br />
-                Research Platform
+        <section className="relative isolate overflow-hidden border-b border-[#d5d9ce] bg-[#edf0e8]">
+          <HomeParticleField className="opacity-45" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(237,240,232,0.98)_0%,rgba(237,240,232,0.9)_43%,rgba(237,240,232,0.24)_100%)]" />
+          <div className="relative mx-auto flex min-h-[510px] max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
+            <div className="max-w-3xl">
+              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.18em] text-[#526a55]">TÜDAP · Turkish Linguistics Research Platform</p>
+              <h1 className="max-w-2xl font-serif text-5xl font-bold leading-[1.04] text-[#20271f] sm:text-6xl">
+                Turkish Linguistics<br />Research Platform
               </h1>
-            </div>
-            <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl">
-              Open academic tools for Turkish linguistics research. Explore IPA transcription, terminology, research writing and events in one place.
-            </p>
-            <div className="mt-8 flex items-center gap-4">
-              <Link
-                href="/cevirici"
-                className="inline-flex items-center gap-2 bg-foreground text-background px-5 py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
-              >
-                Open Transcriber
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/en/about"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                About the platform
-              </Link>
+              <p className="mt-6 max-w-xl text-base leading-7 text-[#566157]">
+                A shared workspace for exploring Turkish sounds, terminology, research and the people building linguistic knowledge.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <Link href="/en/transcriber" className="inline-flex h-11 items-center gap-2 rounded-md bg-[#263b2b] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#385640]">
+                  Open the transcriber <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link href="/en/about" className="inline-flex items-center gap-1 text-sm font-medium text-[#33483a] hover:underline">
+                  About TÜDAP <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <p className="mt-8 text-xs text-[#687367]">The transcription tool has an English interface; several community resources are currently Turkish-first.</p>
             </div>
           </div>
         </section>
 
-        {/* Tools */}
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pb-24">
-          <div className="flex items-end justify-between mb-8">
+        <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 sm:py-16">
+          <div className="mb-7 flex flex-wrap items-end justify-between gap-3 border-b border-border pb-5">
             <div>
-              <p className="text-xs uppercase tracking-widest text-accent font-medium mb-1">Modules</p>
-              <h2 className="text-2xl font-serif font-bold text-foreground">Tools & Resources</h2>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">Explore TÜDAP</p>
+              <h2 className="mt-2 font-serif text-2xl font-bold text-foreground">Tools &amp; community resources</h2>
             </div>
+            <p className="max-w-md text-sm leading-6 text-muted-foreground">Start with the transcriber, then explore resources contributed to Turkish linguistics.</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {TOOLS.map(({ href, icon: Icon, color, bg, title, desc, badge }) => (
-              <Link
-                key={href}
-                href={href}
-                className="group relative flex flex-col gap-4 rounded-xl border border-border bg-card p-6 hover:border-primary/30 hover:shadow-md transition-all duration-200"
-              >
-                <div className="flex items-start justify-between">
-                  <div className={`w-10 h-10 rounded-lg ${bg} flex items-center justify-center transition-colors`}>
-                    <Icon className={`h-5 w-5 ${color}`} />
-                  </div>
-                  <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border rounded-full px-2 py-0.5">
-                    {badge}
-                  </span>
+          <div className="grid grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:gap-x-10 sm:divide-y-0 lg:grid-cols-4">
+            {RESOURCES.map(({ href, icon: Icon, index, title, detail, access }) => (
+              <Link key={href} href={href} className="group flex min-h-52 flex-col border-b border-border py-5 sm:border-b-0 sm:py-4">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs text-muted-foreground">{index}</span>
+                  <Icon className="h-5 w-5 text-[#52705a] transition-transform group-hover:-translate-y-0.5" />
                 </div>
-                <div className="flex-1 space-y-1.5">
-                  <h3 className="font-semibold text-foreground text-sm leading-snug group-hover:text-primary transition-colors">
-                    {title}
-                  </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
-                </div>
-                <div className="flex items-center gap-1 text-xs text-primary font-medium">
-                  Explore <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-                </div>
+                <h3 className="mt-6 font-serif text-lg font-semibold text-foreground group-hover:text-primary">{title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-6 text-muted-foreground">{detail}</p>
+                <span className="mt-4 text-[11px] font-medium uppercase text-[#667765]">{access}</span>
               </Link>
             ))}
           </div>

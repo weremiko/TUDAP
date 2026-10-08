@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useTransition } from "react"
-import { getAllUsers, setUserRole, deleteUser, setUserBlueVerification, setUserTeamMember } from "@/app/actions/admin"
+import { getAllUsers, setUserRole, deleteUser, setUserBlueVerification, setUserTeamMember, setUserPoints } from "@/app/actions/admin"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,6 +10,7 @@ import {
 import { ShieldCheck, ShieldHalf, Trash2, Loader2, RefreshCw, BadgeCheck, UsersRound } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
+import { Input } from "@/components/ui/input"
 
 type User = Awaited<ReturnType<typeof getAllUsers>>[number]
 type Role = "admin" | "moderator" | "user"
@@ -31,6 +32,7 @@ export default function UsersPage() {
   const [users, setUsers]   = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [isPending, startTransition] = useTransition()
+  const [pointDrafts, setPointDrafts] = useState<Record<string, string>>({})
 
   const load = async () => {
     setLoading(true)
@@ -74,6 +76,19 @@ export default function UsersPage() {
     })
   }
 
+  const handlePointsSave = (u: User) => {
+    const points = Number(pointDrafts[u.id] ?? u.points)
+    startTransition(async () => {
+      try {
+        await setUserPoints(u.id, points)
+        toast({ title: "Topluluk puanı güncellendi", description: `${u.name}: ${points} puan` })
+        await load()
+      } catch (error) {
+        toast({ title: "Puan güncellenemedi", description: error instanceof Error ? error.message : "Bir hata oluştu.", variant: "destructive" })
+      }
+    })
+  }
+
   return (
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between">
@@ -103,6 +118,7 @@ export default function UsersPage() {
                 <th className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3">Ad Soyad</th>
                 <th className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3">E-posta</th>
                 <th className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3">Mevcut Rol</th>
+                <th className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3">Topluluk Puanı</th>
                 <th className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3 hidden sm:table-cell">Kayıt Tarihi</th>
                 <th className="text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3">Rol Değiştir</th>
                 <th className="w-10 px-4 py-3"></th>
@@ -127,6 +143,12 @@ export default function UsersPage() {
                       <span className={`inline-flex items-center text-xs px-2 py-0.5 rounded-full border font-medium ${ROLE_STYLES[role]}`}>
                         {ROLE_LABELS[role]}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Input aria-label={`${u.name} topluluk puanı`} type="number" min={0} max={1000000} step={1} value={pointDrafts[u.id] ?? String(u.points)} onChange={(event) => setPointDrafts((current) => ({ ...current, [u.id]: event.target.value }))} className="h-8 w-24" />
+                        <Button variant="outline" size="sm" className="h-8" disabled={isPending} onClick={() => handlePointsSave(u)}>Kaydet</Button>
+                      </div>
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
                       <p className="text-sm text-muted-foreground">

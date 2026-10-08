@@ -6,12 +6,14 @@ import { eq, desc } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { revalidatePath, revalidateTag } from 'next/cache'
+import { recordModeratorAction } from '@/lib/moderator-audit'
 
 async function checkAdminOrModerator() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) throw new Error('Unauthorized')
   const [u] = await db.select({ role: user.role }).from(user).where(eq(user.id, session.user.id)).limit(1)
   if (!u || (u.role !== 'admin' && u.role !== 'moderator')) throw new Error('Forbidden')
+  return session.user.id
 }
 
 export async function getCustomTranscriptions() {
@@ -40,6 +42,7 @@ export async function addCustomTranscription(data: {
     .from(customTranscriptions)
     .where(eq(customTranscriptions.input, data.input.trim()))
     .limit(1)
+  let targetId = existing[0]?.id
 
   if (existing.length > 0) {
     await db.update(customTranscriptions)
@@ -50,13 +53,15 @@ export async function addCustomTranscription(data: {
       })
       .where(eq(customTranscriptions.id, existing[0].id))
   } else {
-    await db.insert(customTranscriptions).values({
+    const [created] = await db.insert(customTranscriptions).values({
       input: data.input.trim(),
       output: data.output.trim(),
       category: data.category || 'exception',
       notes: data.notes || '',
-    })
+    }).returning({ id: customTranscriptions.id })
+    targetId = created.id
   }
+  await recordModeratorAction(session.user.id, existing.length ? 'update' : 'create', 'fixed-transcription', targetId, data.input.trim())
 
   revalidatePath('/admin/sabit-ceviriler')
 }
@@ -70,7 +75,7 @@ export async function updateCustomTranscription(
     notes?: string
   }
 ) {
-  await checkAdminOrModerator()
+  const userId = await checkAdminOrModerator()
   
   if (!data.input.trim() || !data.output.trim()) {
     throw new Error('Giriş ve çıkış boş olamaz')
@@ -84,14 +89,16 @@ export async function updateCustomTranscription(
       notes: data.notes || '',
     })
     .where(eq(customTranscriptions.id, id))
+  await recordModeratorAction(userId, 'update', 'fixed-transcription', id, data.input.trim())
   
   revalidatePath('/admin/sabit-ceviriler')
   revalidateTag('custom-transcriptions')
 }
 
 export async function deleteCustomTranscription(id: number) {
-  await checkAdminOrModerator()
+  const userId = await checkAdminOrModerator()
   await db.delete(customTranscriptions).where(eq(customTranscriptions.id, id))
+  await recordModeratorAction(userId, 'delete', 'fixed-transcription', id)
   revalidatePath('/admin/sabit-ceviriler')
   revalidateTag('custom-transcriptions')
 }

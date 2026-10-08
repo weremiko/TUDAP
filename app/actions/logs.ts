@@ -1,10 +1,11 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { queryLogs, user } from '@/lib/db/schema'
+import { moderatorActionLogs, queryLogs, user } from '@/lib/db/schema'
 import { desc, count, ilike, or, and, gte, eq, sql } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
+import { ensureModeratorAuditTable } from '@/lib/moderator-audit'
 
 const ANONYMOUS_MINUTE_LIMIT = 10
 const MEMBER_MINUTE_LIMIT = 60
@@ -99,6 +100,22 @@ export async function getLogStats() {
     db.select({ todayCount: count() }).from(queryLogs).where(gte(queryLogs.createdAt, today)),
   ])
   return { total: Number(total), today: Number(todayCount) }
+}
+
+export async function getModeratorActionLogs(page = 1) {
+  await requireAdmin()
+  await ensureModeratorAuditTable()
+  const perPage = 25
+  const safePage = Math.max(1, Math.floor(page))
+  const offset = (safePage - 1) * perPage
+  const [rows, [{ total }]] = await Promise.all([
+    db.select().from(moderatorActionLogs)
+      .orderBy(desc(moderatorActionLogs.createdAt))
+      .limit(perPage)
+      .offset(offset),
+    db.select({ total: count() }).from(moderatorActionLogs),
+  ])
+  return { rows, total: Number(total), pages: Math.max(1, Math.ceil(Number(total) / perPage)) }
 }
 
 // Anonymous: 10/minute by IP. Members: 60/minute.

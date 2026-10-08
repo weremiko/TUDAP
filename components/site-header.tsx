@@ -30,6 +30,8 @@ const LANG_MAP: Record<string, string> = {
   "/en/about":   "/hakkinda",
   "/en/contact": "/iletisim",
   "/en/transcriber": "/cevirici",
+  "/en/privacy-policy": "/gizlilik-politikasi",
+  "/en/terms-of-use": "/kullanim-kosullari",
 }
 
 function LangSwitcher({ pathname }: { pathname: string }) {
@@ -49,12 +51,20 @@ function LangSwitcher({ pathname }: { pathname: string }) {
 
 export function SiteHeader() {
   const pathname = usePathname()
+  const isEnglish = pathname.startsWith("/en")
+  const toolLinks = isEnglish
+    ? [{ href: "/en/transcriber", label: "Phonetic Transcription" }]
+    : TOOL_LINKS
+  const navLinks = isEnglish
+    ? [{ href: "/en/about", label: "About" }, { href: "/en/contact", label: "Contact" }]
+    : NAV_LINKS
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false)
   const { data: session } = authClient.useSession()
 
-  const isAdmin = (session?.user as any)?.role === "admin"
+  const role = (session?.user as any)?.role
+  const isStaff = role === "admin" || role === "moderator"
 
   const handleSignOut = async () => {
     await authClient.signOut()
@@ -70,9 +80,9 @@ export function SiteHeader() {
         {/* Desktop */}
         <div className="hidden md:flex items-center justify-between gap-8 py-3.5">
 
-          <Link href="/" className="group shrink-0">
+          <Link href={isEnglish ? "/en" : "/"} className="group shrink-0">
             <span className="block font-serif text-xl font-bold leading-none tracking-tight text-foreground">TÜDAP</span>
-            <span className="mt-1 block text-[9px] uppercase tracking-[0.12em] text-muted-foreground">Türkçe Dilbilim Araştırma Platformu</span>
+            <span className="mt-1 block max-w-[240px] text-[9px] uppercase tracking-[0.08em] text-muted-foreground">{isEnglish ? "Turkish Linguistics Research Platform" : "Türkçe Dilbilim Araştırma Platformu"}</span>
           </Link>
 
           <nav className="flex items-center gap-1 rounded-lg border border-border/70 bg-muted/35 p-1">
@@ -82,12 +92,12 @@ export function SiteHeader() {
                 onClick={() => setToolsDropdownOpen(!toolsDropdownOpen)}
                 className={`flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${toolsDropdownOpen || TOOL_LINKS.some(({ href }) => pathname === href) ? "bg-background text-primary shadow-sm" : "text-foreground hover:bg-background/80 hover:text-primary"}`}
               >
-                Araçlar
+                  {isEnglish ? "Tools" : "Araçlar"}
                 <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${toolsDropdownOpen ? "rotate-180" : ""}`} />
               </button>
               {toolsDropdownOpen && (
                 <div className="absolute top-full left-0 mt-2 w-72 rounded-lg border border-border bg-background p-1.5 shadow-xl shadow-foreground/5 z-50">
-                  {TOOL_LINKS.map(({ href, label }) => (
+                  {toolLinks.map(({ href, label }) => (
                     <Link
                       key={href}
                       href={href}
@@ -103,7 +113,7 @@ export function SiteHeader() {
               )}
             </div>
 
-            {NAV_LINKS.map(({ href, label }) => (
+            {navLinks.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
@@ -119,13 +129,13 @@ export function SiteHeader() {
             <LangSwitcher pathname={pathname} />
             {session?.user ? (
               <>
-                {isAdmin && (
+                {isStaff && (
                   <Button asChild variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-foreground">
-                    <Link href="/admin"><LayoutDashboard className="h-3.5 w-3.5 mr-1.5" />Admin</Link>
+                    <Link href="/admin"><LayoutDashboard className="h-3.5 w-3.5 mr-1.5" />{isEnglish ? "Admin" : "Yönetim"}</Link>
                   </Button>
                 )}
                 <Button asChild variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-foreground">
-                  <Link href="/profil"><UserCircle className="h-3.5 w-3.5 mr-1.5" />Profil</Link>
+                  <Link href="/profil"><UserCircle className="h-3.5 w-3.5 mr-1.5" />{isEnglish ? "Profile" : "Profil"}</Link>
                 </Button>
                 <Button
                   variant="ghost"
@@ -134,16 +144,16 @@ export function SiteHeader() {
                   onClick={handleSignOut}
                 >
                   <LogOut className="h-3.5 w-3.5 mr-1.5" />
-                  Çıkış
+                  {isEnglish ? "Sign out" : "Çıkış"}
                 </Button>
               </>
             ) : (
               <>
                 <Button asChild variant="ghost" size="sm" className="text-xs">
-                  <Link href="/sign-in"><LogIn className="h-3.5 w-3.5 mr-1.5" />Giriş Yap</Link>
+                  <Link href="/sign-in"><LogIn className="h-3.5 w-3.5 mr-1.5" />{isEnglish ? "Sign in" : "Giriş Yap"}</Link>
                 </Button>
                 <Button asChild size="sm" className="text-xs">
-                  <Link href="/sign-up">Kayıt Ol</Link>
+                  <Link href="/sign-up">{isEnglish ? "Create account" : "Kayıt Ol"}</Link>
                 </Button>
               </>
             )}
@@ -152,9 +162,9 @@ export function SiteHeader() {
 
         {/* Mobile */}
         <div className="md:hidden flex items-center justify-between py-3.5">
-          <Link href="/" className="block">
+          <Link href={isEnglish ? "/en" : "/"} className="block">
             <span className="block font-serif text-base font-bold leading-none text-foreground">TÜDAP</span>
-            <span className="mt-1 block max-w-[230px] text-[8px] uppercase tracking-[0.08em] text-muted-foreground">Türkçe Dilbilim Araştırma Platformu</span>
+            <span className="mt-1 block max-w-[230px] text-[8px] uppercase tracking-[0.08em] text-muted-foreground">{isEnglish ? "Turkish Linguistics Research Platform" : "Türkçe Dilbilim Araştırma Platformu"}</span>
           </Link>
           <Button
             variant="ghost"
@@ -170,15 +180,15 @@ export function SiteHeader() {
         {/* Mobile panel */}
         {mobileOpen && (
           <nav className="md:hidden border-t border-border py-4 space-y-0.5">
-            <p className="px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-semibold text-accent">Araçlar</p>
-            {TOOL_LINKS.map(({ href, label }) => (
+            <p className="px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-semibold text-accent">{isEnglish ? "Tools" : "Araçlar"}</p>
+            {toolLinks.map(({ href, label }) => (
               <Link key={href} href={href} onClick={() => setMobileOpen(false)}
                 className={`block rounded-md px-3 py-2.5 text-sm transition-colors ${pathname === href ? "bg-primary/10 font-medium text-primary" : "text-foreground hover:text-primary hover:bg-muted/50"}`}
               >{label}</Link>
             ))}
             <div className="my-2 border-t border-border" />
-            <p className="px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-semibold text-accent">Platform</p>
-            {NAV_LINKS.map(({ href, label }) => (
+            <p className="px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-semibold text-accent">{isEnglish ? "Platform" : "Platform"}</p>
+            {navLinks.map(({ href, label }) => (
               <Link key={href} href={href} onClick={() => setMobileOpen(false)}
                 className={`block rounded-md px-3 py-2.5 text-sm transition-colors ${pathname === href ? "bg-primary/10 font-medium text-primary" : "text-foreground hover:text-primary hover:bg-muted/50"}`}
               >{label}</Link>
@@ -190,22 +200,22 @@ export function SiteHeader() {
             <div className="my-2 border-t border-border" />
             {session?.user ? (
               <>
-                {isAdmin && (
+                {isStaff && (
                   <Link href="/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded text-sm text-foreground hover:bg-muted/50">
-                    <LayoutDashboard className="h-4 w-4" />Admin Paneli
+                    <LayoutDashboard className="h-4 w-4" />{isEnglish ? "Admin" : "Yönetim Paneli"}
                   </Link>
                 )}
                 <Link href="/profil" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2 rounded text-sm text-foreground hover:bg-muted/50">
-                  <UserCircle className="h-4 w-4" />Profil
+                  <UserCircle className="h-4 w-4" />{isEnglish ? "Profile" : "Profil"}
                 </Link>
                 <button onClick={handleSignOut} className="w-full flex items-center gap-2 px-3 py-2 rounded text-sm text-destructive hover:bg-destructive/10 transition-colors">
-                  <LogOut className="h-4 w-4" />Çıkış Yap
+                  <LogOut className="h-4 w-4" />{isEnglish ? "Sign out" : "Çıkış Yap"}
                 </button>
               </>
             ) : (
               <>
-                <Link href="/sign-in" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded text-sm text-foreground hover:bg-muted/50">Giriş Yap</Link>
-                <Link href="/sign-up" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded text-sm text-primary font-medium hover:bg-primary/5">Kayıt Ol</Link>
+                <Link href="/sign-in" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded text-sm text-foreground hover:bg-muted/50">{isEnglish ? "Sign in" : "Giriş Yap"}</Link>
+                <Link href="/sign-up" onClick={() => setMobileOpen(false)} className="block px-3 py-2 rounded text-sm text-primary font-medium hover:bg-primary/5">{isEnglish ? "Create account" : "Kayıt Ol"}</Link>
               </>
             )}
           </nav>

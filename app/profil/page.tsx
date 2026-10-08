@@ -96,7 +96,7 @@ export default async function ProfilePage() {
               <div className="h-px bg-border" />
               <div><p className="text-sm font-medium text-foreground">Topluluk katkısı</p><p className="text-xs leading-relaxed text-muted-foreground mt-1">Onaylanan hata bildirimleri ve madde başı önerileri puan kazandırır.</p></div>
               <Link href="/terim-sozlugu" className="inline-flex items-center gap-2 text-sm text-primary hover:underline"><Users className="h-4 w-4" />Topluluğa katkıda bulun</Link>
-              <Link href="/profil/blog-basvurusu" className="flex items-center gap-2 text-sm text-primary hover:underline"><PenLine className="h-4 w-4" />Blog yazısı gönder</Link>
+              <Link href="/profil/blog-basvurusu" className="flex items-center gap-2 text-sm text-primary hover:underline"><PenLine className="h-4 w-4" />İçerik başvurusu yap</Link>
             </div>
           </aside>
         </div>

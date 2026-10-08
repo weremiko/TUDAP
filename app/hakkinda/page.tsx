@@ -6,11 +6,11 @@ import { getPageSections } from "@/app/actions/page-content"
 const BASE = "https://dilbilim.org.tr"
 
 export const metadata: Metadata = {
-  title: "Hakkında — Türkçe Dilbilim Platformu | TÜDAP",
+  title: "Hakkında — Türkçe Dilbilim Araştırma Platformu | TÜDAP",
   description:
     "TÜDAP, Türkçe dilbilim araştırmaları için IPA fonetik transkripsiyon, terim sözlüğü, akademik blog ve etkinlik ajandası sunan ücretsiz dijital platformdur. Proje amacı ve özellikleri.",
   keywords: [
-    "TÜDAP hakkında", "türkçe dilbilim platformu", "dilbilim araştırma platformu",
+    "TÜDAP hakkında", "türkçe dilbilim araştırma platformu", "dilbilim araştırma platformu",
     "IPA transkripsiyon projesi", "türkçe sesbilim araçları",
   ],
   alternates: {
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     languages: { "en": `${BASE}/en/about`, "tr": `${BASE}/hakkinda` },
   },
   openGraph: {
-    title: "Hakkında — Türkçe Dilbilim Platformu | TÜDAP",
+    title: "Hakkında — Türkçe Dilbilim Araştırma Platformu | TÜDAP",
     description: "TÜDAP, Türkçe dilbilim araştırmaları için ücretsiz araçlar sunan akademik dijital platformdur.",
     url: `${BASE}/hakkinda`,
     siteName: "TÜDAP",
@@ -33,7 +33,7 @@ const aboutJsonLd = {
   url: `${BASE}/hakkinda`,
   inLanguage: "tr",
   description:
-    "TÜDAP (Türkçe Dilbilim Platformu), Türkiye Türkçesine özgü IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik blog ve etkinlik ajandası sunan ücretsiz platformdur.",
+    "TÜDAP (Türkçe Dilbilim Araştırma Platformu), Türkiye Türkçesine özgü IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik içerikler ve etkinlik ajandası sunan ücretsiz platformdur.",
   publisher: {
     "@type": "Organization",
     name: "TÜDAP",
@@ -46,8 +46,8 @@ const aboutJsonLd = {
 
 // Fallback values in case a section is missing from the DB
 const FALLBACKS: Record<string, string> = {
-  proje_hakkinda: "TÜDAP (Türkçe Dilbilim Platformu), dilbilim alanında dijital kaynak eksikliğini gidermek amacıyla geliştirilmiş akademik bir platformdur.",
-  ozellikler: "IPA fonetik transkripsiyon\nDilbilim terimleri sözlüğü\nAkademik blog\nEtkinlik ajandası",
+  proje_hakkinda: "TÜDAP (Türkçe Dilbilim Araştırma Platformu), dilbilim alanında dijital kaynak eksikliğini gidermek amacıyla geliştirilmiş akademik bir platformdur.",
+  ozellikler: "IPA fonetik transkripsiyon\nDilbilim terimleri sözlüğü\nAkademik içerikler\nEtkinlik ajandası",
   kullanim_alanlari: "Dilbilim araştırmaları ve akademik çalışmalar\nTürkçe öğretimi ve telaffuz eğitimi\nKonuşma terapisi ve ses eğitimi",
   akademik_temel: "IPA transkripsiyon sistemi, Türkçenin sesbilimsel özelliklerine dayalı akademik kurallara dayanmaktadır.",
   iletisim_notu: "Öneri, hata bildirimi ve iş birliği talepleriniz için iletisim@dilbilim.org.tr adresine yazabilirsiniz.",

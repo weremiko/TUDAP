@@ -13,7 +13,7 @@ const TABS = [
 
 const PANELS = {
   resources: [
-    { href: "/blog", icon: Newspaper, title: "Akademik Blog", desc: "Dilbilim araştırmaları, yazılar ve platform güncellemeleri." },
+    { href: "/blog", icon: Newspaper, title: "İçerikler", desc: "Dilbilim araştırmaları, yazılar ve platform güncellemeleri." },
     { href: "/ajanda", icon: Calendar, title: "Etkinlik Ajandası", desc: "Seminer, konferans ve çalıştayları takip edin." },
   ],
   platform: [

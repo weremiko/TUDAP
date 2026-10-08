@@ -87,7 +87,7 @@ export default function AdminBlogPage() {
         {/* Header */}
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">Blog Yönetimi</h1>
+            <h1 className="text-2xl font-serif font-bold text-foreground">İçerik Yönetimi</h1>
             <p className="text-sm text-muted-foreground mt-1">{total} kayıt</p>
           </div>
           <div className="flex gap-2">
@@ -97,7 +97,7 @@ export default function AdminBlogPage() {
             </Button>
             <Button size="sm" onClick={() => router.push("/admin/blog/yeni")}>
               <Plus className="h-4 w-4 mr-2" />
-              Yeni Yazı
+              Yeni İçerik
             </Button>
           </div>
         </div>
@@ -114,7 +114,7 @@ export default function AdminBlogPage() {
         ) : posts.length === 0 ? (
           <Card className="p-12 text-center">
             <FileText className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground text-sm mb-4">Henüz blog yazısı yok.</p>
+            <p className="text-muted-foreground text-sm mb-4">Henüz içerik yok.</p>
             <Button onClick={() => router.push("/admin/blog/yeni")} size="sm">
               <Plus className="h-4 w-4 mr-2" />
               İlk yazıyı ekle
@@ -198,9 +198,9 @@ export default function AdminBlogPage() {
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Yazıyı sil</AlertDialogTitle>
+            <AlertDialogTitle>İçeriği sil</AlertDialogTitle>
             <AlertDialogDescription>
-              &quot;{deleteTarget?.title}&quot; yazısı kalıcı olarak silinecek. Bu işlem geri alınamaz.
+              &quot;{deleteTarget?.title}&quot; içeriği kalıcı olarak silinecek. Bu işlem geri alınamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

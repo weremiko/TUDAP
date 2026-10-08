@@ -6,6 +6,7 @@ import { desc, eq, gte } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { recordModeratorAction } from '@/lib/moderator-audit'
 
 async function checkAdminOrModerator() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -52,6 +53,7 @@ export async function addEvent(data: {
     tags: data.tags.trim(),
     createdById: userId,
   }).returning()
+  await recordModeratorAction(userId, 'create', 'event', newEvent.id, newEvent.title)
 
   // Email notification — fire and forget
   try {
@@ -96,7 +98,7 @@ export async function updateEvent(id: number, data: {
   url: string
   tags: string
 }) {
-  await checkAdminOrModerator()
+  const userId = await checkAdminOrModerator()
   if (!data.title.trim()) throw new Error('Başlık gereklidir')
 
   const [updated] = await db.update(events).set({
@@ -111,13 +113,15 @@ export async function updateEvent(id: number, data: {
     tags: data.tags.trim(),
     updatedAt: new Date(),
   }).where(eq(events.id, id)).returning()
+  await recordModeratorAction(userId, 'update', 'event', id, data.title.trim())
 
   revalidatePath('/ajanda')
   return updated
 }
 
 export async function deleteEvent(id: number) {
-  await checkAdminOrModerator()
+  const userId = await checkAdminOrModerator()
   await db.delete(events).where(eq(events.id, id))
+  await recordModeratorAction(userId, 'delete', 'event', id)
   revalidatePath('/ajanda')
 }

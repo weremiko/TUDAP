@@ -1,4 +1,7 @@
+"use client"
+
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 const TOOL_LINKS = [
   { href: "/cevirici",      label: "Sesbilimsel Abece Çeviricisi" },
@@ -20,7 +23,21 @@ const LEGAL_LINKS = [
   { href: "/cerez-politikasi",    label: "Çerez Politikası" },
 ]
 
+const TOOL_LINKS_EN = [{ href: "/en/transcriber", label: "Phonetic transcription" }]
+const PLATFORM_LINKS_EN = [
+  { href: "/en/about", label: "About TÜDAP" },
+  { href: "/en/contact", label: "Contact" },
+]
+const LEGAL_LINKS_EN = [
+  { href: "/en/privacy-policy", label: "Privacy policy" },
+  { href: "/en/terms-of-use", label: "Terms of use" },
+]
+
 export function SiteFooter() {
+  const isEnglish = usePathname().startsWith("/en")
+  const toolLinks = isEnglish ? TOOL_LINKS_EN : TOOL_LINKS
+  const platformLinks = isEnglish ? PLATFORM_LINKS_EN : PLATFORM_LINKS
+  const legalLinks = isEnglish ? LEGAL_LINKS_EN : LEGAL_LINKS
   return (
     <footer className="border-t border-border bg-muted/20 mt-auto">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-12 md:py-16">
@@ -32,7 +49,9 @@ export function SiteFooter() {
               <span className="font-serif text-lg font-bold text-foreground">TÜDAP</span>
             </Link>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Türkçe Dilbilim Platformu. Fonetik transkripsiyon, blog, etkinlik ajandası ve terminoloji araçları.
+              {isEnglish
+                ? "Turkish Linguistics Research Platform. Open tools and resources for research on Turkish."
+                : "Türkçe Dilbilim Araştırma Platformu. Fonetik transkripsiyon, içerikler, etkinlik ajandası ve terminoloji araçları."}
             </p>
             <p className="text-xs text-muted-foreground">
               <a href="mailto:iletisim@dilbilim.org.tr" className="hover:text-foreground transition-colors">
@@ -43,9 +62,9 @@ export function SiteFooter() {
 
           {/* Tools */}
           <div>
-            <h4 className="text-xs uppercase tracking-widest text-foreground font-semibold mb-4">Araçlar</h4>
+            <h4 className="text-xs uppercase tracking-widest text-foreground font-semibold mb-4">{isEnglish ? "Tools" : "Araçlar"}</h4>
             <ul className="space-y-2.5">
-              {TOOL_LINKS.map(({ href, label }) => (
+              {toolLinks.map(({ href, label }) => (
                 <li key={href}>
                   <Link href={href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {label}
@@ -57,9 +76,9 @@ export function SiteFooter() {
 
           {/* Platform */}
           <div>
-            <h4 className="text-xs uppercase tracking-widest text-foreground font-semibold mb-4">Platform</h4>
+            <h4 className="text-xs uppercase tracking-widest text-foreground font-semibold mb-4">{isEnglish ? "Platform" : "Platform"}</h4>
             <ul className="space-y-2.5">
-              {PLATFORM_LINKS.map(({ href, label }) => (
+              {platformLinks.map(({ href, label }) => (
                 <li key={href}>
                   <Link href={href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {label}
@@ -71,9 +90,9 @@ export function SiteFooter() {
 
           {/* Legal */}
           <div>
-            <h4 className="text-xs uppercase tracking-widest text-foreground font-semibold mb-4">Yasal</h4>
+            <h4 className="text-xs uppercase tracking-widest text-foreground font-semibold mb-4">{isEnglish ? "Legal" : "Yasal"}</h4>
             <ul className="space-y-2.5">
-              {LEGAL_LINKS.map(({ href, label }) => (
+              {legalLinks.map(({ href, label }) => (
                 <li key={href}>
                   <Link href={href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {label}
@@ -87,7 +106,7 @@ export function SiteFooter() {
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            © 2026 TÜDAP — Türkçe Dilbilim Platformu
+            © 2026 TÜDAP — {isEnglish ? "Turkish Linguistics Research Platform" : "Türkçe Dilbilim Araştırma Platformu"}
           </p>
           <p className="text-xs text-muted-foreground">
             dilbilim.org.tr

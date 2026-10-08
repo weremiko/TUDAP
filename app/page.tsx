@@ -16,9 +16,9 @@ import type { Metadata } from "next"
 const BASE = "https://dilbilim.org.tr"
 
 export const metadata: Metadata = {
-  title: "TÜDAP — Türkçe Dilbilim Platformu | IPA Çevirici & Terim Sözlüğü",
+  title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu | IPA Çevirici & Terim Sözlüğü",
    description:
-     "Türkçe dilbilim platformu: ücretsiz IPA fonetik transkripsiyon aracı, 700+ madde başı, akademik blog ve etkinlik ajandası. Sesbilim, sözdizimi ve morfoloji araçları.",
+    "Türkçe Dilbilim Araştırma Platformu: ücretsiz IPA fonetik transkripsiyon aracı, 700+ madde başı, akademik içerikler ve etkinlik ajandası.",
   keywords: [
     "türkçe dilbilim", "IPA çevirici", "fonetik transkripsiyon", "türkçe IPA",
     "sesbilimsel transkripsiyon", "dilbilim terimleri sözlüğü", "dilbilim araçları",
@@ -31,18 +31,18 @@ export const metadata: Metadata = {
     languages: { "en": `${BASE}/en`, "tr": BASE, "x-default": BASE },
   },
   openGraph: {
-    title: "TÜDAP — Türkçe Dilbilim Platformu | IPA Çevirici & Terim Sözlüğü",
-    description: "Türkçe dilbilim araçları: IPA fonetik transkripsiyon, 700+ terim sözlüğü, akademik blog ve etkinlik ajandası.",
+    title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu | IPA Çevirici & Terim Sözlüğü",
+    description: "Türkçe dilbilim araçları: IPA fonetik transkripsiyon, 700+ terim sözlüğü, akademik içerikler ve etkinlik ajandası.",
     url: BASE,
     siteName: "TÜDAP",
     locale: "tr_TR",
     type: "website",
-    images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: "TÜDAP — Türkçe Dilbilim Platformu" }],
+    images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: "TÜDAP — Türkçe Dilbilim Araştırma Platformu" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TÜDAP — Türkçe Dilbilim Platformu",
-    description: "Ücretsiz IPA fonetik transkripsiyon, 700+ madde başı, blog ve etkinlik ajandası.",
+    title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu",
+    description: "Ücretsiz IPA fonetik transkripsiyon, 700+ terim, akademik içerikler ve etkinlik ajandası.",
     images: [`${BASE}/og-image.png`],
   },
 }
@@ -95,9 +95,9 @@ export default async function Home() {
         <div className="relative z-10 container mx-auto flex min-h-[560px] items-center px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
           <div className="w-full max-w-6xl space-y-8">
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#8c5d38] font-medium">Türkçe Dilbilim Platformu</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-[#8c5d38] font-medium">Türkçe Dilbilim Araştırma Platformu</p>
             <h1 className="max-w-2xl text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-[#171612] tracking-tight leading-[1.05] text-balance">
-              Türkçe Dilbilim
+              Türkçe Dilbilim Araştırma
               <br />
               Platformu
             </h1>

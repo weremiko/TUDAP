@@ -6,6 +6,7 @@ import { pageSections, user } from '@/lib/db/schema'
 import { eq, and, sql } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
+import { recordModeratorAction } from '@/lib/moderator-audit'
 
 async function requireAdminOrModerator() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -33,8 +34,8 @@ export type PageSection = {
 
 const DEFAULT_SECTIONS: Record<string, Array<{ key: string; label: string; content: string }>> = {
   hakkinda: [
-    { key: 'proje_hakkinda', label: 'Proje Hakkında', content: 'TÜDAP (Türkçe Dilbilim Platformu), dilbilim alanında dijital kaynak eksikliğini gidermek amacıyla geliştirilmiş akademik bir platformdur.' },
-    { key: 'ozellikler', label: 'Özellikler', content: 'IPA fonetik transkripsiyon\nDilbilim terimleri sözlüğü\nAkademik blog\nEtkinlik ajandası' },
+    { key: 'proje_hakkinda', label: 'Proje Hakkında', content: 'TÜDAP (Türkçe Dilbilim Araştırma Platformu), dilbilim alanında dijital kaynak eksikliğini gidermek amacıyla geliştirilmiş akademik bir platformdur.' },
+    { key: 'ozellikler', label: 'Özellikler', content: 'IPA fonetik transkripsiyon\nDilbilim terimleri sözlüğü\nAkademik içerikler\nEtkinlik ajandası' },
     { key: 'kullanim_alanlari', label: 'Kullanım Alanları', content: 'Dilbilim araştırmaları ve akademik çalışmalar\nTürkçe öğretimi ve telaffuz eğitimi\nKonuşma terapisi ve ses eğitimi' },
     { key: 'akademik_temel', label: 'Akademik Temel', content: 'IPA transkripsiyon sistemi, Türkçenin sesbilimsel özelliklerine dayalı akademik kurallara dayanmaktadır.' },
     { key: 'iletisim_notu', label: 'İletişim', content: 'Öneri, hata bildirimi ve iş birliği talepleriniz için iletisim@dilbilim.org.tr adresine yazabilirsiniz.' },
@@ -111,7 +112,7 @@ export async function upsertPageSection(
   key: string,
   content: string
 ): Promise<void> {
-  await requireAdminOrModerator()
+  const actor = await requireAdminOrModerator()
   await ensurePageSectionsTable()
 
   const updated = await db
@@ -128,6 +129,7 @@ export async function upsertPageSection(
       sortOrder: 0,
     })
   }
+  await recordModeratorAction(actor.userId, 'update-section', 'page-content', key, page)
 
   revalidatePath(`/${page === 'hakkinda' ? 'hakkinda' : page === 'takimimiz' ? 'takimimiz' : 'iletisim'}`)
   revalidatePath('/en/about')
@@ -138,7 +140,7 @@ export async function upsertAllPageSections(
   page: string,
   updates: { key: string; content: string }[]
 ): Promise<void> {
-  await requireAdminOrModerator()
+  const actor = await requireAdminOrModerator()
   await ensurePageSectionsTable()
 
   for (const [index, { key, content }] of updates.entries()) {
@@ -157,6 +159,7 @@ export async function upsertAllPageSections(
       })
     }
   }
+  await recordModeratorAction(actor.userId, 'update-sections', 'page-content', undefined, `${page}: ${updates.length} bölüm`)
 
   revalidatePath(`/${page === 'hakkinda' ? 'hakkinda' : page === 'takimimiz' ? 'takimimiz' : 'iletisim'}`)
   revalidatePath('/en/about')

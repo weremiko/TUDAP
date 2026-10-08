@@ -8,22 +8,22 @@ import { getBlogPosts } from "@/app/actions/blog"
 const BASE = "https://dilbilim.org.tr"
 
 export const metadata: Metadata = {
-  title: "Dilbilim Blog — Türkçe Sesbilim, Morfoloji & Sözdizimi Yazıları | TÜDAP",
+  title: "İçerikler — Türkçe Dilbilim Araştırma Platformu | TÜDAP",
   description:
     "Türkçe dilbilim, fonetik transkripsiyon, morfoloji ve sözdizimi üzerine akademik yazılar. TÜDAP platformundan dilbilimcilerin araştırma makaleleri ve analizleri.",
   keywords: [
-    "dilbilim blog", "türkçe dilbilim yazıları", "sesbilim makaleleri",
+    "dilbilim içerikleri", "türkçe dilbilim yazıları", "sesbilim makaleleri",
     "fonetik transkripsiyon", "morfoloji", "sözdizimi", "anlambilim",
     "akademik dilbilim", "türkçe dil araştırması",
   ],
   alternates: { canonical: `${BASE}/blog` },
   openGraph: {
     type: "website",
-    title: "Dilbilim Blog — Türkçe Sesbilim & Sözdizimi Yazıları | TÜDAP",
-    description: "Türkçe dilbilim, fonetik ve dil araştırmaları üzerine akademik yazılar.",
+    title: "TÜDAP İçerikler — Türkçe Dilbilim Araştırmaları",
+    description: "Türkçe dilbilim, fonetik ve dil araştırmaları üzerine yazı, video ve slaytlar.",
     url: `${BASE}/blog`,
     siteName: "TÜDAP",
-    images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: "TÜDAP Blog" }],
+    images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: "TÜDAP İçerikler" }],
   },
 }
 
@@ -33,7 +33,7 @@ export default async function BlogPage() {
   const blogJsonLd = {
     "@context": "https://schema.org",
     "@type": "Blog",
-    name: "TÜDAP Blog",
+    name: "TÜDAP İçerikler",
     url: `${BASE}/blog`,
     description: "Türkçe dilbilim araştırmaları üzerine akademik yazılar.",
     inLanguage: "tr",
@@ -56,9 +56,9 @@ export default async function BlogPage() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl py-14 flex-1">
         <div className="space-y-2 mb-12">
           <p className="text-xs uppercase tracking-widest text-accent font-medium">Dilbilim</p>
-          <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">Blog</h1>
+          <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">İçerikler</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Fonetik, morfoloji ve Türkçe dil araştırmaları üzerine yazılar.
+            Fonetik, morfoloji ve Türkçe dil araştırmaları üzerine yazı, video ve slaytlar.
           </p>
         </div>
 

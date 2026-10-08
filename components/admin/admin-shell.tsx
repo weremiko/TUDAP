@@ -18,6 +18,7 @@ import {
   Calendar,
   FileEdit,
   Megaphone,
+  History,
 } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
@@ -29,11 +30,12 @@ const allNavItems = [
   { label: "Kullanıcılar",    href: "/admin/kullanicilar", icon: Users,           roles: ['admin'] },
   { label: "Sözlük Yönetimi", href: "/admin/sozluk",      icon: BookOpen,        roles: ['admin', 'moderator'] },
   { label: "Sabit Çeviriler", href: "/admin/sabit-ceviriler", icon: Zap,        roles: ['admin', 'moderator'] },
-  { label: "Blog",            href: "/admin/blog",           icon: Newspaper,      roles: ['admin', 'moderator'] },
+  { label: "İçerikler",       href: "/admin/blog",           icon: Newspaper,      roles: ['admin', 'moderator'] },
   { label: "Ajanda",          href: "/admin/ajanda",         icon: Calendar,       roles: ['admin', 'moderator'] },
   { label: "Sayfalar",        href: "/admin/sayfalar",       icon: FileEdit,       roles: ['admin', 'moderator'] },
   { label: "Duyurular",       href: "/admin/duyurular",      icon: Megaphone,      roles: ['admin', 'moderator'] },
   { label: "Sorgu Logları",   href: "/admin/loglar",         icon: ClipboardList,  roles: ['admin'] },
+  { label: "Moderatör Eylemleri", href: "/admin/moderator-log", icon: History, roles: ['admin'] },
   { label: "Hata Raporları",  href: "/admin/hatalar",      icon: AlertTriangle,   roles: ['admin', 'moderator'] },
 ]
 

@@ -78,6 +78,7 @@ export async function getAllUsers() {
       name: user.name,
       email: user.email,
       role: user.role,
+      points: user.points,
       blueVerified: user.blueVerified,
       teamRole: user.teamRole,
       teamOrder: user.teamOrder,
@@ -87,6 +88,16 @@ export async function getAllUsers() {
     })
     .from(user)
     .orderBy(desc(user.createdAt))
+}
+
+export async function setUserPoints(userId: string, points: number) {
+  await requireAdmin()
+  if (!Number.isSafeInteger(points) || points < 0 || points > 1_000_000) {
+    throw new Error('Topluluk puanı 0 ile 1.000.000 arasında bir tam sayı olmalıdır')
+  }
+  await db.update(user).set({ points, updatedAt: new Date() }).where(eq(user.id, userId))
+  revalidatePath('/admin/kullanicilar')
+  revalidatePath('/profil')
 }
 
 export async function setUserTeamMember(userId: string, data: { role: 'founder' | 'advisor' | 'member' | null; order: number; visible: boolean }) {

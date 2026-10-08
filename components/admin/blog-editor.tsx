@@ -28,6 +28,8 @@ interface BlogEditorProps {
     published: boolean
     authorName?: string
     tags?: string
+    contentType?: 'article' | 'video' | 'slides'
+    mediaUrl?: string | null
   }
 }
 
@@ -45,6 +47,8 @@ export function BlogEditor({ post }: BlogEditorProps) {
     published: post?.published ?? false,
     authorName: post?.authorName ?? "",
     tags: post?.tags ?? "",
+    contentType: post?.contentType ?? 'article',
+    mediaUrl: post?.mediaUrl ?? "",
   })
 
   // Auto-resize textarea
@@ -200,6 +204,19 @@ export function BlogEditor({ post }: BlogEditorProps) {
         </div>
 
         <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="content-type" className="text-xs text-muted-foreground uppercase tracking-wider">İçerik türü</Label>
+              <select id="content-type" value={form.contentType} onChange={(event) => setForm(f => ({ ...f, contentType: event.target.value as 'article' | 'video' | 'slides' }))} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                <option value="article">Yazı</option><option value="video">Video</option><option value="slides">Slayt</option>
+              </select>
+            </div>
+            {form.contentType !== 'article' && <div className="space-y-1.5">
+              <Label htmlFor="media-url" className="text-xs text-muted-foreground uppercase tracking-wider">Medya bağlantısı</Label>
+              <Input id="media-url" type="url" value={form.mediaUrl} onChange={(event) => setForm(f => ({ ...f, mediaUrl: event.target.value }))} placeholder="https://" />
+            </div>}
+          </div>
+
           {/* Title */}
           <input
             value={form.title}
@@ -212,7 +229,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground uppercase tracking-wider">
-                Özet <span className="font-normal normal-case">(opsiyonel — blog listesinde görünür)</span>
+                Özet <span className="font-normal normal-case">(opsiyonel — içerik listesinde görünür)</span>
               </Label>
               <Input
                 value={form.excerpt}

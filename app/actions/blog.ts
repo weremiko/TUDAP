@@ -7,11 +7,17 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { sql } from 'drizzle-orm'
+import { recordModeratorAction } from '@/lib/moderator-audit'
 
 let submissionColumnReady: Promise<void> | null = null
 function ensureSubmissionColumn() {
   if (!submissionColumnReady) {
-    submissionColumnReady = db.execute(sql`ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS submission_status TEXT NOT NULL DEFAULT 'approved'`).then(() => undefined)
+    submissionColumnReady = db.execute(sql`
+      ALTER TABLE blog_posts
+        ADD COLUMN IF NOT EXISTS submission_status TEXT NOT NULL DEFAULT 'approved',
+        ADD COLUMN IF NOT EXISTS content_type TEXT NOT NULL DEFAULT 'article',
+        ADD COLUMN IF NOT EXISTS media_url TEXT
+    `).then(() => undefined)
   }
   return submissionColumnReady
 }
@@ -34,6 +40,24 @@ function generateSlug(title: string): string {
     .trim()
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
+}
+
+type ContentType = 'article' | 'video' | 'slides'
+
+function validateContentMedia(contentType: ContentType | undefined, rawMediaUrl: string | undefined) {
+  const type = contentType ?? 'article'
+  const mediaUrl = rawMediaUrl?.trim() || ''
+  if (!['article', 'video', 'slides'].includes(type)) throw new Error('Geçersiz içerik türü')
+  if (mediaUrl.length > 2048) throw new Error('Medya bağlantısı çok uzun')
+  if (mediaUrl) {
+    try {
+      if (new URL(mediaUrl).protocol !== 'https:') throw new Error()
+    } catch {
+      throw new Error('Medya bağlantısı https:// ile başlamalıdır')
+    }
+  }
+  if (type !== 'article' && !mediaUrl) throw new Error('Video ve slayt içerikleri için medya bağlantısı zorunludur')
+  return { contentType: type, mediaUrl: mediaUrl || null }
 }
 
 export async function getBlogPosts(page = 1, limit = 10, publishedOnly = true) {
@@ -88,12 +112,15 @@ export async function createBlogPost(data: {
   published: boolean
   authorName?: string
   tags?: string
+  contentType?: ContentType
+  mediaUrl?: string
 }) {
   await ensureSubmissionColumn()
   const { userId, userName } = await requireAdminOrModerator()
 
   if (!data.title.trim()) throw new Error('Başlık boş olamaz')
   if (!data.content.trim()) throw new Error('İçerik boş olamaz')
+  const media = validateContentMedia(data.contentType, data.mediaUrl)
 
   let slug = generateSlug(data.title)
   const existing = await db.select({ id: blogPosts.id })
@@ -108,8 +135,11 @@ export async function createBlogPost(data: {
     authorId: userId,
     authorName: data.authorName?.trim() || userName,
     tags: data.tags?.trim() || '',
+    ...media,
     published: data.published,
   }).returning()
+
+  await recordModeratorAction(userId, 'create', 'content', post.id, post.title)
 
   revalidatePath('/blog')
   revalidatePath('/admin/blog')
@@ -123,10 +153,13 @@ export async function updateBlogPost(id: number, data: {
   published: boolean
   authorName?: string
   tags?: string
+  contentType?: ContentType
+  mediaUrl?: string
 }) {
-  const { userName } = await requireAdminOrModerator()
+  const { userId, userName } = await requireAdminOrModerator()
 
   if (!data.title.trim()) throw new Error('Başlık boş olamaz')
+  const media = validateContentMedia(data.contentType, data.mediaUrl)
 
   await db.update(blogPosts).set({
     title: data.title.trim(),
@@ -134,30 +167,35 @@ export async function updateBlogPost(id: number, data: {
     excerpt: data.excerpt.trim(),
     authorName: data.authorName?.trim() || userName,
     tags: data.tags?.trim() || '',
+    ...media,
     published: data.published,
     updatedAt: new Date(),
   }).where(eq(blogPosts.id, id))
+
+  await recordModeratorAction(userId, 'update', 'content', id, data.title.trim())
 
   revalidatePath('/blog')
   revalidatePath('/admin/blog')
 }
 
 export async function toggleBlogPostPublished(id: number, published: boolean) {
-  await requireAdminOrModerator()
+  const { userId } = await requireAdminOrModerator()
   await db.update(blogPosts).set({ published, updatedAt: new Date() })
     .where(eq(blogPosts.id, id))
+  await recordModeratorAction(userId, published ? 'publish' : 'unpublish', 'content', id)
   revalidatePath('/blog')
   revalidatePath('/admin/blog')
 }
 
 export async function deleteBlogPost(id: number) {
-  await requireAdminOrModerator()
+  const { userId } = await requireAdminOrModerator()
   await db.delete(blogPosts).where(eq(blogPosts.id, id))
+  await recordModeratorAction(userId, 'delete', 'content', id)
   revalidatePath('/blog')
   revalidatePath('/admin/blog')
 }
 
-export async function submitBlogApplication(data: { title: string; content: string; excerpt: string; tags?: string }) {
+export async function submitBlogApplication(data: { title: string; content: string; excerpt: string; tags?: string; contentType?: ContentType; mediaUrl?: string }) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) throw new Error('Oturum açmanız gerekiyor')
   await ensureSubmissionColumn()
@@ -167,6 +205,7 @@ export async function submitBlogApplication(data: { title: string; content: stri
   const content = data.content.trim()
   const excerpt = data.excerpt.trim()
   const tags = data.tags?.trim() || ''
+  const media = validateContentMedia(data.contentType, data.mediaUrl)
   if (!title || !content) throw new Error('Başlık ve içerik zorunludur')
   if (title.length > 200 || content.length > 50_000 || excerpt.length > 500 || tags.length > 500) {
     throw new Error('Başvuru alanlarından biri çok uzun')
@@ -179,16 +218,18 @@ export async function submitBlogApplication(data: { title: string; content: stri
   const [post] = await db.insert(blogPosts).values({
     title, slug, content, excerpt,
     authorId: session.user.id, authorName: author.name, tags,
-    published: false, submissionStatus: 'pending',
+    ...media, published: false, submissionStatus: 'pending',
   }).returning()
+  await recordModeratorAction(session.user.id, 'submit', 'content', post.id, title)
   revalidatePath('/admin/blog')
   return post
 }
 
 export async function setBlogSubmissionStatus(id: number, status: 'pending' | 'approved' | 'rejected') {
-  await requireAdminOrModerator()
+  const { userId } = await requireAdminOrModerator()
   await ensureSubmissionColumn()
   await db.update(blogPosts).set({ submissionStatus: status, published: status === 'approved', updatedAt: new Date() }).where(eq(blogPosts.id, id))
+  await recordModeratorAction(userId, `submission-${status}`, 'content', id)
   revalidatePath('/blog')
   revalidatePath('/admin/blog')
 }

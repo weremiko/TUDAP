@@ -94,6 +94,17 @@ export const queryLogs = pgTable('query_logs', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
+export const moderatorActionLogs = pgTable('moderator_action_logs', {
+  id: serial('id').primaryKey(),
+  actorId: text('actor_id').notNull(),
+  actorName: text('actor_name').notNull(),
+  action: text('action').notNull(),
+  entity: text('entity').notNull(),
+  entityId: text('entity_id'),
+  summary: text('summary').notNull().default(''),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
 export const errorReports = pgTable('error_reports', {
   id: serial('id').primaryKey(),
   message: text('message').notNull(),
@@ -116,6 +127,8 @@ export const blogPosts = pgTable('blog_posts', {
   authorId: text('author_id').notNull(),
   authorName: text('author_name').notNull().default(''),
   tags: text('tags').notNull().default(''),
+  contentType: text('content_type').notNull().default('article'),
+  mediaUrl: text('media_url'),
   published: boolean('published').notNull().default(false),
   submissionStatus: text('submission_status').notNull().default('approved'),
   createdAt: timestamp('created_at').notNull().defaultNow(),

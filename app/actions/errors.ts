@@ -7,6 +7,7 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import PDFDocument from 'pdfkit'
 import { createMathChallenge, validateMathChallenge } from '@/lib/math-challenge'
+import { recordModeratorAction } from '@/lib/moderator-audit'
 
 let errorColumnsReady: Promise<void> | null = null
 const reportAttempts = new Map<string, { count: number; resetAt: number }>()
@@ -41,6 +42,7 @@ async function requireAdminOrModerator() {
   
   const [u] = await db.select({ role: user.role }).from(user).where(eq(user.id, session.user.id)).limit(1)
   if (!u || (u.role !== 'admin' && u.role !== 'moderator')) throw new Error('Forbidden')
+  return session.user.id
 }
 
 export async function saveErrorReport(data: {
@@ -126,17 +128,13 @@ export async function getErrorStats() {
 }
 
 export async function markErrorAsResolved(id: number) {
-  await requireAdminOrModerator()
+  const userId = await requireAdminOrModerator()
   await ensureErrorColumns()
-  const [report] = await db.select({ userId: errorReports.userId, pointsAwarded: errorReports.pointsAwarded, resolved: errorReports.resolved })
+  const [report] = await db.select({ resolved: errorReports.resolved })
     .from(errorReports).where(eq(errorReports.id, id)).limit(1)
   if (!report || report.resolved) return
-  await db.transaction(async (tx) => {
-    await tx.update(errorReports).set({ resolved: true, pointsAwarded: Boolean(report.userId) }).where(eq(errorReports.id, id))
-    if (report.userId && !report.pointsAwarded) {
-      await tx.update(user).set({ points: sql`${user.points} + 10` }).where(eq(user.id, report.userId))
-    }
-  })
+  await db.update(errorReports).set({ resolved: true, pointsAwarded: false }).where(eq(errorReports.id, id))
+  await recordModeratorAction(userId, 'resolve', 'error-report', id)
 }
 
 export async function exportErrorsToPDF() {
