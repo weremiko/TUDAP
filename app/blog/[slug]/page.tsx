@@ -159,7 +159,7 @@ export default async function BlogPostPage({ params }: Props) {
               })}
             </time>
             <span>·</span>
-            <span>{post.contentType === 'video' ? 'Video' : post.contentType === 'slides' ? 'Slayt' : post.contentType === 'audio' ? 'Ses kaydı' : post.contentType === 'document' ? 'Belge' : `${readTime} dk okuma`}</span>
+            <span>{post.contentType === 'video' ? 'Video' : post.contentType === 'slides' ? 'Slayt' : post.contentType === 'audio' ? 'Podcast' : post.contentType === 'document' ? 'Belge' : `${readTime} dk okuma`}</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground leading-tight text-balance">
             {post.title}
@@ -198,7 +198,7 @@ export default async function BlogPostPage({ params }: Props) {
               <iframe className="aspect-video w-full" src={embedUrl} title={post.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
             ) : (
               <a href={post.mediaUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-4 p-5 text-sm font-medium text-primary hover:underline">
-                {post.contentType === 'video' ? 'Videoyu aç' : post.contentType === 'slides' ? 'Slayt sunumunu aç' : post.contentType === 'audio' ? 'Ses kaydını aç' : 'Belgeyi aç'}<span aria-hidden="true">↗</span>
+                {post.contentType === 'video' ? 'Videoyu aç' : post.contentType === 'slides' ? 'Slayt sunumunu aç' : post.contentType === 'audio' ? 'Podcast’i aç' : 'Belgeyi aç'}<span aria-hidden="true">↗</span>
               </a>
             )}
           </section>

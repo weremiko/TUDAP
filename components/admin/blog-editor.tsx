@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import { createBlogPost, updateBlogPost } from "@/app/actions/blog"
 import Link from "next/link"
+import { ContentMediaUpload } from "@/components/content-media-upload"
 
 interface BlogEditorProps {
   post?: {
@@ -39,6 +40,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
   const [isPending, startTransition] = useTransition()
   const contentRef = useRef<HTMLTextAreaElement>(null)
   const [preview, setPreview] = useState(false)
+  const [uploadingMedia, setUploadingMedia] = useState(false)
 
   const [form, setForm] = useState({
     title: post?.title ?? "",
@@ -196,7 +198,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 Yayımla
               </Label>
             </div>
-            <Button size="sm" onClick={handleSave} disabled={isPending} className="gap-1.5">
+            <Button size="sm" onClick={handleSave} disabled={isPending || uploadingMedia} className="gap-1.5">
               <Save className="h-4 w-4" />
               Kaydet
             </Button>
@@ -207,14 +209,11 @@ export function BlogEditor({ post }: BlogEditorProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="content-type" className="text-xs text-muted-foreground uppercase tracking-wider">İçerik türü</Label>
-              <select id="content-type" value={form.contentType} onChange={(event) => setForm(f => ({ ...f, contentType: event.target.value as 'article' | 'video' | 'slides' | 'audio' | 'document' }))} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                <option value="article">Yazı</option><option value="video">Video</option><option value="slides">Slayt</option><option value="audio">Ses kaydı</option><option value="document">Belge / PDF</option>
+              <select id="content-type" value={form.contentType} onChange={(event) => setForm(f => ({ ...f, contentType: event.target.value as 'article' | 'video' | 'slides' | 'audio' | 'document', mediaUrl: "" }))} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                <option value="article">Yazı</option><option value="video">Video</option><option value="slides">Slayt</option><option value="audio">Podcast</option><option value="document">Belge / PDF</option>
               </select>
             </div>
-            {form.contentType !== 'article' && <div className="space-y-1.5">
-              <Label htmlFor="media-url" className="text-xs text-muted-foreground uppercase tracking-wider">Medya bağlantısı</Label>
-              <Input id="media-url" type="url" value={form.mediaUrl} onChange={(event) => setForm(f => ({ ...f, mediaUrl: event.target.value }))} placeholder="https://" />
-            </div>}
+            {form.contentType !== 'article' && <ContentMediaUpload contentType={form.contentType} mediaUrl={form.mediaUrl} onMediaUrlChange={(mediaUrl) => setForm(f => ({ ...f, mediaUrl }))} onUploadingChange={setUploadingMedia} />}
           </div>
 
           {/* Title */}

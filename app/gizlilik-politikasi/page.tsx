@@ -18,16 +18,20 @@ const SECTIONS = [
     body: "Hata bildiri gönderdiğinizde, mesajınız, email adresiniz (eğer gönderildiyse) ve ilgili URL'yi emniyetli şekilde kaydederiz. Bu veriler sadece platform sorunlarını çözmek amacıyla kullanıcılar ve sistem yöneticileri tarafından incelenebilir.",
   },
   {
+    title: "İçerik Başvuruları ve Medya Dosyaları",
+    body: "Üyelerin gönderdiği içerik başvurularındaki başlık, açıklama, metin ve hesap bilgileri başvuruyu değerlendirmek için saklanır. Yüklenen video, podcast ve PDF dosyaları Vercel Blob üzerinde herkese açık bir URL ile depolanır. Başvuru onaylanana kadar içerik listesinde gösterilmez; ancak URL'ye sahip kişiler dosyaya erişebilir. Yalnızca yayımlanmasını istediğiniz dosyaları yükleyin.",
+  },
+  {
     title: "Çerezler ve Yerel Depolama",
     body: "Platform, önceki oturumunuzu geri yüklemek amacıyla tarayıcınızın localStorage alanını kullanmaktadır. Bu veriler yalnızca kendi cihazınızda tutulur ve üçüncü taraflarla paylaşılmaz.",
   },
   {
     title: "Üçüncü Taraf Hizmetler",
-    body: "Vercel Analytics anonimleştirilmiş ziyaretçi istatistiklerini toplamaktadır. Bu veriler bireysel kullanıcıları tanımlamaz ve yalnızca platform performansını iyileştirme amacıyla kullanılır.",
+    body: "Vercel Analytics anonimleştirilmiş ziyaretçi istatistiklerini toplar. Medya dosyaları Vercel Blob depolama hizmetinde tutulur. Bu hizmetler kendi altyapıları üzerinden veri işler.",
   },
   {
     title: "Veri Saklama ve Güvenliği",
-    body: "Sorgu günlükleri ve hata raporları Neon Postgres veritabanında güvenli şekilde depolanır. Tüm bağlantılar HTTPS üzerinden şifrelenmektedir. Veriler yalnızca yetkili yöneticiler ve sistem bileşenleri tarafından erişilebilir.",
+    body: "Sorgu günlükleri, hesap bilgileri ve başvuru kayıtları Neon Postgres veritabanında depolanır. Uygulama verilerine erişim yetkilendirme ile sınırlandırılır; herkese açık medya dosyalarına URL'si olan kişiler erişebilir. Tüm bağlantılar HTTPS üzerinden şifrelenir.",
   },
   {
     title: "Çocukların Gizliliği",

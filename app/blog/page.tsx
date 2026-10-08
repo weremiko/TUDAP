@@ -79,7 +79,7 @@ export default async function BlogPage() {
                     })}
                   </time>
                   <span className="ml-3 inline-flex rounded border border-border px-2 py-0.5 text-[10px] font-medium uppercase text-muted-foreground">
-                    {post.contentType === 'video' ? 'Video' : post.contentType === 'slides' ? 'Slayt' : post.contentType === 'audio' ? 'Ses kaydı' : post.contentType === 'document' ? 'Belge' : 'Yazı'}
+                    {post.contentType === 'video' ? 'Video' : post.contentType === 'slides' ? 'Slayt' : post.contentType === 'audio' ? 'Podcast' : post.contentType === 'document' ? 'Belge' : 'Yazı'}
                   </span>
                   <h2 className="mt-2 text-xl font-serif font-semibold text-foreground group-hover:text-primary transition-colors leading-snug text-balance">
                     {post.title}
