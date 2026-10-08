@@ -17,7 +17,6 @@ import {
 } from "lucide-react"
 import { createBlogPost, updateBlogPost } from "@/app/actions/blog"
 import Link from "next/link"
-import { ContentMediaUpload } from "@/components/content-media-upload"
 
 interface BlogEditorProps {
   post?: {
@@ -40,7 +39,6 @@ export function BlogEditor({ post }: BlogEditorProps) {
   const [isPending, startTransition] = useTransition()
   const contentRef = useRef<HTMLTextAreaElement>(null)
   const [preview, setPreview] = useState(false)
-  const [uploadingMedia, setUploadingMedia] = useState(false)
 
   const [form, setForm] = useState({
     title: post?.title ?? "",
@@ -198,7 +196,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 Yayımla
               </Label>
             </div>
-            <Button size="sm" onClick={handleSave} disabled={isPending || uploadingMedia} className="gap-1.5">
+            <Button size="sm" onClick={handleSave} disabled={isPending} className="gap-1.5">
               <Save className="h-4 w-4" />
               Kaydet
             </Button>
@@ -213,7 +211,10 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 <option value="article">Yazı</option><option value="video">Video</option><option value="slides">Slayt</option><option value="audio">Podcast</option><option value="document">Belge / PDF</option>
               </select>
             </div>
-            {form.contentType !== 'article' && <ContentMediaUpload contentType={form.contentType} mediaUrl={form.mediaUrl} onMediaUrlChange={(mediaUrl) => setForm(f => ({ ...f, mediaUrl }))} onUploadingChange={setUploadingMedia} />}
+            {form.contentType !== 'article' && <div className="space-y-1.5">
+              <Label htmlFor="media-url" className="text-xs text-muted-foreground uppercase tracking-wider">{form.contentType === 'video' ? 'Video bağlantısı' : form.contentType === 'slides' ? 'Slayt bağlantısı' : form.contentType === 'audio' ? 'Podcast bağlantısı' : 'Belge bağlantısı'}</Label>
+              <Input id="media-url" type="url" value={form.mediaUrl} onChange={(event) => setForm(f => ({ ...f, mediaUrl: event.target.value }))} placeholder="https://" required />
+            </div>}
           </div>
 
           {/* Title */}
