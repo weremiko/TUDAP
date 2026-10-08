@@ -70,6 +70,10 @@ function ensurePageSectionsTable() {
         sort_order INTEGER NOT NULL DEFAULT 0,
         updated_at TIMESTAMP NOT NULL DEFAULT NOW()
       )
+      ;
+      UPDATE page_sections
+      SET content = replace(replace(content, 'Türkçe Dilbilim Platformu', 'Türkçe Dilbilim Araştırma Platformu'), 'Akademik blog', 'Akademik içerikler')
+      WHERE content LIKE '%Türkçe Dilbilim Platformu%' OR content LIKE '%Akademik blog%'
     `).then(() => undefined)
   }
   return pageSectionsTableReady

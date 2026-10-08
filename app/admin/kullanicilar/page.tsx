@@ -102,7 +102,7 @@ export default function UsersPage() {
         </Button>
       </div>
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-x-auto">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -112,7 +112,7 @@ export default function UsersPage() {
             Henüz kayıtlı kullanıcı yok.
           </div>
         ) : (
-          <table className="w-full">
+          <table className="w-full min-w-[980px]">
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 <th className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3">Ad Soyad</th>

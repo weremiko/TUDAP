@@ -39,7 +39,7 @@ export default function AboutPage() {
               {[
                 "IPA phonetic transcription — broad and narrow options informed by Turkish phonology",
                 "Linguistics terminology dictionary — Turkish examples, definitions and English equivalents",
-                "Academic blog — research articles and platform updates",
+                "Research contents — articles, videos and slide presentations",
                 "Turkish Linguistics Agenda — seminars, conferences and workshops",
                 "Public community profiles and contribution features",
                 "Audio playback, local draft recovery and file download",

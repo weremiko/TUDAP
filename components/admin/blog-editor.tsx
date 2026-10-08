@@ -28,7 +28,7 @@ interface BlogEditorProps {
     published: boolean
     authorName?: string
     tags?: string
-    contentType?: 'article' | 'video' | 'slides'
+    contentType?: 'article' | 'video' | 'slides' | 'audio' | 'document'
     mediaUrl?: string | null
   }
 }
@@ -207,8 +207,8 @@ export function BlogEditor({ post }: BlogEditorProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="content-type" className="text-xs text-muted-foreground uppercase tracking-wider">İçerik türü</Label>
-              <select id="content-type" value={form.contentType} onChange={(event) => setForm(f => ({ ...f, contentType: event.target.value as 'article' | 'video' | 'slides' }))} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
-                <option value="article">Yazı</option><option value="video">Video</option><option value="slides">Slayt</option>
+              <select id="content-type" value={form.contentType} onChange={(event) => setForm(f => ({ ...f, contentType: event.target.value as 'article' | 'video' | 'slides' | 'audio' | 'document' }))} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                <option value="article">Yazı</option><option value="video">Video</option><option value="slides">Slayt</option><option value="audio">Ses kaydı</option><option value="document">Belge / PDF</option>
               </select>
             </div>
             {form.contentType !== 'article' && <div className="space-y-1.5">
@@ -221,7 +221,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
           <input
             value={form.title}
             onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
-            placeholder="Yazı başlığı..."
+            placeholder="İçerik başlığı..."
             className="w-full text-3xl md:text-4xl font-serif font-bold bg-transparent border-none outline-none placeholder:text-muted-foreground/40 text-foreground leading-tight"
           />
 

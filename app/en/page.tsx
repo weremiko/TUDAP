@@ -31,7 +31,7 @@ const RESOURCES = [
 
 export default function EnHomePage() {
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div lang="en" className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
       <main className="flex-1">
         <section className="relative isolate overflow-hidden border-b border-[#d5d9ce] bg-[#edf0e8]">

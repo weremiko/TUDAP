@@ -8,7 +8,7 @@ const BASE = "https://dilbilim.org.tr"
 export const metadata: Metadata = {
   title: "Hakkında — Türkçe Dilbilim Araştırma Platformu | TÜDAP",
   description:
-    "TÜDAP, Türkçe dilbilim araştırmaları için IPA fonetik transkripsiyon, terim sözlüğü, akademik blog ve etkinlik ajandası sunan ücretsiz dijital platformdur. Proje amacı ve özellikleri.",
+    "TÜDAP, Türkçe dilbilim araştırmaları için IPA fonetik transkripsiyon, terim sözlüğü, akademik içerikler ve etkinlik ajandası sunan ücretsiz dijital platformdur. Proje amacı ve özellikleri.",
   keywords: [
     "TÜDAP hakkında", "türkçe dilbilim araştırma platformu", "dilbilim araştırma platformu",
     "IPA transkripsiyon projesi", "türkçe sesbilim araçları",

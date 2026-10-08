@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s | TÜDAP",
   },
   description:
-    "Türkçe Dilbilim Araştırma Platformu: Türkiye Türkçesine özgü IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik blog ve etkinlik ajandası.",
+    "Türkçe Dilbilim Araştırma Platformu: Türkiye Türkçesine özgü IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik içerikler ve etkinlik ajandası.",
   keywords: [
     "türkçe dilbilim", "IPA çevirici", "fonetik transkripsiyon", "türkçe IPA",
     "dilbilim terimleri sözlüğü", "sesbilim", "sözdizimi", "anlambilim",
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
     url: BASE,
     siteName: "TÜDAP",
     title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu",
-    description: "Türkiye Türkçesine özgü IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, blog ve etkinlik ajandası.",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "TÜDAP — Türkçe Dilbilim Platformu" }],
+    description: "Türkiye Türkçesine özgü IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, içerikler ve etkinlik ajandası.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "TÜDAP — Türkçe Dilbilim Araştırma Platformu" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -65,7 +65,7 @@ const org = {
   email: "iletisim@dilbilim.org.tr",
   sameAs: [`${BASE}/hakkinda`, `${BASE}/en/about`],
   foundingDate: "2024",
-  description: "Türkiye Türkçesine özgü IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik blog ve etkinlik ajandası sunan ücretsiz platformdur.",
+  description: "Türkiye Türkçesine özgü IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik içerikler ve etkinlik ajandası sunan ücretsiz platformdur.",
 }
 
 const structuredData = [
@@ -77,7 +77,7 @@ const structuredData = [
     alternateName: "Türkçe Dilbilim Araştırma Platformu",
     url: BASE,
     inLanguage: ["tr", "en"],
-    description: "Türkçe Dilbilim Araştırma Platformu — IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik blog ve etkinlik ajandası.",
+    description: "Türkçe Dilbilim Araştırma Platformu — IPA fonetik transkripsiyon, dilbilim terimleri sözlüğü, akademik içerikler ve etkinlik ajandası.",
     potentialAction: {
       "@type": "SearchAction",
       target: { "@type": "EntryPoint", urlTemplate: `${BASE}/terim-sozlugu?q={search_term_string}` },

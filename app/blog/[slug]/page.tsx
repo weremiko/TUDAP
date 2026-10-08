@@ -12,7 +12,7 @@ const BASE = "https://dilbilim.org.tr"
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const post = await getBlogPostBySlug(slug)
-  if (!post) return { title: "Yazı Bulunamadı" }
+  if (!post) return { title: "İçerik Bulunamadı" }
 
   const description = post.excerpt || post.content.replace(/<[^>]+>/g, "").slice(0, 155) + "…"
   const canonical = `${BASE}/blog/${slug}`
@@ -97,8 +97,8 @@ function getMediaEmbed(type: string, mediaUrl: string | null) {
       }
     }
     if (type === 'slides' && url.hostname === 'docs.google.com') {
-      const presentationId = url.pathname.match(/\/presentation\/d\/(?:e\/)?([^/]+)/)?.[1]
-      if (presentationId) return `https://docs.google.com/presentation/d/${presentationId}/embed?start=false&loop=false&delayms=3000`
+      const presentationPath = url.pathname.match(/\/presentation\/(d\/(?:e\/)?[^/]+)/)?.[1]
+      if (presentationPath) return `https://docs.google.com/presentation/${presentationPath}/embed?start=false&loop=false&delayms=3000`
     }
     return null
   } catch {
@@ -116,6 +116,8 @@ export default async function BlogPostPage({ params }: Props) {
   const readTime = Math.ceil(wordCount / 200)
   const embedUrl = getMediaEmbed(post.contentType, post.mediaUrl)
   const directVideo = post.contentType === 'video' && post.mediaUrl && /\.(mp4|webm|ogg)(?:$|\?)/i.test(post.mediaUrl)
+  const directAudio = post.contentType === 'audio' && post.mediaUrl && /\.(mp3|wav|ogg|m4a|aac)(?:$|\?)/i.test(post.mediaUrl)
+  const directDocument = post.contentType === 'document' && post.mediaUrl && /\.pdf(?:$|\?)/i.test(post.mediaUrl)
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -143,7 +145,7 @@ export default async function BlogPostPage({ params }: Props) {
           href="/blog"
           className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 mb-10"
         >
-          ← Blog
+          ← İçerikler
         </Link>
 
         {/* Header */}
@@ -157,7 +159,7 @@ export default async function BlogPostPage({ params }: Props) {
               })}
             </time>
             <span>·</span>
-            <span>{post.contentType === 'video' ? 'Video' : post.contentType === 'slides' ? 'Slayt' : `${readTime} dk okuma`}</span>
+            <span>{post.contentType === 'video' ? 'Video' : post.contentType === 'slides' ? 'Slayt' : post.contentType === 'audio' ? 'Ses kaydı' : post.contentType === 'document' ? 'Belge' : `${readTime} dk okuma`}</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground leading-tight text-balance">
             {post.title}
@@ -188,11 +190,15 @@ export default async function BlogPostPage({ params }: Props) {
           <section className="mb-10 overflow-hidden rounded-lg border border-border bg-muted/20">
             {directVideo ? (
               <video className="aspect-video w-full bg-black" src={post.mediaUrl} controls preload="metadata" />
+            ) : directAudio ? (
+              <audio className="w-full p-5" src={post.mediaUrl} controls preload="metadata" />
+            ) : directDocument ? (
+              <iframe className="aspect-[3/4] w-full" src={post.mediaUrl} title={post.title} />
             ) : embedUrl ? (
               <iframe className="aspect-video w-full" src={embedUrl} title={post.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
             ) : (
               <a href={post.mediaUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-4 p-5 text-sm font-medium text-primary hover:underline">
-                {post.contentType === 'video' ? 'Videoyu aç' : 'Slayt sunumunu aç'}<span aria-hidden="true">↗</span>
+                {post.contentType === 'video' ? 'Videoyu aç' : post.contentType === 'slides' ? 'Slayt sunumunu aç' : post.contentType === 'audio' ? 'Ses kaydını aç' : 'Belgeyi aç'}<span aria-hidden="true">↗</span>
               </a>
             )}
           </section>

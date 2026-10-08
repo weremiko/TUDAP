@@ -23,6 +23,7 @@ interface Post {
   submissionStatus?: string
   createdAt: Date
   updatedAt: Date
+  contentType?: string
 }
 
 export default function AdminBlogPage() {
@@ -117,7 +118,7 @@ export default function AdminBlogPage() {
             <p className="text-muted-foreground text-sm mb-4">Henüz içerik yok.</p>
             <Button onClick={() => router.push("/admin/blog/yeni")} size="sm">
               <Plus className="h-4 w-4 mr-2" />
-              İlk yazıyı ekle
+              İlk içeriği ekle
             </Button>
           </Card>
         ) : (
@@ -128,6 +129,7 @@ export default function AdminBlogPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h2 className="text-sm font-semibold text-foreground">{post.title}</h2>
+                      <Badge variant="outline" className="text-xs">{post.contentType === "video" ? "Video" : post.contentType === "slides" ? "Slayt" : post.contentType === "audio" ? "Ses kaydı" : post.contentType === "document" ? "Belge" : "Yazı"}</Badge>
                       <Badge variant={post.published ? "default" : "secondary"} className="text-xs shrink-0">
                         {post.published ? "Yayımda" : "Taslak"}
                       </Badge>

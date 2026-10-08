@@ -32,6 +32,8 @@ const LANG_MAP: Record<string, string> = {
   "/en/transcriber": "/cevirici",
   "/en/privacy-policy": "/gizlilik-politikasi",
   "/en/terms-of-use": "/kullanim-kosullari",
+  "/gizlilik-politikasi": "/en/privacy-policy",
+  "/kullanim-kosullari": "/en/terms-of-use",
 }
 
 function LangSwitcher({ pathname }: { pathname: string }) {

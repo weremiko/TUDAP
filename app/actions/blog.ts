@@ -42,7 +42,7 @@ function generateSlug(title: string): string {
     .replace(/-+/g, '-')
 }
 
-type ContentType = 'article' | 'video' | 'slides'
+type ContentType = 'article' | 'video' | 'slides' | 'audio' | 'document'
 
 function validateContentMedia(contentType: ContentType | undefined, rawMediaUrl: string | undefined) {
   const type = contentType ?? 'article'
@@ -56,7 +56,7 @@ function validateContentMedia(contentType: ContentType | undefined, rawMediaUrl:
       throw new Error('Medya bağlantısı https:// ile başlamalıdır')
     }
   }
-  if (type !== 'article' && !mediaUrl) throw new Error('Video ve slayt içerikleri için medya bağlantısı zorunludur')
+  if (type !== 'article' && !mediaUrl) throw new Error('Medya içeriği için bağlantı zorunludur')
   return { contentType: type, mediaUrl: mediaUrl || null }
 }
 
@@ -157,6 +157,7 @@ export async function updateBlogPost(id: number, data: {
   mediaUrl?: string
 }) {
   const { userId, userName } = await requireAdminOrModerator()
+  await ensureSubmissionColumn()
 
   if (!data.title.trim()) throw new Error('Başlık boş olamaz')
   const media = validateContentMedia(data.contentType, data.mediaUrl)
