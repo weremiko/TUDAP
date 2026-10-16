@@ -2,10 +2,11 @@
 
 import { db } from '@/lib/db'
 import { glossaryEntries, user } from '@/lib/db/schema'
-import { eq, ilike, or, desc, count, and } from 'drizzle-orm'
+import { eq, ilike, or, desc, count, and, sql } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
+import { recordModeratorAction } from '@/lib/moderator-audit'
 
 async function requireAdminOrModerator() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -25,10 +26,19 @@ export async function getGlossaryPage(page: number, category: string, search: st
     : undefined
   const where = catClause && srchClause ? and(catClause, srchClause) : (catClause ?? srchClause)
 
+  const relevanceOrder = search
+    ? sql`CASE
+        WHEN lower(${glossaryEntries.term}) = lower(${search}) THEN 0
+        WHEN lower(${glossaryEntries.term}) LIKE lower(${`${search}%`}) THEN 1
+        WHEN lower(${glossaryEntries.term}) LIKE lower(${`%${search}%`}) THEN 2
+        ELSE 3
+      END`
+    : glossaryEntries.term
+
   const [rows, [{ total }]] = await Promise.all([
     db.select().from(glossaryEntries)
       .where(where)
-      .orderBy(glossaryEntries.term)
+      .orderBy(relevanceOrder, glossaryEntries.term)
       .limit(PER_PAGE)
       .offset(offset),
     db.select({ total: count() }).from(glossaryEntries).where(where),
@@ -53,8 +63,9 @@ export async function addGlossaryEntry(data: {
   definition: string
   englishEquivalent: string
 }) {
-  await requireAdminOrModerator()
+  const actor = await requireAdminOrModerator()
   await db.insert(glossaryEntries).values(data)
+  await recordModeratorAction(actor.id, 'create', 'glossary-entry', undefined, data.term)
   revalidatePath('/terim-sozlugu')
   revalidatePath('/admin/sozluk')
 }
@@ -66,15 +77,17 @@ export async function updateGlossaryEntry(id: number, data: {
   definition?: string
   englishEquivalent?: string
 }) {
-  await requireAdminOrModerator()
+  const actor = await requireAdminOrModerator()
   await db.update(glossaryEntries).set({ ...data, updatedAt: new Date() }).where(eq(glossaryEntries.id, id))
+  await recordModeratorAction(actor.id, 'update', 'glossary-entry', id, data.term)
   revalidatePath('/terim-sozlugu')
   revalidatePath('/admin/sozluk')
 }
 
 export async function deleteGlossaryEntry(id: number) {
-  await requireAdminOrModerator()
+  const actor = await requireAdminOrModerator()
   await db.delete(glossaryEntries).where(eq(glossaryEntries.id, id))
+  await recordModeratorAction(actor.id, 'delete', 'glossary-entry', id)
   revalidatePath('/terim-sozlugu')
   revalidatePath('/admin/sozluk')
 }
@@ -86,7 +99,7 @@ export async function bulkImportGlossary(entries: {
   definition: string
   englishEquivalent?: string
 }[]) {
-  await requireAdminOrModerator()
+  const actor = await requireAdminOrModerator()
   if (!entries.length) return { inserted: 0 }
   const rows = entries.map((e) => ({
     term: e.term.trim(),
@@ -96,6 +109,7 @@ export async function bulkImportGlossary(entries: {
     englishEquivalent: e.englishEquivalent?.trim() ?? '',
   }))
   await db.insert(glossaryEntries).values(rows)
+  await recordModeratorAction(actor.id, 'bulk-import', 'glossary-entry', undefined, `${rows.length} kayıt`)
   revalidatePath('/terim-sozlugu')
   revalidatePath('/admin/sozluk')
   return { inserted: rows.length }

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next"
 import { db } from "@/lib/db"
-import { blogPosts } from "@/lib/db/schema"
+import { blogPosts, user } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 
 const BASE = "https://dilbilim.org.tr"
@@ -25,11 +25,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/en`,                      lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
     { url: `${BASE}/en/about`,                lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/en/contact`,              lastModified: now, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${BASE}/en/privacy-policy`,       lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE}/en/terms-of-use`,         lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/en/transcriber`,          lastModified: now, changeFrequency: "weekly",  priority: 0.75 },
   ]
 
   // Dynamic blog posts
   let blogEntries: MetadataRoute.Sitemap = []
+  let profileEntries: MetadataRoute.Sitemap = []
   try {
     const posts = await db
       .select({ slug: blogPosts.slug, updatedAt: blogPosts.updatedAt })
@@ -46,5 +49,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB unavailable at build time — skip dynamic entries
   }
 
-  return [...staticPages, ...blogEntries]
+  try {
+    const profiles = await db.select({ profileSlug: user.profileSlug, updatedAt: user.updatedAt }).from(user)
+    profileEntries = profiles
+      .filter((profile): profile is { profileSlug: string; updatedAt: Date } => Boolean(profile.profileSlug))
+      .map((profile) => ({
+        url: `${BASE}/profil/${profile.profileSlug}`,
+        lastModified: profile.updatedAt,
+        changeFrequency: "monthly" as const,
+        priority: 0.45,
+      }))
+  } catch {
+    // Profile column may not exist until the first profile request after deployment.
+  }
+
+  return [...staticPages, ...blogEntries, ...profileEntries]
 }

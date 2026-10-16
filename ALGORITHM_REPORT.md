@@ -1,6 +1,6 @@
 # TÜDAP Sesbilimsel Abece Çeviricisi — Algoritma Raporu
 
-**Platform:** Türkçe Dilbilim Platformu (TÜDAP)  
+**Platform:** Türkçe Dilbilim Araştırma Platformu (TÜDAP)
 **Algoritma Adı:** Turkish-to-IPA Phonetic Transcriber  
 **Dosya:** `lib/turkish-to-ipa.ts`  
 **Dil:** TypeScript  

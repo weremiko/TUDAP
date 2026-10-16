@@ -12,7 +12,7 @@ const EXPERIENCE = [
     org: "Way Labs",
     role: "Founder",
     period: "Jan 2024 — Present",
-    desc: "Microsoft Founders Hub-backed technology start-up. Developing software solutions with a focus on artificial intelligence and natural language processing.",
+    desc: "Microsoft DENEME21212121 Founders Hub-backed technology start-up. Developing software solutions with a focus on artificial intelligence and natural language processing.",
   },
   {
     org: "FIRST Robotics — İdigna #9502",

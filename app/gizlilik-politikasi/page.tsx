@@ -18,16 +18,20 @@ const SECTIONS = [
     body: "Hata bildiri gönderdiğinizde, mesajınız, email adresiniz (eğer gönderildiyse) ve ilgili URL'yi emniyetli şekilde kaydederiz. Bu veriler sadece platform sorunlarını çözmek amacıyla kullanıcılar ve sistem yöneticileri tarafından incelenebilir.",
   },
   {
+    title: "İçerik Başvuruları ve Medya Dosyaları",
+    body: "Üyelerin gönderdiği içerik başvurularındaki başlık, açıklama, metin ve hesap bilgileri başvuruyu değerlendirmek için saklanır. Video, podcast ve PDF dosyaları private Vercel Blob depolamasında tutulur. Dosyalar yalnızca yayımlanmış içeriklerde veya başvuruyu yapan üye ve yetkili moderatörler tarafından görüntülenebilir; medya bağlantıları kısa ömürlü imzalı erişimle sunulur.",
+  },
+  {
     title: "Çerezler ve Yerel Depolama",
     body: "Platform, önceki oturumunuzu geri yüklemek amacıyla tarayıcınızın localStorage alanını kullanmaktadır. Bu veriler yalnızca kendi cihazınızda tutulur ve üçüncü taraflarla paylaşılmaz.",
   },
   {
     title: "Üçüncü Taraf Hizmetler",
-    body: "Vercel Analytics anonimleştirilmiş ziyaretçi istatistiklerini toplamaktadır. Bu veriler bireysel kullanıcıları tanımlamaz ve yalnızca platform performansını iyileştirme amacıyla kullanılır.",
+    body: "Vercel Analytics anonimleştirilmiş ziyaretçi istatistiklerini toplar. Medya dosyaları Vercel Blob depolama hizmetinde tutulur. Bu hizmetler kendi altyapıları üzerinden veri işler.",
   },
   {
     title: "Veri Saklama ve Güvenliği",
-    body: "Sorgu günlükleri ve hata raporları Neon Postgres veritabanında güvenli şekilde depolanır. Tüm bağlantılar HTTPS üzerinden şifrelenmektedir. Veriler yalnızca yetkili yöneticiler ve sistem bileşenleri tarafından erişilebilir.",
+    body: "Sorgu günlükleri, hesap bilgileri ve başvuru kayıtları Neon Postgres veritabanında depolanır. Uygulama verilerine erişim yetkilendirme ile sınırlandırılır; medya dosyaları private Blob depolamasında tutulur ve erişim her istekte içerik yayını veya kullanıcı rolüne göre denetlenir. Tüm bağlantılar HTTPS üzerinden şifrelenir.",
   },
   {
     title: "Çocukların Gizliliği",

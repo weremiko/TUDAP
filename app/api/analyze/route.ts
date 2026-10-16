@@ -15,7 +15,7 @@ import { NextRequest, NextResponse } from "next/server"
 const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL ?? "https://dilbilim.org.tr"
 
 function corsHeaders(origin: string | null) {
-  const allowed = origin === ALLOWED_ORIGIN ? origin : ALLOWED_ORIGIN
+  const allowed = origin === ALLOWED_ORIGIN ? origin : "null"
   return {
     "Access-Control-Allow-Origin": allowed,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -43,9 +43,20 @@ function corsHeaders(origin: string | null) {
 //     return NextResponse.json({ error: "Çok fazla istek." }, { status: 429, headers: corsHeaders(origin) })
 //   }
 
-async function mockRateLimiter(_ip: string): Promise<{ success: boolean; remaining: number }> {
-  // Stub — always passes. Replace with Upstash implementation above.
-  return { success: true, remaining: 49 }
+const requestWindows = new Map<string, { count: number; resetAt: number }>()
+
+async function rateLimiter(ip: string): Promise<{ success: boolean; remaining: number }> {
+  const now = Date.now()
+  const current = requestWindows.get(ip)
+  const window = current && current.resetAt > now ? current : { count: 0, resetAt: now + 60_000 }
+  window.count += 1
+  requestWindows.set(ip, window)
+  if (requestWindows.size > 10_000) {
+    for (const [key, value] of requestWindows) {
+      if (value.resetAt <= now) requestWindows.delete(key)
+    }
+  }
+  return { success: window.count <= 50, remaining: Math.max(0, 50 - window.count) }
 }
 
 // ── Server-side Sanitization ──────────────────────────────────────────────────
@@ -65,9 +76,13 @@ export async function POST(req: NextRequest) {
   const origin = req.headers.get("origin")
   const headers = corsHeaders(origin)
 
+  if (origin && origin !== ALLOWED_ORIGIN) {
+    return NextResponse.json({ error: "İzin verilmeyen origin." }, { status: 403, headers })
+  }
+
   // 1. Rate limiting
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "anonymous"
-  const { success: allowed } = await mockRateLimiter(ip)
+  const { success: allowed } = await rateLimiter(ip)
   if (!allowed) {
     return NextResponse.json(
       { error: "İstek limiti aşıldı. Lütfen bir dakika bekleyin." },

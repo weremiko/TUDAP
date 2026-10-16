@@ -3,9 +3,25 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { user, session } from '@/lib/db/schema'
-import { desc, eq, count, gt } from 'drizzle-orm'
+import { asc, desc, eq, count, gt } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
+import { sql } from 'drizzle-orm'
+import { ensureProfileColumns } from '@/app/actions/profile'
+
+let verificationColumnsReady: Promise<void> | null = null
+function ensureVerificationColumn() {
+  if (!verificationColumnsReady) {
+    verificationColumnsReady = db.execute(sql`
+      ALTER TABLE "user"
+        ADD COLUMN IF NOT EXISTS blue_verified BOOLEAN NOT NULL DEFAULT FALSE,
+        ADD COLUMN IF NOT EXISTS team_role TEXT,
+        ADD COLUMN IF NOT EXISTS team_order INTEGER NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS team_visible BOOLEAN NOT NULL DEFAULT FALSE
+    `).then(() => undefined)
+  }
+  return verificationColumnsReady
+}
 
 async function requireAdmin() {
   const s = await auth.api.getSession({ headers: await headers() })
@@ -55,17 +71,57 @@ export async function getAdminStats() {
 
 export async function getAllUsers() {
   await requireAdmin()
+  await ensureVerificationColumn()
   return db
     .select({
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
+      points: user.points,
+      blueVerified: user.blueVerified,
+      teamRole: user.teamRole,
+      teamOrder: user.teamOrder,
+      teamVisible: user.teamVisible,
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,
     })
     .from(user)
     .orderBy(desc(user.createdAt))
+}
+
+export async function setUserPoints(userId: string, points: number) {
+  await requireAdmin()
+  if (!Number.isSafeInteger(points) || points < 0 || points > 1_000_000) {
+    throw new Error('Topluluk puanı 0 ile 1.000.000 arasında bir tam sayı olmalıdır')
+  }
+  await db.update(user).set({ points, updatedAt: new Date() }).where(eq(user.id, userId))
+  revalidatePath('/admin/kullanicilar')
+  revalidatePath('/profil')
+}
+
+export async function setUserTeamMember(userId: string, data: { role: 'founder' | 'advisor' | 'member' | null; order: number; visible: boolean }) {
+  await requireAdmin()
+  await ensureVerificationColumn()
+  await db.update(user).set({ teamRole: data.role, teamOrder: Math.max(0, data.order || 0), teamVisible: data.visible, updatedAt: new Date() }).where(eq(user.id, userId))
+  revalidatePath('/admin/kullanicilar')
+  revalidatePath('/takimimiz')
+}
+
+export async function getPublicTeamMembers() {
+  await Promise.all([ensureVerificationColumn(), ensureProfileColumns()])
+  return db.select({ id: user.id, name: user.name, profileSlug: user.profileSlug, image: user.image, institution: user.institution, bio: user.bio, blueVerified: user.blueVerified, teamRole: user.teamRole, teamOrder: user.teamOrder })
+    .from(user)
+    .where(eq(user.teamVisible, true))
+    .orderBy(asc(user.name))
+}
+
+export async function setUserBlueVerification(userId: string, verified: boolean) {
+  await requireAdmin()
+  await ensureVerificationColumn()
+  await db.update(user).set({ blueVerified: verified, updatedAt: new Date() }).where(eq(user.id, userId))
+  revalidatePath('/admin/kullanicilar')
+  revalidatePath('/profil')
 }
 
 export async function setUserRole(userId: string, role: 'admin' | 'moderator' | 'user') {

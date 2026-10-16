@@ -32,10 +32,6 @@ const FAQ = [
     a: "Araç beta aşamasındadır; tipik sözcüklerde yüksek doğruluk sağlamakla birlikte özellikle alıntı sözcükler ve istisnai yapılarda hatalar oluşabilir. Akademik çalışmalar için uzman denetimi önerilir.",
   },
   {
-    q: "Verilerimi saklıyor musunuz?",
-    a: "Giriş yaptığınız metinler sunucularımızda saklanmaz. Oturum kurtarma özelliği tamamen tarayıcınızın localStorage alanını kullanır.",
-  },
-  {
     q: "Araçları ticari amaçla kullanabilir miyim?",
     a: "Akademik ve kişisel kullanım serbesttir. Ticari kullanım için lütfen iletisim@dilbilim.org.tr adresinden bizimle iletişime geçin.",
   },

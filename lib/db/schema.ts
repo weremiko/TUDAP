@@ -10,8 +10,24 @@ export const user = pgTable('user', {
   emailVerified: boolean('emailVerified').notNull().default(false),
   image: text('image'),
   role: text('role').notNull().default('user'),
+  profileSlug: text('profile_slug'),
+  blueVerified: boolean('blue_verified').notNull().default(false),
+  points: integer('points').notNull().default(0),
+  institution: text('institution'),
+  bio: text('bio'),
+  websiteUrl: text('website_url'),
+  profileVisibility: boolean('profile_visibility').notNull().default(true),
+  teamRole: text('team_role'),
+  teamOrder: integer('team_order').notNull().default(0),
+  teamVisible: boolean('team_visible').notNull().default(false),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+})
+
+export const userFollows = pgTable('user_follows', {
+  followerId: text('follower_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  followingId: text('following_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
 export const session = pgTable('session', {
@@ -73,6 +89,19 @@ export const queryLogs = pgTable('query_logs', {
   ipaOutput: text('ipa_output').notNull(),
   transcriptionType: text('transcription_type').notNull().default('broad'),
   charCount: integer('char_count').notNull().default(0),
+  ipAddress: text('ip_address'),
+  userId: text('user_id'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+export const moderatorActionLogs = pgTable('moderator_action_logs', {
+  id: serial('id').primaryKey(),
+  actorId: text('actor_id').notNull(),
+  actorName: text('actor_name').notNull(),
+  action: text('action').notNull(),
+  entity: text('entity').notNull(),
+  entityId: text('entity_id'),
+  summary: text('summary').notNull().default(''),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
@@ -82,6 +111,9 @@ export const errorReports = pgTable('error_reports', {
   userEmail: text('user_email').notNull().default('anonymous'),
   url: text('url').notNull().default(''),
   errorWord: text('error_word').notNull().default(''),
+  userId: text('user_id'),
+  reportType: text('report_type').notNull().default('error'),
+  pointsAwarded: boolean('points_awarded').notNull().default(false),
   resolved: boolean('resolved').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
@@ -95,7 +127,10 @@ export const blogPosts = pgTable('blog_posts', {
   authorId: text('author_id').notNull(),
   authorName: text('author_name').notNull().default(''),
   tags: text('tags').notNull().default(''),
+  contentType: text('content_type').notNull().default('article'),
+  mediaUrl: text('media_url'),
   published: boolean('published').notNull().default(false),
+  submissionStatus: text('submission_status').notNull().default('approved'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
@@ -130,6 +165,20 @@ export const events = pgTable('events', {
   url: text('url').notNull().default(''),
   tags: text('tags').notNull().default(''),
   endDate: timestamp('end_date'),
+  createdById: text('created_by_id').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const announcements = pgTable('announcements', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  content: text('content').notNull().default(''),
+  linkLabel: text('link_label'),
+  linkUrl: text('link_url'),
+  startsAt: timestamp('starts_at').notNull(),
+  endsAt: timestamp('ends_at'),
+  active: boolean('active').notNull().default(true),
   createdById: text('created_by_id').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

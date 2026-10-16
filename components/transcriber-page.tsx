@@ -3,11 +3,10 @@
 import { useState, useEffect, useRef } from "react"
 import {
   Moon, Sun, Volume2, Copy, BookOpen, ChevronUp,
-  Download, RotateCcw, AlertTriangle, Lock,
+  Download, RotateCcw, AlertTriangle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
@@ -15,11 +14,12 @@ import { turkishToIPA } from "@/lib/turkish-to-ipa"
 import { sanitizeInput } from "@/lib/sanitize"
 import { useLocalStorage } from "@/hooks/use-local-storage"
 import { saveQueryLog, checkQueryLimit } from "@/app/actions/logs"
-import { saveErrorReport } from "@/app/actions/errors"
+import { getErrorReportChallenge, saveErrorReport } from "@/app/actions/errors"
 import { getCustomTranscriptions } from "@/app/actions/transcriptions"
 import { useSession } from "@/lib/auth-client"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { CiteThisTool } from "@/components/cite-this-tool"
 
 const MAX_WORDS = 3
 
@@ -77,7 +77,7 @@ const LOADING_STEPS_EN = [
 const UI = {
   tr: {
     loadingSteps: LOADING_STEPS_TR,
-    betaBanner: { bold: "Beta Sürümü:", text: "Bu araç aktif geliştirme aşamasındadır ve %100 doğruluk garanti etmez. Akademik çalışmalar için sonuçları uzman denetiminden geçirerek kullanınız." },
+    betaBanner: { bold: "Akademik Açık Erişim Sürümü:", text: "Bu araç aktif geliştirme aşamasındadır ve %100 doğruluk garanti etmez. Akademik çalışmalar için sonuçları uzman denetiminden geçirerek kullanınız." },
     limitLabel: "Günlük sorgu sınırı:",
     limitSub: (r: number) => `Oturum açın veya kayıt olun — sınırsız kullanım için.`,
     limitSignIn: "Oturum açın",
@@ -85,6 +85,7 @@ const UI = {
     toolLabel: "Sesbilim Aracı",
     title: "Sesbilimsel Abece Çeviricisi",
     desc: "Türkçe metinleri Uluslararası Fonetik Alfabe formatına dönüştürün. Türkiye Türkçesi boğumlanma özelliklerine dayalı akademik transkripsiyon.",
+    methodology: "Motorumuz kural tabanlı çalıştığı için bağlamsal istisnalarda sapmalar olabilmektedir; temel mantık Ergenç (2002)'ye dayanmaktadır.",
     broad: "Geniş Transkripsiyon",
     refOpen: "IPA Referans",
     refClose: "Referansı Kapat",
@@ -94,11 +95,11 @@ const UI = {
     consonants: "Ünsüzler",
     inputLabel: "Türkçe Metin",
     wordCount: (c: number, m: number) => `${c} / ${m} sözcük`,
-    wordLimit: (m: number) => `En fazla ${m} sözcük girilebilir. Beta sürümde sözcük sınırı uygulanmaktadır.`,
+    wordLimit: (m: number) => `En fazla ${m} sözcük girilebilir. Akademik Açık Erişim Sürümünde sözcük sınırı uygulanmaktadır.`,
     placeholder: "Çevirmek istediğiniz Türkçe metni buraya yazın…",
     speak: "Seslendir",
     clear: "Temizle",
-    reportBtn: "Hata Bildir",
+    reportBtn: "Hatalı Çevriyazı Bildir",
     reportWord: "Hatalı sözcük (ör: 'kitap')…",
     reportNote: "Açıklama (isteğe bağlı)…",
     reportSend: "Gönder",
@@ -129,6 +130,7 @@ const UI = {
     toolLabel: "Phonetics Tool",
     title: "Phonetic Transcription Tool",
     desc: "Convert Turkish text into International Phonetic Alphabet notation. Academic broad transcription based on Turkish phonological properties.",
+    methodology: "Because the engine is rule-based, deviations may occur in contextual exceptions; its core logic is based on Ergenç (2002).",
     broad: "Broad Transcription",
     refOpen: "IPA Reference",
     refClose: "Close Reference",
@@ -166,8 +168,19 @@ const UI = {
 }
 
 const LS_INPUT = "tudap_transcriber_input"
-const LS_BROAD = "tudap_transcriber_broad"
+const LS_MODE = "tudap_transcriber_mode"
 const LS_DARK  = "tudap_transcriber_dark"
+
+type TranscriptionMode = "narrow" | "broad" | "traditional"
+
+function getTranscriptionOptions(mode: TranscriptionMode) {
+  return {
+    broad: mode !== "narrow",
+    rules: mode === "traditional"
+      ? { allophones: false, assimilation: true, aspiration: false, stress: false }
+      : undefined,
+  }
+}
 
 export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
   const t = UI[lang]
@@ -175,32 +188,32 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
   const { data: session } = useSession()
 
   const [savedInput, setSavedInput, , inputHydrated] = useLocalStorage<string>(LS_INPUT, "")
-  const [savedBroad, setSavedBroad, , broadHydrated] = useLocalStorage<boolean>(LS_BROAD, true)
+  const [savedMode, setSavedMode, , modeHydrated] = useLocalStorage<TranscriptionMode>(LS_MODE, "narrow")
   const [savedDark,  setSavedDark,  , darkHydrated]  = useLocalStorage<boolean>(LS_DARK, false)
 
   const [inputText,          setInputText]          = useState("")
   const [outputText,         setOutputText]          = useState("")
-  const [broadTranscription, setBroadTranscription]  = useState(true)
+  const [transcriptionMode, setTranscriptionMode] = useState<TranscriptionMode>("narrow")
   const [isDark,             setIsDark]              = useState(false)
   const [showReference,      setShowReference]       = useState(false)
   const [isProcessing,       setIsProcessing]        = useState(false)
   const [loadingStep,        setLoadingStep]         = useState(0)
   const [wordLimitWarning,   setWordLimitWarning]    = useState(false)
-  const [queryLimitRemaining, setQueryLimitRemaining] = useState(5)
-  const [isQueryLimited,     setIsQueryLimited]      = useState(false)
   const [customTranscriptions, setCustomTranscriptions] = useState<Array<{input: string, output: string}>>([])
 
   // Error report state — no dialog, just direct send
   const [errorNote,          setErrorNote]           = useState("")
   const [errorWord,          setErrorWord]           = useState("")
   const [showErrorForm,      setShowErrorForm]       = useState(false)
+  const [reportChallenge,    setReportChallenge]     = useState<{ challenge: string; question: string; signature: string } | null>(null)
+  const [reportAnswer,       setReportAnswer]        = useState("")
 
   const sessionRestoredRef = useRef(false)
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Hydrate from localStorage
   useEffect(() => {
-    if (!inputHydrated || !broadHydrated || !darkHydrated) return
+    if (!inputHydrated || !modeHydrated || !darkHydrated) return
     if (sessionRestoredRef.current) return
     sessionRestoredRef.current = true
 
@@ -208,47 +221,33 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
       setIsDark(true)
       document.documentElement.classList.add("dark")
     }
-    setBroadTranscription(savedBroad)
+    setTranscriptionMode(savedMode)
     setInputText(savedInput)
-    if (savedInput) setOutputText(turkishToIPA(savedInput, { broad: savedBroad }))
+    if (savedInput) setOutputText(turkishToIPA(savedInput, getTranscriptionOptions(savedMode)))
     if (savedInput.length > 0) {
       toast({ title: t.toastSession.title, description: t.toastSession.desc })
     }
-  }, [inputHydrated, broadHydrated, darkHydrated]) // eslint-disable-line
+  }, [inputHydrated, modeHydrated, darkHydrated]) // eslint-disable-line
 
-  // Check query limit on mount and when session changes
+  // Load custom transcriptions once on mount
   useEffect(() => {
-    const checkLimit = async () => {
-      const { allowed, remaining } = await checkQueryLimit()
-      setIsQueryLimited(!allowed && !session?.user)
-      setQueryLimitRemaining(remaining)
-    }
-    checkLimit()
-    
-    // Load custom transcriptions once on mount
     getCustomTranscriptions()
       .then(data => setCustomTranscriptions(data))
       .catch(err => console.error('[v0] Error loading custom transcriptions:', err))
-  }, [session?.user])
+  }, [])
 
   // Process pipeline
-  const processInput = async (raw: string, broad: boolean) => {
+  const processInput = async (raw: string, mode: TranscriptionMode) => {
     if (!raw.trim()) { setOutputText(""); return }
     
-    // Check query limit for anonymous users
-    if (!session?.user) {
-      const { allowed, remaining } = await checkQueryLimit()
-      if (!allowed) {
-        setIsQueryLimited(true)
-        setQueryLimitRemaining(remaining)
-        toast({
-          title: t.toastLimitReached.title,
-          description: t.toastLimitReached.desc,
-          variant: "destructive"
-        })
-        return
-      }
-      setQueryLimitRemaining(remaining)
+    const { allowed } = await checkQueryLimit()
+    if (!allowed) {
+      toast({
+        title: t.toastLimitReached.title,
+        description: t.toastLimitReached.desc,
+        variant: "destructive"
+      })
+      return
     }
     
     setIsProcessing(true)
@@ -274,10 +273,10 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
         if (customMap.has(key)) {
           return customMap.get(key)!
         }
-        return turkishToIPA(token, { broad: true })
+        return turkishToIPA(token, getTranscriptionOptions(mode))
       }).join("")
     } else {
-      ipa = turkishToIPA(clean, { broad: true })
+      ipa = turkishToIPA(clean, getTranscriptionOptions(mode))
     }
     
     setLoadingStep(2)
@@ -289,7 +288,7 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
     saveQueryLog({
       inputText: clean,
       ipaOutput: ipa,
-      transcriptionType: 'broad',
+      transcriptionType: mode === "broad" ? "broad" : "narrow",
       charCount: clean.length,
     }).catch(() => {})
   }
@@ -304,13 +303,14 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
     // Debounce processInput: clear timer, set new one (500ms)
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
     debounceTimerRef.current = setTimeout(() => {
-      processInput(value, broadTranscription)
+      processInput(value, transcriptionMode)
     }, 500)
   }
 
-  const handleBroadToggle = (checked: boolean) => {
-    setBroadTranscription(checked)
-    setSavedBroad(true)
+  const handleModeChange = (mode: TranscriptionMode) => {
+    setTranscriptionMode(mode)
+    setSavedMode(mode)
+    if (inputText.trim()) processInput(inputText, mode)
   }
 
   const toggleDarkMode = () => {
@@ -364,17 +364,31 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
       toast({ title: t.toastReportEmpty.title, description: t.toastReportEmpty.desc, variant: "destructive" })
       return
     }
+    if (!reportChallenge || !reportAnswer.trim()) {
+      toast({ title: "İnsan doğrulaması gerekli", description: "Lütfen matematik sorusunu yanıtlayın.", variant: "destructive" })
+      return
+    }
     
-    await saveErrorReport({
-      message: note,
-      userEmail: session?.user?.email || 'anonymous',
-      url: typeof window !== 'undefined' ? window.location.href : '',
-      errorWord: errorWord.trim(),
-    })
+    try {
+      await saveErrorReport({
+        message: note,
+        userEmail: session?.user?.email || 'anonymous',
+        url: typeof window !== 'undefined' ? window.location.href : '',
+        errorWord: errorWord.trim(),
+        challenge: reportChallenge.challenge,
+        challengeSignature: reportChallenge.signature,
+        challengeAnswer: reportAnswer,
+      })
+    } catch (error) {
+      toast({ title: "Rapor gönderilemedi", description: error instanceof Error ? error.message : "Lütfen tekrar deneyin.", variant: "destructive" })
+      return
+    }
     
     setShowErrorForm(false)
     setErrorNote("")
     setErrorWord("")
+    setReportAnswer("")
+    setReportChallenge(null)
     toast({ title: t.toastReportSent.title, description: t.toastReportSent.desc })
   }
 
@@ -393,26 +407,6 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
             </p>
           </div>
 
-          {/* Query limit warning for anonymous users */}
-          {!session?.user && (
-            <div className="rounded-lg border border-blue-200/60 bg-blue-50/60 dark:bg-blue-900/20 dark:border-blue-800/40 px-4 py-3">
-              <div className="flex items-start gap-3">
-                <Lock className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-blue-900 dark:text-blue-200">
-                    {t.limitLabel} <span className="font-bold">{Math.max(0, queryLimitRemaining)} / 5</span>
-                  </p>
-                  <p className="text-xs text-blue-800 dark:text-blue-300 mt-1">
-                    <a href="/sign-in" className="underline hover:no-underline font-medium">{t.limitSignIn}</a>{" "}
-                    {lang === "en" ? "or " : "veya "}
-                    <a href="/sign-up" className="underline hover:no-underline font-medium">{t.limitSignUp}</a>
-                    {lang === "en" ? " for unlimited use." : " — sınırsız kullanım için."}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Title row */}
           <div className="flex items-start justify-between gap-4 border-b border-border pb-8">
             <div className="space-y-2">
@@ -422,6 +416,9 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
               </h1>
               <p className="text-muted-foreground text-sm leading-relaxed max-w-xl">
                 {t.desc}
+              </p>
+              <p className="max-w-xl border-l-2 border-primary/30 pl-3 text-xs leading-relaxed text-muted-foreground/80">
+                {t.methodology}
               </p>
             </div>
             {/* Dark mode toggle isolated to transcriber */}
@@ -463,17 +460,50 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
             </div>
           )}
 
-          {/* Broad transcription label + reference toggle */}
-          <div className="flex items-center justify-between gap-4">
-            <Label className="text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">{t.broad}</span>
-              <span className="ml-2 font-mono text-xs text-muted-foreground">/ … /</span>
-            </Label>
-            <Button variant="ghost" size="sm" onClick={() => setShowReference(!showReference)}
-              className="text-muted-foreground hover:text-foreground gap-1.5 text-xs">
-              <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">{showReference ? t.refClose : t.refOpen}</span>
-            </Button>
+          {/* Transcription modes */}
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2" role="tablist" aria-label="Transkripsiyon biçimi">
+              {([
+                ["narrow", lang === "en" ? "Modern acoustic phonetics" : "Modern Akustik Fonetik", "[ … ]"],
+                ["broad", lang === "en" ? "Broad phonemic transcription" : "Geniş Fonemik Çevriyazı", "/ … /"],
+                ["traditional", lang === "en" ? "Traditional / comparative" : "Geleneksel / Karşılaştırmalı", "IPA"],
+              ] as const).map(([mode, label, notation]) => (
+                <button
+                  key={mode}
+                  type="button"
+                  role="tab"
+                  aria-selected={transcriptionMode === mode}
+                  onClick={() => handleModeChange(mode)}
+                  className={`min-h-16 rounded-lg border px-3 py-2 text-left transition-colors ${
+                    transcriptionMode === mode
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border bg-card text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  <span className="block text-xs font-medium leading-snug">{label}</span>
+                  <span className="mt-1 block font-mono text-xs opacity-70">{notation}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+              <Label className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">
+                  {transcriptionMode === "narrow" ? (lang === "en" ? "Modern acoustic phonetics" : "Modern Akustik Fonetik") :
+                    transcriptionMode === "broad" ? t.broad : (lang === "en" ? "Traditional / comparative" : "Geleneksel / Karşılaştırmalı")}
+                </span>
+                <span className="ml-2 font-mono text-xs text-muted-foreground">
+                  {transcriptionMode === "narrow" ? "[ … ]" : transcriptionMode === "broad" ? "/ … /" : "IPA"}
+                </span>
+              </Label>
+              <Button variant="ghost" size="sm" onClick={() => setShowReference(!showReference)}
+                className="text-muted-foreground hover:text-foreground gap-1.5 text-xs">
+                <BookOpen className="h-4 w-4" />
+                <span className="hidden sm:inline">{showReference ? t.refClose : t.refOpen}</span>
+              </Button>
+              <CiteThisTool />
+            </div>
+
           </div>
 
           {/* Editor grid */}
@@ -519,7 +549,7 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
                 <div className="ml-auto flex items-center gap-2">
                   {!showErrorForm ? (
                     <Button
-                      onClick={() => setShowErrorForm(true)}
+                      onClick={async () => { setShowErrorForm(true); setReportChallenge(await getErrorReportChallenge()) }}
                       disabled={!outputText}
                       variant="ghost" size="sm"
                       className="text-xs text-destructive/70 hover:text-destructive hover:bg-destructive/10"
@@ -537,6 +567,18 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
                         placeholder={t.reportWord}
                         className="h-7 text-xs px-2 rounded border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                       />
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">{reportChallenge?.question ?? "Soru yükleniyor..."}</span>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={reportAnswer}
+                          onChange={(e) => setReportAnswer(e.target.value)}
+                          placeholder="Cevap"
+                          aria-label="Matematik sorusunun cevabı"
+                          className="h-7 w-20 text-xs px-2 rounded border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                      </div>
                       <input
                         type="text"
                         value={errorNote}

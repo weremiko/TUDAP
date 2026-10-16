@@ -14,6 +14,7 @@ import { useSession } from "@/lib/auth-client"
 const PAGES = [
   { key: "hakkinda", label: "Hakkında", path: "/hakkinda" },
   { key: "iletisim", label: "İletişim", path: "/iletisim" },
+  { key: "takimimiz", label: "Takımımız", path: "/takimimiz" },
 ]
 
 function SectionEditor({
@@ -25,7 +26,8 @@ function SectionEditor({
   value: string
   onChange: (val: string) => void
 }) {
-  const isMultiline = value.includes("\n") || value.length > 120
+  const isImageUrl = section.key.endsWith("_fotograf")
+  const isMultiline = !isImageUrl && (value.includes("\n") || value.length > 120)
 
   return (
     <div className="space-y-2">
@@ -40,13 +42,20 @@ function SectionEditor({
           </span>
         )}
       </div>
-      <Textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        rows={isMultiline ? Math.min(Math.max(value.split("\n").length + 1, 4), 12) : 3}
-        className="text-sm font-sans resize-y min-h-[72px]"
-        placeholder="İçerik girin…"
-      />
+      {isImageUrl ? (
+        <>
+          <input type="url" value={value} onChange={(e) => onChange(e.target.value)} className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" placeholder="https://…" />
+          {value && <img src={value} alt="Önizleme" className="mt-3 h-24 w-24 rounded-full object-cover border border-border" />}
+        </>
+      ) : (
+        <Textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          rows={isMultiline ? Math.min(Math.max(value.split("\n").length + 1, 4), 12) : 3}
+          className="text-sm font-sans resize-y min-h-[72px]"
+          placeholder="İçerik girin…"
+        />
+      )}
     </div>
   )
 }
@@ -64,28 +73,52 @@ export default function SayfalarPage() {
 
   // Load sections when active page changes
   useEffect(() => {
+    let cancelled = false
     setLoading(true)
-    getPageSections(activePage).then((rows) => {
-      setSections(rows)
-      const initial: Record<string, string> = {}
-      rows.forEach((r) => (initial[r.key] = r.content))
-      setDrafts(initial)
-      setSavedKeys([])
-      setLoading(false)
-    })
-  }, [activePage])
+    getPageSections(activePage)
+      .then((rows) => {
+        if (cancelled) return
+        setSections(rows)
+        const initial: Record<string, string> = {}
+        rows.forEach((r) => (initial[r.key] = r.content))
+        setDrafts(initial)
+        setSavedKeys([])
+      })
+      .catch(() => {
+        if (cancelled) return
+        setSections([])
+        setDrafts({})
+        toast({
+          title: "Sayfa içerikleri yüklenemedi",
+          description: "Veritabanı bağlantısını veya page_sections tablosunu kontrol edin.",
+          variant: "destructive",
+        })
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [activePage, toast])
 
   const isDirty = sections.some((s) => drafts[s.key] !== s.content)
 
   const handleSave = () => {
     startTransition(async () => {
-      const updates = sections.map((s) => ({ key: s.key, content: drafts[s.key] ?? s.content }))
-      await upsertAllPageSections(activePage, updates)
-      // Update local baseline
-      setSections((prev) => prev.map((s) => ({ ...s, content: drafts[s.key] ?? s.content })))
-      setSavedKeys(sections.map((s) => s.key))
-      toast({ title: "Kaydedildi", description: "Sayfa içerikleri güncellendi." })
-      setTimeout(() => setSavedKeys([]), 2500)
+      try {
+        const updates = sections.map((s) => ({ key: s.key, content: drafts[s.key] ?? s.content }))
+        await upsertAllPageSections(activePage, updates)
+        // Update local baseline only after the server confirms the write.
+        setSections((prev) => prev.map((s) => ({ ...s, content: drafts[s.key] ?? s.content })))
+        setSavedKeys(sections.map((s) => s.key))
+        toast({ title: "Kaydedildi", description: "Sayfa içerikleri güncellendi." })
+        setTimeout(() => setSavedKeys([]), 2500)
+      } catch {
+        toast({
+          title: "Kaydetme başarısız",
+          description: "İçerik güncellenemedi. Veritabanı bağlantısını kontrol edin.",
+          variant: "destructive",
+        })
+      }
     })
   }
 

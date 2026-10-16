@@ -1,17 +1,24 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Languages, BookText, TreePine, FileText, BarChart3, ArrowRight, Lock, Newspaper, Calendar } from "lucide-react"
+import { ArrowRight, TreePine, FileText, BarChart3 } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { HomeTabs } from "@/components/home-tabs"
+import { HomeBlogSlider } from "@/components/home-blog-slider"
+import { HomeGlossarySearch } from "@/components/home-glossary-search"
+import { HomeRoadmap } from "@/components/home-roadmap"
+import { HomeParticleField } from "@/components/home-particle-field"
+import { getBlogPosts } from "@/app/actions/blog"
+import { getActiveAnnouncement } from "@/app/actions/announcements"
+import { AnnouncementPopup } from "@/components/announcement-popup"
 import type { Metadata } from "next"
 
 const BASE = "https://dilbilim.org.tr"
 
 export const metadata: Metadata = {
-  title: "TÜDAP — Türkçe Dilbilim Platformu | IPA Çevirici & Terim Sözlüğü",
-  description:
-    "Türkçe dilbilim platformu: ücretsiz IPA fonetik transkripsiyon aracı, 700+ terimlik dilbilim sözlüğü, akademik blog ve etkinlik ajandası. Sesbilim, sözdizimi ve morfoloji araçları.",
+  title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu | IPA Çevirici & Terim Sözlüğü",
+   description:
+    "Türkçe Dilbilim Araştırma Platformu: ücretsiz IPA fonetik transkripsiyon aracı, 700+ madde başı, akademik içerikler ve etkinlik ajandası.",
   keywords: [
     "türkçe dilbilim", "IPA çevirici", "fonetik transkripsiyon", "türkçe IPA",
     "sesbilimsel transkripsiyon", "dilbilim terimleri sözlüğü", "dilbilim araçları",
@@ -24,18 +31,18 @@ export const metadata: Metadata = {
     languages: { "en": `${BASE}/en`, "tr": BASE, "x-default": BASE },
   },
   openGraph: {
-    title: "TÜDAP — Türkçe Dilbilim Platformu | IPA Çevirici & Terim Sözlüğü",
-    description: "Türkçe dilbilim araçları: IPA fonetik transkripsiyon, 700+ terim sözlüğü, akademik blog ve etkinlik ajandası.",
+    title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu | IPA Çevirici & Terim Sözlüğü",
+    description: "Türkçe dilbilim araçları: IPA fonetik transkripsiyon, 700+ terim sözlüğü, akademik içerikler ve etkinlik ajandası.",
     url: BASE,
     siteName: "TÜDAP",
     locale: "tr_TR",
     type: "website",
-    images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: "TÜDAP — Türkçe Dilbilim Platformu" }],
+    images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: "TÜDAP — Türkçe Dilbilim Araştırma Platformu" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TÜDAP — Türkçe Dilbilim Platformu",
-    description: "Ücretsiz IPA fonetik transkripsiyon, 700+ terimlik dilbilim sözlüğü, blog ve etkinlik ajandası.",
+    title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu",
+    description: "Ücretsiz IPA fonetik transkripsiyon, 700+ terim, akademik içerikler ve etkinlik ajandası.",
     images: [`${BASE}/og-image.png`],
   },
 }
@@ -67,69 +74,35 @@ const homepageJsonLd = [
   },
 ]
 
-const TOOLS = [
-  {
-    href: "/cevirici",
-    icon: Languages,
-    color: "text-primary",
-    bg: "bg-primary/10 group-hover:bg-primary/20",
-    title: "Sesbilimsel Abece Çeviricisi",
-    desc: "Türkçe metinleri IPA formatına çevirin. Geniş ve dar transkripsiyon seçenekleri ile akademik düzeyde çıktı. Günde 5 sorgu (oturum açıp sınırsız).",
-    badge: "Aktif",
-    disabled: false,
-  },
-  {
-    href: "/terim-sozlugu",
-    icon: BookText,
-    color: "text-chart-2",
-    bg: "bg-chart-2/10 group-hover:bg-chart-2/20",
-    title: "Dilbilim Terimleri Sözlüğü",
-    desc: "700+ terim, Türkçe örnekler ve akademik açıklamalar. Sesbilim, sözdizimi, anlambilim ve daha fazlası. Yönetici panelinden dinamik ekleme.",
-    badge: "Aktif",
-    disabled: false,
-  },
-  {
-    href: "/blog",
-    icon: Newspaper,
-    color: "text-chart-3",
-    bg: "bg-chart-3/10 group-hover:bg-chart-3/20",
-    title: "Blog",
-    desc: "Dilbilim araştırmaları, akademik yazılar ve platform güncellemeleri. Uzman yazılar ve son gelişmeler hakkında bilgi.",
-    badge: "Aktif",
-    disabled: false,
-  },
-  {
-    href: "/ajanda",
-    icon: Calendar,
-    color: "text-chart-4",
-    bg: "bg-chart-4/10 group-hover:bg-chart-4/20",
-    title: "Türkiye Dilbilim Ajandası",
-    desc: "Dilbilim alanında düzenlenen seminerler, konferanslar, çalıştaylar ve diğer etkinlikleri takip edin.",
-    badge: "Aktif",
-    disabled: false,
-  },
-]
+export default async function Home() {
+  const [{ posts: latestPosts }, announcement] = await Promise.all([
+    getBlogPosts(1, 6, true),
+    getActiveAnnouncement(),
+  ])
 
-export default function Home() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {homepageJsonLd.map((schema, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       ))}
       <SiteHeader />
+      <AnnouncementPopup announcement={announcement} />
 
       {/* Hero */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl pt-20 sm:pt-28 pb-16 sm:pb-20">
-        <div className="max-w-3xl space-y-8">
+      <section className="relative isolate min-h-[560px] overflow-hidden border-b border-[#ded8cc] bg-[#f4f1e9]">
+        <HomeParticleField className="opacity-65" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_48%,rgba(244,241,233,0.02),rgba(244,241,233,0.38)_44%,rgba(244,241,233,0.88)_82%),linear-gradient(90deg,rgba(244,241,233,0.98)_0%,rgba(244,241,233,0.9)_31%,rgba(244,241,233,0.38)_64%,rgba(244,241,233,0.08)_100%)]" />
+        <div className="relative z-10 container mx-auto flex min-h-[560px] items-center px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+          <div className="w-full max-w-6xl space-y-8">
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-widest text-accent font-medium">Türkçe Dilbilim Platformu</p>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground tracking-tight leading-[1.08] text-balance">
-              Türkçe Dilbilim
+            <p className="text-xs uppercase tracking-[0.2em] text-[#8c5d38] font-medium">Türkçe Dilbilim Araştırma Platformu</p>
+            <h1 className="max-w-2xl text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-[#171612] tracking-tight leading-[1.05] text-balance">
+              Türkçe Dilbilim Araştırma
               <br />
               Platformu
             </h1>
           </div>
-          <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
+          <p className="max-w-xl text-lg text-[#5d5a53] leading-relaxed">
             Türkiye Türkçesine özgü fonetik transkripsiyon, sözdizimsel analiz ve terminoloji araçları.
             Akademik çalışmalar ve dilbilim eğitimi için geliştirilmiş dijital platform.
           </p>
@@ -141,32 +114,16 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="/hakkinda">
-              <Button variant="outline" size="lg" className="h-11 px-7 text-sm font-medium bg-transparent">
+              <Button variant="outline" size="lg" className="h-11 border-[#aaa398] bg-transparent px-7 text-sm font-medium text-[#24221e] hover:bg-white/60 hover:text-[#171612]">
                 Platform Hakkında
               </Button>
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Stats strip */}
-      <section className="border-y border-border bg-muted/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              ["3", "Aktif Araç"],
-              ["700+", "Dilbilim Terimi"],
-              ["50+", "günlük ziyaretçi"],
-              ["%100", "İşlevsellik"],
-            ].map(([val, label]) => (
-              <div key={label}>
-                <p className="text-2xl md:text-3xl font-serif font-bold text-foreground">{val}</p>
-                <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wide">{label}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
+
+      <HomeRoadmap />
 
       {/* Tool cards */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-16 sm:py-20">
@@ -174,55 +131,11 @@ export default function Home() {
           <p className="text-xs uppercase tracking-widest text-muted-foreground">Araçlar</p>
           <h2 className="text-2xl font-serif font-bold text-foreground">Neler yapabilirsiniz?</h2>
         </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {TOOLS.map(({ href, icon: Icon, color, bg, title, desc, badge, disabled }) =>
-            disabled ? (
-              <div key={href} className="opacity-50 cursor-not-allowed">
-                <Card className="p-6 h-full border-dashed border-border">
-                  <div className="space-y-4">
-                    <div className={`w-11 h-11 rounded-xl ${bg.split(" ")[0]} flex items-center justify-center`}>
-                      <Icon className={`h-5 w-5 ${color}`} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <h3 className="text-base font-semibold text-foreground">{title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Lock className="h-3 w-3" />
-                      Yakında kullanılabilir
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            ) : (
-              <Link key={href} href={href} className="group">
-                <Card className="p-6 h-full border-border hover:border-primary/40 hover:shadow-md transition-all duration-200">
-                  <div className="space-y-4">
-                    <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center transition-colors`}>
-                      <Icon className={`h-5 w-5 ${color}`} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-base font-semibold text-foreground">{title}</h3>
-                        {badge && (
-                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-accent/15 text-accent border border-accent/20">
-                            {badge}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                      Aracı aç <ArrowRight className="h-3 w-3" />
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            )
-          )}
-        </div>
+        <HomeTabs />
       </section>
+
+      <HomeBlogSlider posts={latestPosts} />
+      <HomeGlossarySearch />
 
       <SiteFooter />
     </div>

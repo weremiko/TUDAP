@@ -2,10 +2,39 @@
 
 import { db } from '@/lib/db'
 import { errorReports, user } from '@/lib/db/schema'
-import { desc, count, eq, gte } from 'drizzle-orm'
+import { desc, count, eq, gte, sql } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import PDFDocument from 'pdfkit'
+import { createMathChallenge, validateMathChallenge } from '@/lib/math-challenge'
+import { recordModeratorAction } from '@/lib/moderator-audit'
+
+let errorColumnsReady: Promise<void> | null = null
+const reportAttempts = new Map<string, { count: number; resetAt: number }>()
+export async function getErrorReportChallenge() {
+  return createMathChallenge()
+}
+
+function reportRateAllowed(identifier: string) {
+  const now = Date.now()
+  const current = reportAttempts.get(identifier)
+  const window = current && current.resetAt > now ? current : { count: 0, resetAt: now + 60_000 }
+  window.count += 1
+  reportAttempts.set(identifier, window)
+  return window.count <= 5
+}
+
+function ensureErrorColumns() {
+  if (!errorColumnsReady) {
+    errorColumnsReady = db.execute(sql`
+      ALTER TABLE error_reports
+        ADD COLUMN IF NOT EXISTS user_id TEXT,
+        ADD COLUMN IF NOT EXISTS report_type TEXT NOT NULL DEFAULT 'error',
+        ADD COLUMN IF NOT EXISTS points_awarded BOOLEAN NOT NULL DEFAULT FALSE
+    `).then(() => undefined)
+  }
+  return errorColumnsReady
+}
 
 async function requireAdminOrModerator() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -13,6 +42,7 @@ async function requireAdminOrModerator() {
   
   const [u] = await db.select({ role: user.role }).from(user).where(eq(user.id, session.user.id)).limit(1)
   if (!u || (u.role !== 'admin' && u.role !== 'moderator')) throw new Error('Forbidden')
+  return session.user.id
 }
 
 export async function saveErrorReport(data: {
@@ -20,21 +50,44 @@ export async function saveErrorReport(data: {
   userEmail?: string
   url?: string
   errorWord?: string
+  reportType?: 'error' | 'term-suggestion'
+  challenge?: string
+  challengeSignature?: string
+  challengeAnswer?: string
 }) {
   try {
+    const requestHeaders = await headers()
+    const identifier = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anonymous'
+    if (!reportRateAllowed(identifier)) throw new Error('Çok fazla hata raporu gönderildi')
+    if (!data.challenge || !data.challengeSignature || !data.challengeAnswer || !validateChallenge(data.challenge, data.challengeSignature, data.challengeAnswer)) {
+      throw new Error('İnsan doğrulaması başarısız')
+    }
+    const message = typeof data.message === 'string' ? data.message.trim() : ''
+    const userEmail = typeof data.userEmail === 'string' ? data.userEmail.trim() : ''
+    const url = typeof data.url === 'string' ? data.url.trim() : ''
+    const errorWord = typeof data.errorWord === 'string' ? data.errorWord.trim() : ''
+    if (!message || message.length > 5000 || userEmail.length > 320 || url.length > 2048 || errorWord.length > 500) {
+      throw new Error('Hata raporu alanları geçersiz veya çok uzun')
+    }
+    await ensureErrorColumns()
+    const session = await auth.api.getSession({ headers: await headers() })
     await db.insert(errorReports).values({
-      message: data.message || '',
-      userEmail: data.userEmail || 'anonymous',
-      url: data.url || '',
-      errorWord: data.errorWord || '',
+      message,
+      userEmail: userEmail || 'anonymous',
+      url,
+      errorWord,
+      userId: session?.user?.id ?? null,
+      reportType: data.reportType || 'error',
     })
   } catch (error) {
     console.error('[v0] Error saving error report:', error)
+    throw error
   }
 }
 
 export async function getErrorReports(page: number = 1, search: string = '') {
   await requireAdminOrModerator()
+  await ensureErrorColumns()
   
   const PER_PAGE = 20
   const offset = (page - 1) * PER_PAGE
@@ -62,6 +115,7 @@ export async function getErrorReports(page: number = 1, search: string = '') {
 
 export async function getErrorStats() {
   await requireAdminOrModerator()
+  await ensureErrorColumns()
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const [[{ total }], [{ todayCount }]] = await Promise.all([
@@ -74,12 +128,18 @@ export async function getErrorStats() {
 }
 
 export async function markErrorAsResolved(id: number) {
-  await requireAdminOrModerator()
-  await db.update(errorReports).set({ resolved: true }).where(eq(errorReports.id, id))
+  const userId = await requireAdminOrModerator()
+  await ensureErrorColumns()
+  const [report] = await db.select({ resolved: errorReports.resolved })
+    .from(errorReports).where(eq(errorReports.id, id)).limit(1)
+  if (!report || report.resolved) return
+  await db.update(errorReports).set({ resolved: true, pointsAwarded: false }).where(eq(errorReports.id, id))
+  await recordModeratorAction(userId, 'resolve', 'error-report', id)
 }
 
 export async function exportErrorsToPDF() {
   await requireAdminOrModerator()
+  await ensureErrorColumns()
   const reports = await db.select().from(errorReports).orderBy(desc(errorReports.createdAt))
   
   const doc = new PDFDocument()

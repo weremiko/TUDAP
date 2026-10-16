@@ -10,7 +10,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { Plus, Pencil, Trash2, Globe, EyeOff, ExternalLink, RefreshCw, FileText } from "lucide-react"
-import { getAdminBlogPosts, deleteBlogPost, toggleBlogPostPublished } from "@/app/actions/blog"
+import { getAdminBlogPostsByStatus, deleteBlogPost, toggleBlogPostPublished, setBlogSubmissionStatus } from "@/app/actions/blog"
+import { getContentMediaUrl } from "@/lib/content-media"
 
 interface Post {
   id: number
@@ -20,8 +21,11 @@ interface Post {
   content: string
   authorName: string
   published: boolean
+  submissionStatus?: string
   createdAt: Date
   updatedAt: Date
+  contentType?: string
+  mediaUrl?: string | null
 }
 
 export default function AdminBlogPage() {
@@ -31,21 +35,22 @@ export default function AdminBlogPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [deleteTarget, setDeleteTarget] = useState<Post | null>(null)
+  const [activeTab, setActiveTab] = useState<"pending" | "draft" | "published">("pending")
   const { toast } = useToast()
 
   const load = async () => {
     setIsLoading(true)
     try {
-      const result = await getAdminBlogPosts(1, 100)
-      setPosts(result.posts as Post[])
-      setTotal(result.total)
+      const result = await getAdminBlogPostsByStatus(activeTab)
+      setPosts(result as Post[])
+      setTotal(result.length)
     } catch {
       toast({ title: "Yüklenemedi", variant: "destructive" })
     }
     setIsLoading(false)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [activeTab])
 
   const handleDelete = () => {
     if (!deleteTarget) return
@@ -68,6 +73,14 @@ export default function AdminBlogPage() {
     })
   }
 
+  const handleSubmission = (post: Post, status: "approved" | "rejected") => {
+    startTransition(async () => {
+      await setBlogSubmissionStatus(post.id, status)
+      toast({ title: status === "approved" ? "Başvuru onaylandı" : "Başvuru reddedildi" })
+      load()
+    })
+  }
+
   const wordCount = (content: string) =>
     content.split(/\s+/).filter(Boolean).length
 
@@ -77,11 +90,8 @@ export default function AdminBlogPage() {
         {/* Header */}
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">Blog Yönetimi</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {total} yazı — {posts.filter(p => p.published).length} yayımda,{" "}
-              {posts.filter(p => !p.published).length} taslak
-            </p>
+            <h1 className="text-2xl font-serif font-bold text-foreground">İçerik Yönetimi</h1>
+            <p className="text-sm text-muted-foreground mt-1">{total} kayıt</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={load} disabled={isLoading} className="bg-transparent">
@@ -90,9 +100,15 @@ export default function AdminBlogPage() {
             </Button>
             <Button size="sm" onClick={() => router.push("/admin/blog/yeni")}>
               <Plus className="h-4 w-4 mr-2" />
-              Yeni Yazı
+              Yeni İçerik
             </Button>
           </div>
+        </div>
+
+        <div className="flex gap-1 border-b border-border">
+          {([['pending', 'Başvurular'], ['draft', 'Taslaklar'], ['published', 'Yayınlananlar']] as const).map(([tab, label]) => (
+            <button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 py-2.5 text-sm border-b-2 -mb-px ${activeTab === tab ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground'}`}>{label}</button>
+          ))}
         </div>
 
         {/* List */}
@@ -101,10 +117,10 @@ export default function AdminBlogPage() {
         ) : posts.length === 0 ? (
           <Card className="p-12 text-center">
             <FileText className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground text-sm mb-4">Henüz blog yazısı yok.</p>
+            <p className="text-muted-foreground text-sm mb-4">Henüz içerik yok.</p>
             <Button onClick={() => router.push("/admin/blog/yeni")} size="sm">
               <Plus className="h-4 w-4 mr-2" />
-              İlk yazıyı ekle
+              İlk içeriği ekle
             </Button>
           </Card>
         ) : (
@@ -115,13 +131,16 @@ export default function AdminBlogPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h2 className="text-sm font-semibold text-foreground">{post.title}</h2>
+                      <Badge variant="outline" className="text-xs">{post.contentType === "video" ? "Video" : post.contentType === "slides" ? "Slayt" : post.contentType === "audio" ? "Podcast" : post.contentType === "document" ? "Belge" : "Yazı"}</Badge>
                       <Badge variant={post.published ? "default" : "secondary"} className="text-xs shrink-0">
                         {post.published ? "Yayımda" : "Taslak"}
                       </Badge>
+                      {activeTab === "pending" && <Badge variant="outline" className="text-xs border-amber-500 text-amber-700">Başvuru bekliyor</Badge>}
                     </div>
                     {post.excerpt && (
                       <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{post.excerpt}</p>
                     )}
+                    {post.mediaUrl && <a href={getContentMediaUrl(post.mediaUrl)} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex text-xs font-medium text-primary hover:underline">Medya önizlemesi</a>}
                     <div className="mt-1.5 flex items-center gap-3 text-xs text-muted-foreground">
                       <span>{post.authorName}</span>
                       <span>{new Date(post.createdAt).toLocaleDateString("tr-TR")}</span>
@@ -130,6 +149,10 @@ export default function AdminBlogPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    {activeTab === "pending" && <>
+                      <Button variant="outline" size="sm" onClick={() => handleSubmission(post, "approved")} disabled={isPending} className="h-8 text-xs">Onayla</Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleSubmission(post, "rejected")} disabled={isPending} className="h-8 text-xs text-destructive">Reddet</Button>
+                    </>}
                     {post.published && (
                       <Button variant="ghost" size="icon" asChild className="h-8 w-8" title="Siteye git">
                         <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
@@ -137,7 +160,7 @@ export default function AdminBlogPage() {
                         </a>
                       </Button>
                     )}
-                    <Button
+                    {activeTab !== "pending" && <Button
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
@@ -149,7 +172,7 @@ export default function AdminBlogPage() {
                         ? <EyeOff className="h-3.5 w-3.5" />
                         : <Globe className="h-3.5 w-3.5" />
                       }
-                    </Button>
+                    </Button>}
                     <Button
                       variant="ghost"
                       size="icon"
@@ -180,9 +203,9 @@ export default function AdminBlogPage() {
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Yazıyı sil</AlertDialogTitle>
+            <AlertDialogTitle>İçeriği sil</AlertDialogTitle>
             <AlertDialogDescription>
-              &quot;{deleteTarget?.title}&quot; yazısı kalıcı olarak silinecek. Bu işlem geri alınamaz.
+              &quot;{deleteTarget?.title}&quot; içeriği kalıcı olarak silinecek. Bu işlem geri alınamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

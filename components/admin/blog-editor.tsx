@@ -28,6 +28,8 @@ interface BlogEditorProps {
     published: boolean
     authorName?: string
     tags?: string
+    contentType?: 'article' | 'video' | 'slides' | 'audio' | 'document'
+    mediaUrl?: string | null
   }
 }
 
@@ -47,6 +49,8 @@ export function BlogEditor({ post }: BlogEditorProps) {
     published: post?.published ?? false,
     authorName: post?.authorName ?? "",
     tags: post?.tags ?? "",
+    contentType: post?.contentType ?? 'article',
+    mediaUrl: post?.mediaUrl ?? "",
   })
 
   // Auto-resize textarea
@@ -221,11 +225,24 @@ export function BlogEditor({ post }: BlogEditorProps) {
         </div>
 
         <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="content-type" className="text-xs text-muted-foreground uppercase tracking-wider">İçerik türü</Label>
+              <select id="content-type" value={form.contentType} onChange={(event) => setForm(f => ({ ...f, contentType: event.target.value as 'article' | 'video' | 'slides' | 'audio' | 'document', mediaUrl: "" }))} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
+                <option value="article">Yazı</option><option value="video">Video</option><option value="slides">Slayt</option><option value="audio">Podcast</option><option value="document">Belge / PDF</option>
+              </select>
+            </div>
+            {form.contentType !== 'article' && <div className="space-y-1.5">
+              <Label htmlFor="media-url" className="text-xs text-muted-foreground uppercase tracking-wider">{form.contentType === 'video' ? 'Video bağlantısı' : form.contentType === 'slides' ? 'Slayt bağlantısı' : form.contentType === 'audio' ? 'Podcast bağlantısı' : 'Belge bağlantısı'}</Label>
+              <Input id="media-url" type="url" value={form.mediaUrl} onChange={(event) => setForm(f => ({ ...f, mediaUrl: event.target.value }))} placeholder="https://" required />
+            </div>}
+          </div>
+
           {/* Title */}
           <input
             value={form.title}
             onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
-            placeholder="Yazı başlığı..."
+            placeholder="İçerik başlığı..."
             className="w-full text-3xl md:text-4xl font-serif font-bold bg-transparent border-none outline-none placeholder:text-muted-foreground/40 text-foreground leading-tight"
           />
 
@@ -233,7 +250,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground uppercase tracking-wider">
-                Özet <span className="font-normal normal-case">(opsiyonel — blog listesinde görünür)</span>
+                Özet <span className="font-normal normal-case">(opsiyonel — içerik listesinde görünür)</span>
               </Label>
               <Input
                 value={form.excerpt}

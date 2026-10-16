@@ -13,6 +13,8 @@ export default function robots(): MetadataRoute.Robots {
           "/sign-in/",
           "/sign-up/",
           "/api/",
+          "/profil/ayarlar/",
+          "/profil/blog-basvurusu/",
           "/eren/",
         ],
       },

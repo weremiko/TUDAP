@@ -1,15 +1,16 @@
 "use client"
 
 import { useEffect, useState, useTransition } from "react"
-import { getAllUsers, setUserRole, deleteUser } from "@/app/actions/admin"
+import { getAllUsers, setUserRole, deleteUser, setUserBlueVerification, setUserTeamMember, setUserPoints } from "@/app/actions/admin"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { ShieldCheck, ShieldHalf, Trash2, Loader2, RefreshCw } from "lucide-react"
+import { ShieldCheck, ShieldHalf, Trash2, Loader2, RefreshCw, BadgeCheck, UsersRound } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
+import { Input } from "@/components/ui/input"
 
 type User = Awaited<ReturnType<typeof getAllUsers>>[number]
 type Role = "admin" | "moderator" | "user"
@@ -31,6 +32,7 @@ export default function UsersPage() {
   const [users, setUsers]   = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [isPending, startTransition] = useTransition()
+  const [pointDrafts, setPointDrafts] = useState<Record<string, string>>({})
 
   const load = async () => {
     setLoading(true)
@@ -58,6 +60,35 @@ export default function UsersPage() {
     })
   }
 
+  const handleVerification = (userId: string, verified: boolean) => {
+    startTransition(async () => {
+      await setUserBlueVerification(userId, verified)
+      toast({ title: verified ? "Mavi tik verildi" : "Mavi tik kaldırıldı" })
+      await load()
+    })
+  }
+
+  const handleTeamToggle = (u: User) => {
+    startTransition(async () => {
+      await setUserTeamMember(u.id, { role: u.teamRole ? null : 'member', order: u.teamOrder, visible: !u.teamRole })
+      toast({ title: u.teamRole ? "Takımdan çıkarıldı" : "Takıma eklendi" })
+      await load()
+    })
+  }
+
+  const handlePointsSave = (u: User) => {
+    const points = Number(pointDrafts[u.id] ?? u.points)
+    startTransition(async () => {
+      try {
+        await setUserPoints(u.id, points)
+        toast({ title: "Topluluk puanı güncellendi", description: `${u.name}: ${points} puan` })
+        await load()
+      } catch (error) {
+        toast({ title: "Puan güncellenemedi", description: error instanceof Error ? error.message : "Bir hata oluştu.", variant: "destructive" })
+      }
+    })
+  }
+
   return (
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between">
@@ -71,7 +102,7 @@ export default function UsersPage() {
         </Button>
       </div>
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-x-auto">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -81,12 +112,13 @@ export default function UsersPage() {
             Henüz kayıtlı kullanıcı yok.
           </div>
         ) : (
-          <table className="w-full">
+          <table className="w-full min-w-[980px]">
             <thead>
               <tr className="border-b border-border bg-muted/30">
                 <th className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3">Ad Soyad</th>
                 <th className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3">E-posta</th>
                 <th className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3">Mevcut Rol</th>
+                <th className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3">Topluluk Puanı</th>
                 <th className="text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3 hidden sm:table-cell">Kayıt Tarihi</th>
                 <th className="text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4 py-3">Rol Değiştir</th>
                 <th className="w-10 px-4 py-3"></th>
@@ -101,7 +133,7 @@ export default function UsersPage() {
                       <div className="flex items-center gap-2">
                         {role === "admin" && <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />}
                         {role === "moderator" && <ShieldHalf className="h-3.5 w-3.5 text-amber-600 shrink-0" />}
-                        <p className="text-sm font-medium text-foreground">{u.name}</p>
+                        <p className="text-sm font-medium text-foreground flex items-center gap-1">{u.name}{u.blueVerified && <BadgeCheck className="h-4 w-4 text-primary" />}</p>
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -112,12 +144,24 @@ export default function UsersPage() {
                         {ROLE_LABELS[role]}
                       </span>
                     </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Input aria-label={`${u.name} topluluk puanı`} type="number" min={0} max={1000000} step={1} value={pointDrafts[u.id] ?? String(u.points)} onChange={(event) => setPointDrafts((current) => ({ ...current, [u.id]: event.target.value }))} className="h-8 w-24" />
+                        <Button variant="outline" size="sm" className="h-8" disabled={isPending} onClick={() => handlePointsSave(u)}>Kaydet</Button>
+                      </div>
+                    </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
                       <p className="text-sm text-muted-foreground">
                         {new Date(u.createdAt).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" })}
                       </p>
                     </td>
                     <td className="px-4 py-3 text-right">
+                      <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={isPending} onClick={() => handleVerification(u.id, !u.blueVerified)}>
+                        <BadgeCheck className="h-3.5 w-3.5 text-primary" />{u.blueVerified ? "Tiki kaldır" : "Mavi tik"}
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-8 text-xs gap-1" disabled={isPending} onClick={() => handleTeamToggle(u)} title="Takıma ekle/çıkar">
+                        <UsersRound className="h-3.5 w-3.5" />{u.teamRole ? "Takımdan çıkar" : "Takıma ekle"}
+                      </Button>
                       <Select
                         value={role}
                         onValueChange={(v) => handleRoleChange(u.id, v as Role)}

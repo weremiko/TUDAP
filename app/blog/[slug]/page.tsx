@@ -4,6 +4,7 @@ import Link from "next/link"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { getBlogPostBySlug } from "@/app/actions/blog"
+import { getContentMediaUrl } from "@/lib/content-media"
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -12,7 +13,7 @@ const BASE = "https://dilbilim.org.tr"
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const post = await getBlogPostBySlug(slug)
-  if (!post) return { title: "Yazı Bulunamadı" }
+  if (!post) return { title: "İçerik Bulunamadı" }
 
   const description = post.excerpt || post.content.replace(/<[^>]+>/g, "").slice(0, 155) + "…"
   const canonical = `${BASE}/blog/${slug}`
@@ -46,7 +47,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 function renderMarkdown(text: string): string {
-  return text
+  const escaped = text.replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  })[character]!)
+
+  return escaped
     // Headings
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
@@ -73,14 +82,44 @@ function renderMarkdown(text: string): string {
     .join('\n')
 }
 
+function getMediaEmbed(type: string, mediaUrl: string | null) {
+  if (!mediaUrl) return null
+  try {
+    const url = new URL(mediaUrl)
+    if (url.protocol !== 'https:') return null
+    if (type === 'video') {
+      if (url.hostname === 'youtu.be') return `https://www.youtube-nocookie.com/embed/${url.pathname.slice(1)}`
+      if (['youtube.com', 'www.youtube.com', 'm.youtube.com'].includes(url.hostname)) {
+        const videoId = url.searchParams.get('v') ?? url.pathname.match(/\/(?:embed|shorts)\/([^/]+)/)?.[1]
+        if (videoId) return `https://www.youtube-nocookie.com/embed/${videoId}`
+      }
+      if (['vimeo.com', 'www.vimeo.com'].includes(url.hostname) && /^\/(\d+)$/.test(url.pathname)) {
+        return `https://player.vimeo.com/video/${url.pathname.slice(1)}`
+      }
+    }
+    if (type === 'slides' && url.hostname === 'docs.google.com') {
+      const presentationPath = url.pathname.match(/\/presentation\/(d\/(?:e\/)?[^/]+)/)?.[1]
+      if (presentationPath) return `https://docs.google.com/presentation/${presentationPath}/embed?start=false&loop=false&delayms=3000`
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
   const post = await getBlogPostBySlug(slug)
 
-  if (!post || !post.published) notFound()
+  if (!post || !post.published || post.submissionStatus !== 'approved') notFound()
 
   const wordCount = post.content.split(/\s+/).filter(Boolean).length
   const readTime = Math.ceil(wordCount / 200)
+  const embedUrl = getMediaEmbed(post.contentType, post.mediaUrl)
+  const mediaSrc = post.mediaUrl ? getContentMediaUrl(post.mediaUrl) : null
+  const directVideo = post.contentType === 'video' && post.mediaUrl && /\.(mp4|webm|ogg)(?:$|\?)/i.test(post.mediaUrl)
+  const directAudio = post.contentType === 'audio' && post.mediaUrl && /\.(mp3|wav|ogg|m4a|aac)(?:$|\?)/i.test(post.mediaUrl)
+  const directDocument = (post.contentType === 'document' || post.contentType === 'slides') && post.mediaUrl && /\.pdf(?:$|\?)/i.test(post.mediaUrl)
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -108,7 +147,7 @@ export default async function BlogPostPage({ params }: Props) {
           href="/blog"
           className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 mb-10"
         >
-          ← Blog
+          ← İçerikler
         </Link>
 
         {/* Header */}
@@ -122,7 +161,7 @@ export default async function BlogPostPage({ params }: Props) {
               })}
             </time>
             <span>·</span>
-            <span>{readTime} dk okuma</span>
+            <span>{post.contentType === 'video' ? 'Video' : post.contentType === 'slides' ? 'Slayt' : post.contentType === 'audio' ? 'Podcast' : post.contentType === 'document' ? 'Belge' : `${readTime} dk okuma`}</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground leading-tight text-balance">
             {post.title}
@@ -149,6 +188,23 @@ export default async function BlogPostPage({ params }: Props) {
         </header>
 
         {/* Content */}
+        {post.mediaUrl && (
+          <section className="mb-10 overflow-hidden rounded-lg border border-border bg-muted/20">
+            {directVideo ? (
+              <video className="aspect-video w-full bg-black" src={mediaSrc ?? undefined} controls preload="metadata" />
+            ) : directAudio ? (
+              <audio className="w-full p-5" src={mediaSrc ?? undefined} controls preload="metadata" />
+            ) : directDocument ? (
+              <iframe className="aspect-[3/4] w-full" src={mediaSrc ?? undefined} title={post.title} />
+            ) : embedUrl ? (
+              <iframe className="aspect-video w-full" src={embedUrl} title={post.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
+            ) : (
+              <a href={mediaSrc ?? undefined} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-4 p-5 text-sm font-medium text-primary hover:underline">
+                {post.contentType === 'video' ? 'Videoyu aç' : post.contentType === 'slides' ? 'Slayt sunumunu aç' : post.contentType === 'audio' ? 'Podcast’i aç' : 'Belgeyi aç'}<span aria-hidden="true">↗</span>
+              </a>
+            )}
+          </section>
+        )}
         <div
           className="
             prose prose-sm max-w-none
