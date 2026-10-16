@@ -13,7 +13,7 @@ import { Toaster } from "@/components/ui/toaster"
 import {
   ArrowLeft, Save, Eye, EyeOff,
   Bold, Italic, Heading2, Heading3,
-  List, ListOrdered, Minus, Quote, Link2,
+  List, ListOrdered, Minus, Quote, Link2, ImagePlus,
 } from "lucide-react"
 import { createBlogPost, updateBlogPost } from "@/app/actions/blog"
 import Link from "next/link"
@@ -36,7 +36,9 @@ export function BlogEditor({ post }: BlogEditorProps) {
   const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
   const contentRef = useRef<HTMLTextAreaElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
 
   const [form, setForm] = useState({
     title: post?.title ?? "",
@@ -68,6 +70,25 @@ export function BlogEditor({ post }: BlogEditorProps) {
       ta.focus()
       ta.setSelectionRange(start + before.length, start + before.length + selected.length)
     }, 0)
+  }
+
+  const uploadImage = async (file: File) => {
+    setIsUploading(true)
+    try {
+      const body = new FormData()
+      body.append('file', file)
+      const response = await fetch('/api/uploads', { method: 'POST', body })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Yükleme başarısız.')
+      const imageMarkdown = `![${file.name.replace(/\.[^/.]+$/, '')}](${result.url})`
+      setForm((current) => ({ ...current, content: `${current.content}${current.content ? '\\n\\n' : ''}${imageMarkdown}` }))
+      toast({ title: 'Fotoğraf yüklendi', description: 'Fotoğraf yazının sonuna eklendi.' })
+    } catch (error) {
+      toast({ title: 'Yükleme başarısız', description: error instanceof Error ? error.message : 'Dosya yüklenemedi.', variant: 'destructive' })
+    } finally {
+      setIsUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
   }
 
   const insertLink = () => {
@@ -283,7 +304,21 @@ export function BlogEditor({ post }: BlogEditorProps) {
               <ToolbarBtn onClick={() => insertFormat("\n---\n", "", "")} title="Yatay çizgi">
                 <Minus className="h-4 w-4" />
               </ToolbarBtn>
+              <ToolbarBtn onClick={() => fileInputRef.current?.click()} title="Fotoğraf yükle">
+                <ImagePlus className="h-4 w-4" />
+              </ToolbarBtn>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="sr-only"
+                onChange={(event) => {
+                  const file = event.target.files?.[0]
+                  if (file) void uploadImage(file)
+                }}
+              />
               <div className="ml-auto hidden sm:flex items-center gap-3 text-xs text-muted-foreground pr-1">
+                {isUploading ? <span>Fotoğraf yükleniyor…</span> : null}
                 <span>Markdown desteklenir</span>
               </div>
             </div>
