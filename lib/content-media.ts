@@ -37,13 +37,24 @@ export function formatFileSize(bytes: number) {
 }
 
 export function isUploadedContentPath(value: string) {
-  return value.startsWith('content/') &&
-    value.length <= 300 &&
-    /^[a-zA-Z0-9._/-]+$/.test(value) &&
-    !value.split('/').some((segment) => !segment || segment === '.' || segment === '..')
+  const pathname = value.startsWith('/api/uploads?pathname=')
+    ? (() => {
+        try {
+          return decodeURIComponent(value.slice('/api/uploads?pathname='.length))
+        } catch {
+          return ''
+        }
+      })()
+    : value
+
+  return (pathname.startsWith('uploads/') || pathname.startsWith('content/')) &&
+    pathname.length <= 300 &&
+    /^[a-zA-Z0-9._/-]+$/.test(pathname) &&
+    !pathname.split('/').some((segment) => !segment || segment === '.' || segment === '..')
 }
 
 export function getContentMediaUrl(mediaUrl: string) {
+  if (mediaUrl.startsWith('/api/uploads?pathname=')) return mediaUrl
   if (!isUploadedContentPath(mediaUrl)) return mediaUrl
-  return `/api/content-media?pathname=${encodeURIComponent(mediaUrl)}`
+  return `/api/uploads?pathname=${encodeURIComponent(mediaUrl)}`
 }

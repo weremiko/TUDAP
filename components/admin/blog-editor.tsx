@@ -131,9 +131,10 @@ export function BlogEditor({ post }: BlogEditorProps) {
           router.push("/admin/blog")
         }
       } catch (err) {
+        console.error("[blog-editor] Save failed:", err)
         toast({
-          title: "Hata",
-          description: err instanceof Error ? err.message : "Bir hata oluştu.",
+          title: "Yazı kaydedilemedi",
+          description: err instanceof Error ? err.message : "Bir hata oluştu. Lütfen tekrar deneyin.",
           variant: "destructive",
         })
       }
