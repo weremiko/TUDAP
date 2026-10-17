@@ -3,7 +3,7 @@ import { toNextJsHandler } from 'better-auth/next-js'
 import { validateMathChallenge } from '@/lib/math-challenge'
 import { NextRequest, NextResponse } from 'next/server'
 
-const { GET: betterAuthGet, POST: betterAuthPost } = toNextJsHandler(auth.handler)
+const { GET: betterAuthGet, POST: betterAuthPost } = toNextJsHandler(auth)
 const attempts = new Map<string, { count: number; resetAt: number }>()
 
 async function limitedPost(request: NextRequest) {
