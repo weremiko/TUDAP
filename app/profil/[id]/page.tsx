@@ -4,6 +4,8 @@ import { headers } from 'next/headers'
 import { auth } from '@/lib/auth'
 import { getPublicProfile } from '@/app/actions/profile'
 import { ProfileFollowButton } from '@/components/profile-follow-button'
+import { ProfileBadges } from '@/components/profile-badges'
+
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -40,6 +42,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               {profile.institution && <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-3"><Building2 className="h-3.5 w-3.5" />{profile.institution}</p>}
               {profile.websiteUrl && <a href={profile.websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm text-primary hover:underline mt-3"><ExternalLink className="h-3.5 w-3.5" />Web sitesini ziyaret et</a>}
               <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2"><Link2 className="h-3.5 w-3.5" />TÜDAP topluluk profili</p>
+              <ProfileBadges points={profile.points} isVerified={profile.isVerified} hasBio={Boolean(profile.bio)} hasInstitution={Boolean(profile.institution)} />
             </div>
             {canFollow && <ProfileFollowButton targetUserId={profile.id} initialFollowing={profile.isFollowing} />}
           </div>

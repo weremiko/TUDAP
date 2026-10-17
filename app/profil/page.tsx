@@ -15,6 +15,7 @@ import { Card } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import Link from 'next/link'
 import { Settings, Mail, Building2, CalendarDays, Sparkles, Users, FileText, Copy, BadgeCheck, PenLine, ExternalLink } from 'lucide-react'
+import { ProfileBadges } from '@/components/profile-badges'
 
 export const metadata: Metadata = {
   title: 'Profil — TÜDAP',
@@ -66,6 +67,7 @@ export default async function ProfilePage() {
               </div>
               <p className="text-sm text-muted-foreground mt-1">{profile.email}</p>
               {profile.institution && <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-3"><Building2 className="h-3.5 w-3.5" />{profile.institution}</p>}
+              <ProfileBadges points={profile.points} isVerified={profile.blueVerified || profile.email.toLowerCase().endsWith('.edu.tr')} hasBio={Boolean(profile.bio)} hasInstitution={Boolean(profile.institution)} transcriptionCount={transcriptionCount} />
             </div>
             <div className="flex flex-wrap gap-2 self-start sm:self-center">
               <Button asChild variant="outline" size="sm" className="gap-2"><Link href={`/profil/${profile.profileSlug ?? profile.id}`}><Copy className="h-3.5 w-3.5" />Genel profil</Link></Button>
