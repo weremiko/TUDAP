@@ -1,4 +1,4 @@
-import { put } from '@vercel/blob'
+import { get, put } from '@vercel/blob'
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
@@ -8,6 +8,27 @@ import { eq } from 'drizzle-orm'
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024
 const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+
+export async function GET(request: NextRequest) {
+  const pathname = request.nextUrl.searchParams.get('pathname')
+  if (!pathname || !pathname.startsWith('uploads/')) return NextResponse.json({ error: 'Geçersiz dosya yolu.' }, { status: 400 })
+
+  const result = await get(pathname, {
+    access: 'private',
+    ifNoneMatch: request.headers.get('if-none-match') ?? undefined,
+  })
+  if (!result) return new NextResponse('Dosya bulunamadı.', { status: 404 })
+  if (result.statusCode === 304) {
+    return new NextResponse(null, { status: 304, headers: { ETag: result.blob.etag, 'Cache-Control': 'public, max-age=31536000, immutable' } })
+  }
+  return new NextResponse(result.stream, {
+    headers: {
+      'Content-Type': result.blob.contentType,
+      ETag: result.blob.etag,
+      'Cache-Control': 'public, max-age=31536000, immutable',
+    },
+  })
+}
 
 export async function POST(request: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -26,6 +47,6 @@ export async function POST(request: NextRequest) {
 
   const extension = file.name.split('.').pop()?.toLowerCase() || 'bin'
   const pathname = `uploads/${session.user.id}/${crypto.randomUUID()}.${extension}`
-  const blob = await put(pathname, file, { access: 'public', addRandomSuffix: false, contentType: file.type })
-  return NextResponse.json({ url: blob.url, pathname: blob.pathname })
+  const blob = await put(pathname, file, { access: 'private', addRandomSuffix: false, contentType: file.type })
+  return NextResponse.json({ url: `/api/uploads?pathname=${encodeURIComponent(blob.pathname)}`, pathname: blob.pathname })
 }
