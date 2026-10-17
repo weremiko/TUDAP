@@ -85,7 +85,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
       const result = await response.json()
       if (!response.ok) throw new Error(result.error || 'Yükleme başarısız.')
       const imageMarkdown = `![${file.name.replace(/\.[^/.]+$/, '')}](${result.url})`
-      setForm((current) => ({ ...current, content: `${current.content}${current.content ? '\\n\\n' : ''}${imageMarkdown}` }))
+      setForm((current) => ({ ...current, content: `${current.content}${current.content ? '\n\n' : ''}${imageMarkdown}` }))
       toast({ title: 'Fotoğraf yüklendi', description: 'Fotoğraf yazının sonuna eklendi.' })
     } catch (error) {
       toast({ title: 'Yükleme başarısız', description: error instanceof Error ? error.message : 'Dosya yüklenemedi.', variant: 'destructive' })
