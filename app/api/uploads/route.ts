@@ -6,8 +6,15 @@ import { db } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 
-const MAX_FILE_SIZE = 8 * 1024 * 1024
-const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+const DEFAULT_MAX_FILE_SIZE = 8 * 1024 * 1024
+const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+const MEDIA_RULES: Record<string, { types: Set<string>; maxSize: number }> = {
+  image: { types: IMAGE_TYPES, maxSize: DEFAULT_MAX_FILE_SIZE },
+  video: { types: new Set(['video/mp4', 'video/webm', 'video/quicktime']), maxSize: 500 * 1024 * 1024 },
+  audio: { types: new Set(['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/ogg', 'audio/webm']), maxSize: 100 * 1024 * 1024 },
+  slides: { types: new Set(['application/pdf']), maxSize: 30 * 1024 * 1024 },
+  document: { types: new Set(['application/pdf']), maxSize: 30 * 1024 * 1024 },
+}
 
 export async function GET(request: NextRequest) {
   const pathname = request.nextUrl.searchParams.get('pathname')
@@ -41,9 +48,11 @@ export async function POST(request: NextRequest) {
 
   const formData = await request.formData()
   const file = formData.get('file')
+  const contentType = String(formData.get('contentType') || 'image')
+  const rules = MEDIA_RULES[contentType]
   if (!(file instanceof File)) return NextResponse.json({ error: 'Dosya seçilmedi.' }, { status: 400 })
-  if (!ALLOWED_TYPES.has(file.type)) return NextResponse.json({ error: 'Yalnızca JPG, PNG, WebP veya GIF yüklenebilir.' }, { status: 400 })
-  if (file.size > MAX_FILE_SIZE) return NextResponse.json({ error: 'Dosya boyutu 8 MB sınırını aşamaz.' }, { status: 400 })
+  if (!rules || !rules.types.has(file.type)) return NextResponse.json({ error: 'Bu dosya türü desteklenmiyor.' }, { status: 400 })
+  if (file.size > rules.maxSize) return NextResponse.json({ error: `Dosya boyutu ${Math.round(rules.maxSize / 1024 / 1024)} MB sınırını aşamaz.` }, { status: 400 })
 
   const extension = file.name.split('.').pop()?.toLowerCase() || 'bin'
   const pathname = `uploads/${session.user.id}/${crypto.randomUUID()}.${extension}`
