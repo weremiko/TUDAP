@@ -7,6 +7,7 @@ import { HomeTabs } from "@/components/home-tabs"
 import { HomeBlogSlider } from "@/components/home-blog-slider"
 import { HomeGlossarySearch } from "@/components/home-glossary-search"
 import { HomeRoadmap } from "@/components/home-roadmap"
+import { HomeSuffixDisplay } from "@/components/home-suffix-display"
 import { getBlogPosts } from "@/app/actions/blog"
 import { getActiveAnnouncement } from "@/app/actions/announcements"
 import { AnnouncementPopup } from "@/components/announcement-popup"
@@ -88,15 +89,15 @@ export default async function Home() {
       <AnnouncementPopup announcement={announcement} />
 
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-border bg-muted/30">
-        <div className="container mx-auto grid min-h-[570px] max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.8fr)] lg:gap-16 lg:px-8 lg:py-24">
-          <div className="max-w-2xl">
+      <section className="border-b border-border bg-muted/30">
+        <div className="container mx-auto grid min-h-[570px] max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20 lg:px-8 lg:py-24">
+          <div className="max-w-xl">
             <div className="mb-7 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.22em] text-accent">
               <span className="h-px w-8 bg-accent" />
               Türkçe üzerine çalışanlar için
             </div>
-            <h1 className="max-w-xl font-serif text-5xl font-bold leading-[1.02] tracking-tight text-foreground text-balance sm:text-6xl lg:text-7xl">
-              Dili yalnızca okumayın, <span className="text-accent">inceleyin.</span>
+            <h1 className="font-serif text-5xl font-bold leading-[1.02] tracking-tight text-foreground text-balance sm:text-6xl lg:text-7xl">
+              Dili yalnızca okumayın, <span className="font-normal italic text-accent">inceleyin.</span>
             </h1>
             <p className="mt-7 max-w-lg text-lg leading-relaxed text-muted-foreground">
               Türkçe metinleri seslerine, yapılarına ve anlamlarına ayıran açık bir çalışma alanı. IPA çevirici, terim sözlüğü ve akademik içerikler tek yerde.
@@ -112,51 +113,16 @@ export default async function Home() {
                 Terim sözlüğüne git
               </Link>
             </div>
-            <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-border pt-5 text-sm text-muted-foreground">
-              <span><strong className="font-semibold text-foreground">700+</strong> dilbilim terimi</span>
-              <span><strong className="font-semibold text-foreground">Ücretsiz</strong> araçlar</span>
-              <span><strong className="font-semibold text-foreground">Türkçe</strong> odaklı</span>
-            </div>
           </div>
-
-          <div className="relative lg:justify-self-end">
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-2xl shadow-foreground/10">
-              <div className="border-b border-border px-5 py-4 sm:px-7">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">TÜDAP çalışma masası</p>
-                <div className="mt-3 flex items-end justify-between gap-4">
-                  <h2 className="font-serif text-2xl font-semibold text-foreground">Bir sorudan<br />bir araştırmaya</h2>
-                  <span className="mb-1 text-3xl font-serif text-accent/70">01</span>
-                </div>
-              </div>
-              <div className="divide-y divide-border">
-                <Link href="/cevirici" className="group flex items-center justify-between px-5 py-5 transition-colors hover:bg-muted/50 sm:px-7">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Sesi dinle</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Türkçe metnin söyleyişini incele</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-accent" />
-                </Link>
-                <Link href="/terim-sozlugu" className="group flex items-center justify-between px-5 py-5 transition-colors hover:bg-muted/50 sm:px-7">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Kavramı bul</p>
-                    <p className="mt-1 text-xs text-muted-foreground">700&apos;den fazla terim ve açıklama</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-accent" />
-                </Link>
-                <Link href="/blog" className="group flex items-center justify-between px-5 py-5 transition-colors hover:bg-muted/50 sm:px-7">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Bağlamı oku</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Akademik yazılar ve güncel çalışmalar</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-accent" />
-                </Link>
-              </div>
-              <div className="flex items-center justify-between bg-muted/40 px-5 py-4 text-xs text-muted-foreground sm:px-7">
-                <span>Açık ve ücretsiz</span>
-                <span className="font-medium text-foreground">Türkçe dilbilim</span>
-              </div>
-            </div>
-          </div>
+          <HomeSuffixDisplay />
+        </div>
+        <div className="container mx-auto max-w-6xl border-t border-border px-4 py-4 sm:px-6 lg:px-8">
+          <form action="/terim-sozlugu" className="flex max-w-xl items-center gap-3">
+            <label htmlFor="hero-term-search" className="sr-only">Terim ara</label>
+            <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Terim ara</span>
+            <input id="hero-term-search" name="q" type="search" placeholder="ör. biçimbirim" className="min-w-0 flex-1 border-0 border-b border-border bg-transparent px-1 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-accent" />
+            <button type="submit" className="text-sm font-medium text-accent hover:underline">Ara</button>
+          </form>
         </div>
       </section>
 
