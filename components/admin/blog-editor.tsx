@@ -82,6 +82,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
     try {
       const body = new FormData()
       body.append('file', file)
+      body.append('contentType', 'image')
       const response = await fetch('/api/uploads', { method: 'POST', body })
       const result = await response.json()
       if (!response.ok) throw new Error(result.error || 'Yükleme başarısız.')
