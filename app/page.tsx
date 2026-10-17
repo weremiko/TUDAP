@@ -7,6 +7,7 @@ import { HomeTabs } from "@/components/home-tabs"
 import { HomeBlogSlider } from "@/components/home-blog-slider"
 import { HomeGlossarySearch } from "@/components/home-glossary-search"
 import { HomeRoadmap } from "@/components/home-roadmap"
+import { HomeHeroCopy } from "@/components/home-hero-copy"
 import { getBlogPosts } from "@/app/actions/blog"
 import { getActiveAnnouncement } from "@/app/actions/announcements"
 import { getEvents } from "@/app/actions/events"
@@ -97,9 +98,7 @@ export default async function Home() {
               <span className="h-px w-8 bg-accent" />
               Türkçe Dilbilim Araştırma Platformu
             </div>
-            <h1 className="font-serif text-5xl font-bold leading-[1.02] tracking-tight text-foreground text-balance sm:text-6xl lg:text-7xl">
-              Dili yalnızca okumayın, <span className="font-normal italic text-accent">inceleyin.</span>
-            </h1>
+            <HomeHeroCopy />
             <p className="mt-7 max-w-lg text-lg leading-relaxed text-muted-foreground">
               Türkçe metinleri seslerine, yapılarına ve anlamlarına ayıran açık bir çalışma alanı. IPA çevirici, terim sözlüğü ve akademik içerikler tek yerde.
             </p>
