@@ -54,8 +54,9 @@ export default async function ProfilePage() {
           </div>
         </div>
 
-        <section className="overflow-hidden rounded-xl border border-border bg-muted/25 p-6 md:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-5 md:gap-7">
+        <section className="relative overflow-hidden rounded-2xl border border-border bg-muted/25 p-6 md:p-9">
+          <div className="pointer-events-none absolute -right-16 -top-20 size-64 rounded-full bg-primary/10 blur-3xl" />
+          <div className="relative flex flex-col sm:flex-row sm:items-center gap-5 md:gap-7">
             <Avatar className="h-24 w-24 md:h-28 md:w-28 border-4 border-background ring-1 ring-border">
               <AvatarImage src={profile.image ?? undefined} alt={profile.name} />
               <AvatarFallback className="text-2xl font-serif">{initials}</AvatarFallback>

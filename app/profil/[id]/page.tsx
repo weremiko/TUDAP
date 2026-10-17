@@ -30,8 +30,9 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground mt-2">Kullanıcı profili</h1>
         </div>
 
-        <section className="border-y border-border py-8 md:py-10">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-5 md:gap-7">
+        <section className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 p-6 md:p-9">
+          <div className="pointer-events-none absolute -right-16 -top-20 size-64 rounded-full bg-accent/10 blur-3xl" />
+          <div className="relative flex flex-col sm:flex-row sm:items-center gap-5 md:gap-7">
             <Avatar className="h-24 w-24 md:h-28 md:w-28 border-4 border-background ring-1 ring-border">
               <AvatarImage src={profile.image ?? undefined} alt={profile.name} />
               <AvatarFallback className="text-2xl font-serif">{initials}</AvatarFallback>
@@ -44,9 +45,10 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             </div>
             {canFollow && <ProfileFollowButton targetUserId={profile.id} initialFollowing={profile.isFollowing} />}
           </div>
-          <div className="grid grid-cols-2 max-w-sm mt-8 border-t border-border pt-5">
-            <div><p className="text-xl font-semibold text-foreground">{profile.followers}</p><p className="text-xs text-muted-foreground mt-1">Takipçi</p></div>
-            <div><p className="text-xl font-semibold text-foreground">{profile.following}</p><p className="text-xs text-muted-foreground mt-1">Takip</p></div>
+          <div className="relative mt-8 grid max-w-md grid-cols-3 gap-3 border-t border-border pt-6">
+            <div className="rounded-xl bg-background/70 px-4 py-3"><p className="text-xl font-semibold text-foreground">{profile.followers}</p><p className="mt-1 text-xs text-muted-foreground">Takipçi</p></div>
+            <div className="rounded-xl bg-background/70 px-4 py-3"><p className="text-xl font-semibold text-foreground">{profile.following}</p><p className="mt-1 text-xs text-muted-foreground">Takip</p></div>
+            <div className="rounded-xl bg-background/70 px-4 py-3"><p className="text-xl font-semibold text-foreground">{profile.points.toLocaleString('tr-TR')}</p><p className="mt-1 text-xs text-muted-foreground">Puan</p></div>
           </div>
         </section>
 

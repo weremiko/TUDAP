@@ -17,10 +17,13 @@ export function CommunityBadges({ points, showProgress = false }: { points: numb
     : 100
 
   return (
-    <div className="mt-5 border-t border-border pt-4">
-      <div className="flex items-center gap-2 mb-3">
-        <Trophy className="h-4 w-4 text-accent" />
-        <h3 className="text-sm font-semibold text-foreground">Topluluk rozetleri</h3>
+    <div className="mt-5 rounded-xl border border-border/70 bg-background/60 p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Trophy className="h-4 w-4 text-accent" />
+          <h3 className="text-sm font-semibold text-foreground">Topluluk rozetleri</h3>
+        </div>
+        <span className="text-xs font-semibold text-accent">{points.toLocaleString('tr-TR')} puan</span>
       </div>
       {earned.length > 0 ? (
         <div className="flex flex-wrap gap-2">
