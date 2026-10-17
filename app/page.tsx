@@ -1,15 +1,15 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, TreePine, FileText, BarChart3 } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { HomeTabs } from "@/components/home-tabs"
 import { HomeBlogSlider } from "@/components/home-blog-slider"
 import { HomeGlossarySearch } from "@/components/home-glossary-search"
 import { HomeRoadmap } from "@/components/home-roadmap"
-import { HomeSuffixDisplay } from "@/components/home-suffix-display"
 import { getBlogPosts } from "@/app/actions/blog"
 import { getActiveAnnouncement } from "@/app/actions/announcements"
+import { getEvents } from "@/app/actions/events"
 import { AnnouncementPopup } from "@/components/announcement-popup"
 import type { Metadata } from "next"
 
@@ -75,9 +75,10 @@ const homepageJsonLd = [
 ]
 
 export default async function Home() {
-  const [{ posts: latestPosts }, announcement] = await Promise.all([
+  const [{ posts: latestPosts }, announcement, upcomingEvents] = await Promise.all([
     getBlogPosts(1, 6, true),
     getActiveAnnouncement(),
+    getEvents(),
   ])
 
   return (
@@ -90,11 +91,11 @@ export default async function Home() {
 
       {/* Hero */}
       <section className="border-b border-border bg-muted/30">
-        <div className="container mx-auto grid min-h-[570px] max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20 lg:px-8 lg:py-24">
-          <div className="max-w-xl">
+        <div className="container mx-auto min-h-[570px] max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+          <div className="max-w-4xl">
             <div className="mb-7 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.22em] text-accent">
               <span className="h-px w-8 bg-accent" />
-              Türkçe üzerine çalışanlar için
+              Türkçe Dilbilim Araştırma Platformu
             </div>
             <h1 className="font-serif text-5xl font-bold leading-[1.02] tracking-tight text-foreground text-balance sm:text-6xl lg:text-7xl">
               Dili yalnızca okumayın, <span className="font-normal italic text-accent">inceleyin.</span>
@@ -114,7 +115,11 @@ export default async function Home() {
               </Link>
             </div>
           </div>
-          <HomeSuffixDisplay />
+          <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-border pt-5 text-sm text-muted-foreground">
+            <span><strong className="font-semibold text-foreground">700+</strong> dilbilim terimi</span>
+            <span><strong className="font-semibold text-foreground">Ücretsiz</strong> araçlar</span>
+            <span><strong className="font-semibold text-foreground">Türkçe</strong> odaklı</span>
+          </div>
         </div>
         <div className="container mx-auto max-w-6xl border-t border-border px-4 py-4 sm:px-6 lg:px-8">
           <form action="/terim-sozlugu" className="flex max-w-xl items-center gap-3">
@@ -126,7 +131,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <HomeRoadmap />
+      <HomeRoadmap events={upcomingEvents} />
 
       {/* Tool cards */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-16 sm:py-20">
