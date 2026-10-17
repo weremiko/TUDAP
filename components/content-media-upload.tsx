@@ -1,7 +1,7 @@
 "use client"
 
 import { useId, useState } from "react"
-import { uploadPresigned } from "@vercel/blob/client"
+
 import { Check, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -47,20 +47,17 @@ export function ContentMediaUpload({
     onUploadingChange(true)
     setProgress(0)
     try {
-      const blob = await uploadPresigned(`content/${Date.now()}-${safeName}`, file, {
-        access: "private",
-        handleUploadUrl: "/api/content-upload",
-        clientPayload: JSON.stringify({ contentType }),
-        multipart: file.size > 5 * 1024 * 1024,
-        onUploadProgress: ({ percentage }) => setProgress(Math.round(percentage)),
-      })
-      onMediaUrlChange(blob.pathname)
+      const body = new FormData()
+      body.append("file", file, safeName)
+      body.append("contentType", contentType)
+      const response = await fetch("/api/uploads", { method: "POST", body })
+      const result = await response.json() as { url?: string; error?: string }
+      if (!response.ok || !result.url) throw new Error(result.error || "Dosya yüklenemedi.")
+      setProgress(100)
+      onMediaUrlChange(result.url)
     } catch (uploadError) {
       const message = uploadError instanceof Error ? uploadError.message : "Dosya yüklenemedi."
-      const lowerMessage = message.toLowerCase()
-      setError(lowerMessage.includes("token") || lowerMessage.includes("presigned url")
-        ? "Private Blob bağlantısı eksik. Vercel projesine bu store'u bağlayıp BLOB_STORE_ID, VERCEL_OIDC_TOKEN ve BLOB_WEBHOOK_PUBLIC_KEY değişkenlerini etkinleştirin."
-        : message)
+      setError(message)
     } finally {
       setUploading(false)
       onUploadingChange(false)
