@@ -120,32 +120,42 @@ export default async function Home() {
           </div>
 
           <div className="relative lg:justify-self-end">
-            <div className="absolute -inset-5 rounded-[2rem] bg-accent/10 blur-2xl" />
             <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-2xl shadow-foreground/10">
-              <div className="flex items-center justify-between border-b border-border px-5 py-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                  <span className="h-2 w-2 rounded-full bg-accent" />
-                  Sesbilimsel çalışma alanı
+              <div className="border-b border-border px-5 py-4 sm:px-7">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">TÜDAP çalışma masası</p>
+                <div className="mt-3 flex items-end justify-between gap-4">
+                  <h2 className="font-serif text-2xl font-semibold text-foreground">Bir sorudan<br />bir araştırmaya</h2>
+                  <span className="mb-1 text-3xl font-serif text-accent/70">01</span>
                 </div>
-                <span className="text-xs text-muted-foreground">IPA</span>
               </div>
-              <div className="space-y-6 px-5 py-7 sm:px-7">
-                <div>
-                  <p className="mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Türkçe metin</p>
-                  <p className="font-serif text-2xl text-foreground">dilbilim üzerine</p>
-                </div>
-                <div className="h-px bg-border" />
-                <div>
-                  <p className="mb-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Geniş transkripsiyon</p>
-                  <p className="font-mono text-2xl tracking-tight text-accent">/dilbiˈlim üzeˈrine/</p>
-                </div>
-                <div className="flex items-center justify-between border-t border-border pt-5 text-xs text-muted-foreground">
-                  <span>Sesbilim kuralları etkin</span>
-                  <span className="rounded-full bg-accent/10 px-2.5 py-1 text-accent">hazır</span>
-                </div>
+              <div className="divide-y divide-border">
+                <Link href="/cevirici" className="group flex items-center justify-between px-5 py-5 transition-colors hover:bg-muted/50 sm:px-7">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Sesi dinle</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Türkçe metnin söyleyişini incele</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-accent" />
+                </Link>
+                <Link href="/terim-sozlugu" className="group flex items-center justify-between px-5 py-5 transition-colors hover:bg-muted/50 sm:px-7">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Kavramı bul</p>
+                    <p className="mt-1 text-xs text-muted-foreground">700&apos;den fazla terim ve açıklama</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-accent" />
+                </Link>
+                <Link href="/blog" className="group flex items-center justify-between px-5 py-5 transition-colors hover:bg-muted/50 sm:px-7">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Bağlamı oku</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Akademik yazılar ve güncel çalışmalar</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-accent" />
+                </Link>
+              </div>
+              <div className="flex items-center justify-between bg-muted/40 px-5 py-4 text-xs text-muted-foreground sm:px-7">
+                <span>Açık ve ücretsiz</span>
+                <span className="font-medium text-foreground">Türkçe dilbilim</span>
               </div>
             </div>
-            <p className="mt-4 text-center text-xs text-muted-foreground">Bir metin girin, Türkçenin ses yapısını görün.</p>
           </div>
         </div>
       </section>
