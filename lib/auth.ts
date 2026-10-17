@@ -15,6 +15,7 @@ export const auth = betterAuth({
     autoSignIn: true,
   },
   trustedOrigins: [
+    'https://dilbilim.org.tr',
     ...(process.env.NODE_ENV === 'development'
       ? [
           'http://localhost:3000',
