@@ -42,6 +42,12 @@ export const metadata: Metadata = {
 
 export default async function AjandaPage() {
   const events = await getEvents()
+  const now = new Date()
+  const isPastEvent = (event: (typeof events)[number]) => new Date(event.endDate ?? event.date) < now
+  const eventGroups = [
+    { title: 'Yaklaşan Etkinlikler', events: events.filter((event) => !isPastEvent(event)) },
+    { title: 'Geçmiş Etkinlikler', events: events.filter(isPastEvent).reverse() },
+  ]
 
   const eventListJsonLd = events.length > 0 ? {
     "@context": "https://schema.org",
@@ -62,7 +68,7 @@ export default async function AjandaPage() {
         ...(e.organizer ? { organizer: { "@type": "Organization", name: e.organizer } } : {}),
         ...(e.url ? { url: e.url } : {}),
         inLanguage: "tr",
-        eventStatus: "https://schema.org/EventScheduled",
+        eventStatus: isPastEvent(e) ? "https://schema.org/EventCompleted" : "https://schema.org/EventScheduled",
         eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
       },
     })),
@@ -97,13 +103,18 @@ export default async function AjandaPage() {
             <p>Şu anda programlanmış etkinlik bulunmamaktadır.</p>
           </Card>
         ) : (
-          <div className="space-y-6">
-            {events.map((event) => {
+          <div className="space-y-10">
+            {eventGroups.map((group) => group.events.length > 0 && (
+              <section key={group.title}>
+                <h2 className="text-xl font-serif font-semibold mb-4">{group.title}</h2>
+                <div className="space-y-5">
+            {group.events.map((event) => {
               const typeInfo = EVENT_TYPES[event.eventType] || EVENT_TYPES.other
               const eventDate = new Date(event.date)
+              const past = isPastEvent(event)
 
               return (
-                <Card key={event.id} className="p-6 hover:shadow-lg transition border-l-4 border-l-chart-1">
+                <Card key={event.id} className={`p-6 transition border-l-4 border-l-chart-1 ${past ? 'opacity-75' : 'hover:shadow-lg'}`}>
                   <div className="flex items-start gap-6">
                     {/* Tarih Kutusu */}
                     <div className="text-center min-w-max py-3 px-4 bg-muted rounded-lg shrink-0">
@@ -137,6 +148,7 @@ export default async function AjandaPage() {
                         <Badge className={`${typeInfo.color}`}>
                           {typeInfo.label}
                         </Badge>
+                        {past && <Badge variant="outline">Tamamlandı</Badge>}
                       </div>
 
                       <p className="text-foreground mb-4 leading-relaxed">
@@ -188,6 +200,9 @@ export default async function AjandaPage() {
                 </Card>
               )
             })}
+                </div>
+              </section>
+            ))}
           </div>
         )}
       </main>

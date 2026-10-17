@@ -10,12 +10,12 @@ import { ensureProfileColumns, getFollowSummary } from '@/app/actions/profile'
 import { ensureQueryRateColumns } from '@/app/actions/logs'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { CommunityBadges } from '@/components/community-badges'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import Link from 'next/link'
 import { Settings, Mail, Building2, CalendarDays, Sparkles, Users, FileText, Copy, BadgeCheck, PenLine, ExternalLink } from 'lucide-react'
-import { ProfileBadges } from '@/components/profile-badges'
 
 export const metadata: Metadata = {
   title: 'Profil — TÜDAP',
@@ -67,7 +67,6 @@ export default async function ProfilePage() {
               </div>
               <p className="text-sm text-muted-foreground mt-1">{profile.email}</p>
               {profile.institution && <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-3"><Building2 className="h-3.5 w-3.5" />{profile.institution}</p>}
-              <ProfileBadges points={profile.points} isVerified={profile.blueVerified || profile.email.toLowerCase().endsWith('.edu.tr')} hasBio={Boolean(profile.bio)} hasInstitution={Boolean(profile.institution)} transcriptionCount={transcriptionCount} />
             </div>
             <div className="flex flex-wrap gap-2 self-start sm:self-center">
               <Button asChild variant="outline" size="sm" className="gap-2"><Link href={`/profil/${profile.profileSlug ?? profile.id}`}><Copy className="h-3.5 w-3.5" />Genel profil</Link></Button>
@@ -80,6 +79,7 @@ export default async function ProfilePage() {
             <div><p className="text-xl font-semibold text-foreground">{followSummary.following}</p><p className="text-xs text-muted-foreground mt-1">Takip</p></div>
             <div><p className="text-xl font-semibold text-foreground">{profile.points.toLocaleString('tr-TR')}</p><p className="text-xs text-muted-foreground mt-1">Topluluk puanı</p></div>
           </div>
+          <CommunityBadges points={profile.points} showProgress />
         </section>
 
         <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-6 md:gap-8 pt-8">

@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db'
 import { events, user } from '@/lib/db/schema'
-import { desc, eq, gte } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
@@ -18,7 +18,6 @@ async function checkAdminOrModerator() {
 
 export async function getEvents() {
   return await db.select().from(events)
-    .where(gte(events.date, new Date()))
     .orderBy(events.date)
 }
 
