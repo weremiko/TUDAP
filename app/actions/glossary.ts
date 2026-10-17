@@ -16,6 +16,27 @@ async function requireAdminOrModerator() {
   return session.user
 }
 
+function normalizeTerm(value: string) {
+  return value.trim().toLocaleLowerCase('tr-TR').replace(/ı/g, 'i')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ')
+}
+
+function levenshteinDistance(left: string, right: string) {
+  let previous = Array.from({ length: right.length + 1 }, (_, index) => index)
+  for (let row = 1; row <= left.length; row++) {
+    const current = [row]
+    for (let column = 1; column <= right.length; column++) {
+      current[column] = Math.min(
+        current[column - 1] + 1,
+        previous[column] + 1,
+        previous[column - 1] + (left[row - 1] === right[column - 1] ? 0 : 1),
+      )
+    }
+    previous = current
+  }
+  return previous[right.length]
+}
+
 export async function getGlossaryPage(page: number, category: string, search: string) {
   const PER_PAGE = 20
   const offset = (page - 1) * PER_PAGE
@@ -44,7 +65,20 @@ export async function getGlossaryPage(page: number, category: string, search: st
     db.select({ total: count() }).from(glossaryEntries).where(where),
   ])
 
-  return { rows, total: Number(total), pages: Math.max(1, Math.ceil(Number(total) / PER_PAGE)) }
+  let suggestions: string[] = []
+  const normalizedSearch = normalizeTerm(search)
+  if (Number(total) === 0 && normalizedSearch.length > 0 && normalizedSearch.length <= 60) {
+    const candidates = await db.select({ term: glossaryEntries.term }).from(glossaryEntries).where(catClause)
+    const maxDistance = normalizedSearch.length <= 4 ? 1 : normalizedSearch.length <= 9 ? 2 : 3
+    suggestions = candidates
+      .map(({ term }) => ({ term, distance: levenshteinDistance(normalizeTerm(term), normalizedSearch) }))
+      .filter(({ distance }) => distance <= maxDistance)
+      .sort((left, right) => left.distance - right.distance || left.term.localeCompare(right.term, 'tr-TR'))
+      .slice(0, 3)
+      .map(({ term }) => term)
+  }
+
+  return { rows, total: Number(total), pages: Math.max(1, Math.ceil(Number(total) / PER_PAGE)), suggestions }
 }
 
 export async function getGlossaryCategories() {

@@ -162,7 +162,7 @@ export async function getFollowSummary(targetUserId: string) {
 export async function getPublicProfile(targetUserId: string) {
   await Promise.all([ensureProfileColumns(), ensureSocialTable()])
   const [profile] = await db
-    .select({ id: user.id, name: user.name, profileSlug: user.profileSlug, email: user.email, image: user.image, institution: user.institution, bio: user.bio, websiteUrl: user.websiteUrl, blueVerified: user.blueVerified })
+    .select({ id: user.id, name: user.name, profileSlug: user.profileSlug, email: user.email, image: user.image, institution: user.institution, bio: user.bio, websiteUrl: user.websiteUrl, points: user.points, blueVerified: user.blueVerified })
     .from(user)
     .where(or(eq(user.profileSlug, targetUserId), eq(user.id, targetUserId)))
     .limit(1)

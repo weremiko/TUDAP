@@ -10,6 +10,7 @@ import { ensureProfileColumns, getFollowSummary } from '@/app/actions/profile'
 import { ensureQueryRateColumns } from '@/app/actions/logs'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { CommunityBadges } from '@/components/community-badges'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -78,6 +79,7 @@ export default async function ProfilePage() {
             <div><p className="text-xl font-semibold text-foreground">{followSummary.following}</p><p className="text-xs text-muted-foreground mt-1">Takip</p></div>
             <div><p className="text-xl font-semibold text-foreground">{profile.points.toLocaleString('tr-TR')}</p><p className="text-xs text-muted-foreground mt-1">Topluluk puanı</p></div>
           </div>
+          <CommunityBadges points={profile.points} showProgress />
         </section>
 
         <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-6 md:gap-8 pt-8">

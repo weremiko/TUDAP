@@ -27,6 +27,7 @@ export default function GlossaryPage() {
   const [selectedCategory, setSelectedCategory] = useState("Tümü")
   const [searchTerm, setSearchTerm]     = useState("")
   const [activeSearch, setActiveSearch] = useState("")
+  const [suggestedTerms, setSuggestedTerms] = useState<string[]>([])
   const [suggestionOpen, setSuggestionOpen] = useState(false)
   const [suggestionTerm, setSuggestionTerm] = useState("")
   const [suggestionDefinition, setSuggestionDefinition] = useState("")
@@ -44,6 +45,7 @@ export default function GlossaryPage() {
       setTerms(data.rows as Term[])
       setTotalCount(data.total)
       setTotalPages(data.pages)
+      setSuggestedTerms(data.suggestions)
       if (cats) setCategories(cats)
     })
   }
@@ -59,6 +61,13 @@ export default function GlossaryPage() {
     setActiveSearch(searchTerm)
     setCurrentPage(1)
     load(1, selectedCategory, searchTerm)
+  }
+
+  const handleSuggestedTerm = (term: string) => {
+    setSearchTerm(term)
+    setActiveSearch(term)
+    setCurrentPage(1)
+    load(1, selectedCategory, term)
   }
 
   const handleCategoryChange = (cat: string) => {
@@ -204,6 +213,16 @@ export default function GlossaryPage() {
             ) : (
               <Card className="p-12 text-center border-border">
                 <p className="text-muted-foreground">Arama kriterinize uygun terim bulunamadı.</p>
+                {suggestedTerms.length > 0 && (
+                  <div className="mt-4 space-y-2" role="status">
+                    <p className="text-sm text-foreground">Bunlardan birini mi aradınız?</p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {suggestedTerms.map((term) => (
+                        <Button key={term} variant="outline" size="sm" onClick={() => handleSuggestedTerm(term)}>{term}</Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </Card>
             )}
           </div>

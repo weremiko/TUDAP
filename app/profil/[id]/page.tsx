@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { auth } from '@/lib/auth'
 import { getPublicProfile } from '@/app/actions/profile'
 import { ProfileFollowButton } from '@/components/profile-follow-button'
+import { CommunityBadges } from '@/components/community-badges'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -57,6 +58,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           <aside className="border-l-0 md:border-l border-border md:pl-8">
             <div className="flex items-center gap-2 mb-5"><Users className="h-4 w-4 text-primary" /><h2 className="text-sm uppercase tracking-[0.16em] font-semibold text-foreground">Topluluk</h2></div>
             <p className="text-sm leading-relaxed text-muted-foreground">TÜDAP üzerinde dilbilim kaynaklarını keşfeden ve paylaşan bir topluluk üyesi.</p>
+            <CommunityBadges points={profile.points} />
             <p className="flex items-center gap-2 text-xs text-muted-foreground mt-6"><CalendarDays className="h-3.5 w-3.5" />Herkese açık profil</p>
           </aside>
         </div>
