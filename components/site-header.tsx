@@ -82,9 +82,9 @@ export function SiteHeader() {
         {/* Desktop */}
         <div className="hidden md:flex items-center justify-between gap-8 py-3.5">
 
-          <Link href={isEnglish ? "/en" : "/"} className="group shrink-0">
-            <span className="block font-serif text-xl font-bold leading-none tracking-tight text-foreground">TÜDAP</span>
-            <span className="mt-1 block max-w-[240px] text-[9px] uppercase tracking-[0.08em] text-muted-foreground">{isEnglish ? "Turkish Linguistics Research Platform" : "Türkçe Dilbilim Araştırma Platformu"}</span>
+          <Link href={isEnglish ? "/en" : "/"} className="group flex shrink-0 items-center gap-3">
+            <img src="/tudap-symbol.png" alt="TÜDAP" className="h-10 w-10 object-contain" />
+            <span className="sr-only">{isEnglish ? "Turkish Linguistics Research Platform" : "Türkçe Dilbilim Araştırma Platformu"}</span>
           </Link>
 
           <nav className="flex items-center gap-1 rounded-lg border border-border/70 bg-muted/35 p-1">
@@ -165,8 +165,8 @@ export function SiteHeader() {
         {/* Mobile */}
         <div className="md:hidden flex items-center justify-between py-3.5">
           <Link href={isEnglish ? "/en" : "/"} className="block">
-            <span className="block font-serif text-base font-bold leading-none text-foreground">TÜDAP</span>
-            <span className="mt-1 block max-w-[230px] text-[8px] uppercase tracking-[0.08em] text-muted-foreground">{isEnglish ? "Turkish Linguistics Research Platform" : "Türkçe Dilbilim Araştırma Platformu"}</span>
+            <img src="/tudap-symbol.png" alt="TÜDAP" className="h-9 w-9 object-contain" />
+            <span className="sr-only">{isEnglish ? "Turkish Linguistics Research Platform" : "Türkçe Dilbilim Araştırma Platformu"}</span>
           </Link>
           <Button
             variant="ghost"

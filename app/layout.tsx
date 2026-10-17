@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     description: "Türkçe dilbilim araştırmaları için ücretsiz araçlar, blog ve etkinlik ajandası.",
     images: ["/og-image.png"],
   },
-  icons: { icon: "/favicon.png", apple: "/favicon.png" },
+  icons: { icon: "/icon.png", apple: "/icon.png" },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large" } },
 }
 

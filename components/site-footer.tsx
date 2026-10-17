@@ -46,7 +46,7 @@ export function SiteFooter() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1 space-y-3">
             <Link href="/" className="block">
-              <span className="font-serif text-lg font-bold text-foreground">TÜDAP</span>
+              <img src="/tudap-wordmark.png" alt="TÜDAP — Türkçe Dilbilim Araştırma Platformu" className="h-auto w-56 max-w-full object-contain object-left" />
             </Link>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {isEnglish
