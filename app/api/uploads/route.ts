@@ -54,8 +54,13 @@ export async function POST(request: NextRequest) {
   if (!rules || !rules.types.has(file.type)) return NextResponse.json({ error: 'Bu dosya türü desteklenmiyor.' }, { status: 400 })
   if (file.size > rules.maxSize) return NextResponse.json({ error: `Dosya boyutu ${Math.round(rules.maxSize / 1024 / 1024)} MB sınırını aşamaz.` }, { status: 400 })
 
-  const extension = file.name.split('.').pop()?.toLowerCase() || 'bin'
-  const pathname = `uploads/${session.user.id}/${crypto.randomUUID()}.${extension}`
-  const blob = await put(pathname, file, { access: 'private', addRandomSuffix: false, contentType: file.type })
-  return NextResponse.json({ url: `/api/uploads?pathname=${encodeURIComponent(blob.pathname)}`, pathname: blob.pathname })
+  try {
+    const extension = file.name.split('.').pop()?.toLowerCase() || 'bin'
+    const pathname = `uploads/${session.user.id}/${crypto.randomUUID()}.${extension}`
+    const blob = await put(pathname, file, { access: 'private', addRandomSuffix: false, contentType: file.type })
+    return NextResponse.json({ url: `/api/uploads?pathname=${encodeURIComponent(blob.pathname)}`, pathname: blob.pathname })
+  } catch (error) {
+    console.error('[uploads] Blob upload failed:', error)
+    return NextResponse.json({ error: 'Dosya depolamaya yüklenemedi. Blob bağlantısını ve proje ortamını kontrol edin.' }, { status: 503 })
+  }
 }
