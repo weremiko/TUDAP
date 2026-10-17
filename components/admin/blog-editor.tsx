@@ -16,6 +16,7 @@ import {
   List, ListOrdered, Minus, Quote, Link2, ImagePlus,
 } from "lucide-react"
 import { createBlogPost, updateBlogPost } from "@/app/actions/blog"
+import { ContentMediaUpload } from "@/components/content-media-upload"
 import Link from "next/link"
 
 interface BlogEditorProps {
@@ -232,10 +233,23 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 <option value="article">Yazı</option><option value="video">Video</option><option value="slides">Slayt</option><option value="audio">Podcast</option><option value="document">Belge / PDF</option>
               </select>
             </div>
-            {form.contentType !== 'article' && <div className="space-y-1.5">
-              <Label htmlFor="media-url" className="text-xs text-muted-foreground uppercase tracking-wider">{form.contentType === 'video' ? 'Video bağlantısı' : form.contentType === 'slides' ? 'Slayt bağlantısı' : form.contentType === 'audio' ? 'Podcast bağlantısı' : 'Belge bağlantısı'}</Label>
-              <Input id="media-url" type="url" value={form.mediaUrl} onChange={(event) => setForm(f => ({ ...f, mediaUrl: event.target.value }))} placeholder="https://" required />
-            </div>}
+            {form.contentType !== 'article' && (
+              <div className="space-y-4 sm:col-span-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="media-url" className="text-xs text-muted-foreground uppercase tracking-wider">{form.contentType === 'video' ? 'Video bağlantısı' : form.contentType === 'slides' ? 'Slayt bağlantısı' : form.contentType === 'audio' ? 'Podcast bağlantısı' : 'Belge bağlantısı'}</Label>
+                  <Input id="media-url" type="text" value={form.mediaUrl} onChange={(event) => setForm(f => ({ ...f, mediaUrl: event.target.value }))} placeholder="https:// veya yüklenen dosya" required />
+                </div>
+                <div className="rounded-lg border border-border bg-card/40 p-4">
+                  <p className="mb-3 text-xs text-muted-foreground">Bağlantı yerine bilgisayarınızdan dosya da ekleyebilirsiniz.</p>
+                  <ContentMediaUpload
+                    contentType={form.contentType}
+                    mediaUrl={form.mediaUrl}
+                    onMediaUrlChange={(mediaUrl) => setForm((current) => ({ ...current, mediaUrl }))}
+                    onUploadingChange={() => undefined}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Title */}
