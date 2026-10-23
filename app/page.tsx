@@ -76,11 +76,14 @@ const homepageJsonLd = [
 ]
 
 export default async function Home() {
-  const [{ posts: latestPosts }, announcement, upcomingEvents] = await Promise.all([
+  const [{ posts: latestPosts }, announcement, allEvents] = await Promise.all([
     getBlogPosts(1, 6, true),
     getActiveAnnouncement(),
     getEvents(),
   ])
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const upcomingEvents = allEvents.filter((event) => new Date(event.endDate ?? event.date) >= today)
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
