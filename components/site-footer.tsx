@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 const TOOL_LINKS = [
   { href: "/cevirici",      label: "Sesbilimsel Abece Çeviricisi" },
   { href: "/terim-sozlugu", label: "Dilbilim Terimleri Sözlüğü" },
+  { href: "/pusula",        label: "Dilbilim Pusulası" },
 ]
 
 const PLATFORM_LINKS = [
