@@ -1,5 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
+import { headers } from "next/headers"
 import { Inter } from "next/font/google"
 import "./globals.css"
 
@@ -91,7 +92,11 @@ const structuredData = [
   },
 ]
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const requestHeaders = await headers()
+  const maintenanceAdmin = requestHeaders.get('x-tudap-maintenance-admin') === 'true'
+  const maintenanceLocale = requestHeaders.get('x-tudap-maintenance-locale')
+
   return (
     <html lang="tr" className={`${inter.variable} bg-background`}>
       <head>
@@ -109,6 +114,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         ))}
       </head>
       <body className="font-sans antialiased">
+        {maintenanceAdmin && (
+          <div role="status" className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 bg-primary px-4 py-2 text-center text-xs font-medium text-primary-foreground">
+            <span>{maintenanceLocale === 'en' ? 'Maintenance mode is on.' : 'Bakım modu açık.'}</span>
+            <a href="/admin/bakim" className="underline underline-offset-2">
+              {maintenanceLocale === 'en' ? 'Manage settings' : 'Ayarları yönet'}
+            </a>
+          </div>
+        )}
         {children}
       </body>
     </html>

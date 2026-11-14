@@ -19,6 +19,7 @@ import {
   FileEdit,
   Megaphone,
   History,
+  Wrench,
 } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
@@ -37,6 +38,7 @@ const allNavItems = [
   { label: "Sorgu Logları",   href: "/admin/loglar",         icon: ClipboardList,  roles: ['admin'] },
   { label: "Moderatör Eylemleri", href: "/admin/moderator-log", icon: History, roles: ['admin'] },
   { label: "Hata Raporları",  href: "/admin/hatalar",      icon: AlertTriangle,   roles: ['admin', 'moderator'] },
+  { label: "Bakım Modu",       href: "/admin/bakim",         icon: Wrench,          roles: ['admin'] },
 ]
 
 function Sidebar({ onClose, userRole = 'admin' }: { onClose?: () => void; userRole?: string }) {
