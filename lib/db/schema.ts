@@ -184,6 +184,12 @@ export const announcements = pgTable('announcements', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
+export const siteSettings = pgTable('site_settings', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull().default(''),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
 // ---
 // Add your app tables below. Always include a plain `userId` column so queries
 // can be scoped per user — the security model depends on this column existing,
