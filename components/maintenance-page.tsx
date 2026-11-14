@@ -135,9 +135,6 @@ function MaintenanceContent({ locale, settings, teamMembers, leadership }: { loc
               <a href="mailto:iletisim@dilbilim.org.tr" className="underline decoration-border underline-offset-4 hover:text-accent">iletisim@dilbilim.org.tr</a>
               <a href="https://instagram.com/tudaporg" target="_blank" rel="noopener noreferrer" className="underline decoration-border underline-offset-4 hover:text-accent">Instagram</a>
             </div>
-            <Link href="/sign-in" className="mt-7 w-fit text-xs text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground">
-              {isEnglish ? 'Administrator sign in' : 'Yönetici girişi'}
-            </Link>
           </aside>
         </div>
 
