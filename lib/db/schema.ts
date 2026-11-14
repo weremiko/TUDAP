@@ -190,6 +190,14 @@ export const siteSettings = pgTable('site_settings', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
+export const maintenanceAuditLogs = pgTable('maintenance_audit_logs', {
+  id: serial('id').primaryKey(),
+  actorId: text('actor_id').notNull(),
+  actorName: text('actor_name').notNull(),
+  enabled: boolean('enabled').notNull(),
+  changedAt: timestamp('changed_at').notNull().defaultNow(),
+})
+
 // ---
 // Add your app tables below. Always include a plain `userId` column so queries
 // can be scoped per user — the security model depends on this column existing,

@@ -1,11 +1,12 @@
+import type { Metadata } from 'next'
 import { MaintenancePage } from '@/components/maintenance-page'
 
-export const metadata = {
-  title: 'Yakında Açılıyoruz — TÜDAP',
-  description: 'Türkçe Dilbilim Araştırma Platformu Aralık 2026’da açılıyor.',
-  robots: { index: false, follow: false },
+export const metadata: Metadata = {
+  title: 'TÜDAP — Açılış hazırlıkları',
+  description: 'Türkçe Dilbilim Araştırma Platformu açılış hazırlıklarını sürdürüyor.',
+  robots: { index: false, follow: false, nocache: true },
 }
 
-export default function MaintenanceRoute() {
-  return <MaintenancePage />
+export default function TurkishMaintenanceRoute() {
+  return <MaintenancePage locale="tr" />
 }
