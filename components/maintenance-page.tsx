@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getPublicTeamMembers } from '@/app/actions/admin'
 import { getMaintenanceSettings, type MaintenanceSettings } from '@/app/actions/maintenance'
+import { getPageSections } from '@/app/actions/page-content'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 type Locale = 'tr' | 'en'
@@ -13,8 +14,18 @@ const ROLE_LABELS: Record<string, { tr: string; en: string }> = {
   member: { tr: 'Ekip üyesi', en: 'Team member' },
 }
 
+const LEADERSHIP_FIELDS = [
+  { nameKey: 'kurucu', photoKey: 'kurucu_fotograf', roleTr: 'Kurucu', roleEn: 'Founder' },
+  { nameKey: 'akademik_danisman', photoKey: 'akademik_danisman_fotograf', roleTr: 'Akademik danışman', roleEn: 'Academic adviser' },
+] as const
+
 function getInitials(name: string) {
   return name.trim().split(/\s+/).map((part) => part[0] ?? '').join('').slice(0, 2).toLocaleUpperCase('tr-TR')
+}
+
+function getLeadershipInitials(name: string) {
+  const personName = name.replace(/^(?:(?:Öğr\.\s*Gör\.?|Prof\.?|Doç\.?|Dr\.?)\s*)+/u, '').trim()
+  return getInitials(personName || name)
 }
 
 function getLaunchDate(month: string, locale: Locale) {
@@ -41,13 +52,48 @@ function MemberRow({ member, locale }: { member: Member; locale: Locale }) {
   )
 }
 
-export async function MaintenancePage({ locale }: { locale: Locale }) {
-  const settings = await getMaintenanceSettings()
-  const teamMembers = settings.showTeam ? await getPublicTeamMembers() : []
-  return <MaintenanceContent locale={locale} settings={settings} teamMembers={teamMembers} />
+type Leadership = { name: string; photo: string; roleTr: string; roleEn: string }
+
+function LeadershipRow({ person, locale }: { person: Leadership; locale: Locale }) {
+  return (
+    <article className="flex items-start gap-3 border-t border-border py-4">
+      <Avatar className="size-14 shrink-0 rounded-md">
+        <AvatarImage src={person.photo || undefined} alt="" />
+        <AvatarFallback className="rounded-md bg-muted text-sm font-medium">{getLeadershipInitials(person.name)}</AvatarFallback>
+      </Avatar>
+      <div className="min-w-0 pt-1">
+        <p className="text-xs font-medium uppercase tracking-[0.12em] text-accent">{locale === 'en' ? person.roleEn : person.roleTr}</p>
+        <p className="mt-1 text-sm font-semibold text-foreground">{person.name}</p>
+      </div>
+    </article>
+  )
 }
 
-function MaintenanceContent({ locale, settings, teamMembers }: { locale: Locale; settings: MaintenanceSettings; teamMembers: Member[] }) {
+export async function MaintenancePage({ locale }: { locale: Locale }) {
+  const settings = await getMaintenanceSettings()
+  let teamMembers: Member[] = []
+  let leadership: Leadership[] = []
+
+  if (settings.showTeam) {
+    const [members, rows] = await Promise.all([getPublicTeamMembers(), getPageSections('takimimiz')])
+    teamMembers = members
+    const sections = new Map(rows.map((row) => [row.key, row.content.trim()]))
+    leadership = LEADERSHIP_FIELDS.flatMap((field) => {
+      const name = sections.get(field.nameKey) ?? ''
+      if (!name || name === 'Henüz bilgi eklenmedi.') return []
+      return [{
+        name,
+        photo: sections.get(field.photoKey) ?? '',
+        roleTr: field.roleTr,
+        roleEn: field.roleEn,
+      }]
+    })
+  }
+
+  return <MaintenanceContent locale={locale} settings={settings} teamMembers={teamMembers} leadership={leadership} />
+}
+
+function MaintenanceContent({ locale, settings, teamMembers, leadership }: { locale: Locale; settings: MaintenanceSettings; teamMembers: Member[]; leadership: Leadership[] }) {
   const isEnglish = locale === 'en'
   const title = isEnglish ? settings.titleEn : settings.titleTr
   const description = isEnglish ? settings.descriptionEn : settings.descriptionTr
@@ -95,15 +141,25 @@ function MaintenanceContent({ locale, settings, teamMembers }: { locale: Locale;
           </aside>
         </div>
 
-        {settings.showTeam && teamMembers.length > 0 && (
+        {settings.showTeam && (teamMembers.length > 0 || leadership.length > 0) && (
           <section className="border-t border-border py-8" aria-labelledby="maintenance-team-heading">
             <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
               <h2 id="maintenance-team-heading" className="font-serif text-2xl font-semibold">{isEnglish ? 'The team' : 'Takımımız'}</h2>
               <p className="text-sm text-muted-foreground">{isEnglish ? 'People working on the platform.' : 'Platform üzerinde çalışan ekip.'}</p>
             </div>
-            <ul className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
-              {teamMembers.map((member) => <MemberRow key={member.id} member={member} locale={locale} />)}
-            </ul>
+            {leadership.length > 0 && (
+              <div className="mb-5 grid gap-x-8 sm:grid-cols-2">
+                {leadership.map((person) => <LeadershipRow key={person.roleTr} person={person} locale={locale} />)}
+              </div>
+            )}
+            {teamMembers.length > 0 && (
+              <>
+                {leadership.length > 0 && <h3 className="mb-1 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">{isEnglish ? 'Team members' : 'Ekip üyeleri'}</h3>}
+                <ul className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
+                  {teamMembers.map((member) => <MemberRow key={member.id} member={member} locale={locale} />)}
+                </ul>
+              </>
+            )}
           </section>
         )}
 
