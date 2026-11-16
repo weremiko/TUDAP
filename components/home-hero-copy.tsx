@@ -35,10 +35,10 @@ export function HomeHeroCopy() {
   return (
     <h1
       aria-live="polite"
-      className={`min-h-[2.1em] max-w-4xl font-serif text-5xl font-bold leading-[1.02] tracking-tight text-foreground text-balance transition-opacity duration-200 sm:text-6xl lg:text-7xl ${isVisible ? "opacity-100" : "opacity-0"}`}
+      className={`min-h-[2.2em] max-w-[900px] font-serif text-[3.5rem] font-semibold leading-[0.82] tracking-[-0.065em] text-foreground text-balance transition-opacity duration-200 sm:text-[5rem] lg:text-[7.1rem] ${isVisible ? "opacity-100" : "opacity-0"}`}
     >
       {lead}
-      {ending && <span className="font-normal italic text-accent">{ending}</span>}
+      {ending && <span className="block font-normal italic text-accent">{ending}</span>}
     </h1>
   )
 }
