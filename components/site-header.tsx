@@ -35,6 +35,8 @@ const LANG_MAP: Record<string, string> = {
   "/en/terms-of-use": "/kullanim-kosullari",
   "/gizlilik-politikasi": "/en/privacy-policy",
   "/kullanim-kosullari": "/en/terms-of-use",
+  "/kurumsal-kimlik": "/en/brand",
+  "/en/brand": "/kurumsal-kimlik",
 }
 
 function LangSwitcher({ pathname }: { pathname: string }) {

@@ -94,10 +94,10 @@ export function MaintenanceControl({ settings: initialSettings, audit }: { setti
 
         <section className="flex flex-col gap-5 rounded-lg border border-border bg-card p-5 sm:p-7">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <label htmlFor="launch-month" className="flex flex-col gap-1 text-sm font-medium">
-              Lansman ayı <span className="text-xs font-normal text-muted-foreground">İsteğe bağlı; boş bırakılırsa bakım sayfasında gösterilmez.</span>
+            <label htmlFor="launch-date" className="flex flex-col gap-1 text-sm font-medium">
+              Lansman tarihi <span className="text-xs font-normal text-muted-foreground">Gün, ay ve yıl. Boş bırakılırsa bakım sayfasında gösterilmez.</span>
             </label>
-            <input id="launch-month" type="month" value={settings.launchMonth} onChange={(event) => setSettings({ ...settings, launchMonth: event.target.value })} disabled={isPending} className="w-fit rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+            <input id="launch-date" type="date" value={settings.launchDate} onChange={(event) => setSettings({ ...settings, launchDate: event.target.value })} disabled={isPending} className="w-fit rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" />
           </div>
           <div className="flex flex-col gap-4 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
             <div>

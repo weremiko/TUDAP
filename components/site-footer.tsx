@@ -16,6 +16,7 @@ const PLATFORM_LINKS = [
   { href: "/takimimiz", label: "Takımımız" },
   { href: "/iletisim", label: "İletişim" },
   { href: "/sikca-sorulan-sorular", label: "Sık Sorulan Sorular" },
+  { href: "/kurumsal-kimlik", label: "Kurumsal Kimlik" },
 ]
 
 const LEGAL_LINKS = [
@@ -28,6 +29,7 @@ const TOOL_LINKS_EN = [{ href: "/en/transcriber", label: "Phonetic transcription
 const PLATFORM_LINKS_EN = [
   { href: "/en/about", label: "About TÜDAP" },
   { href: "/en/contact", label: "Contact" },
+  { href: "/en/brand", label: "Brand assets" },
 ]
 const LEGAL_LINKS_EN = [
   { href: "/en/privacy-policy", label: "Privacy policy" },
