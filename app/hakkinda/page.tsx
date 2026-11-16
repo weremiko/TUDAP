@@ -8,7 +8,7 @@ const BASE = "https://dilbilim.org.tr"
 export const metadata: Metadata = {
   title: "Hakkında — Türkçe Dilbilim Araştırma Platformu | TÜDAP",
   description:
-    "TÜDAP, Türkçe dilbilim araştırmaları için IPA fonetik transkripsiyon, terim sözlüğü, akademik içerikler ve etkinlik ajandası sunan ücretsiz dijital platformdur. Proje amacı ve özellikleri.",
+    "TÜDAP, Türkçenin ses ve biçim özelliklerine dayalı IPA transkripsiyon, terim sözlüğü, akademik içerikler ve etkinlik takvimi için açık erişim sunan bir platformdur.",
   keywords: [
     "TÜDAP hakkında", "türkçe dilbilim araştırma platformu", "dilbilim araştırma platformu",
     "IPA transkripsiyon projesi", "türkçe sesbilim araçları",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Hakkında — Türkçe Dilbilim Araştırma Platformu | TÜDAP",
-    description: "TÜDAP, Türkçe dilbilim araştırmaları için ücretsiz araçlar sunan akademik dijital platformdur.",
+    description: "TÜDAP, Türkçenin sesbilimsel analizi ve terminoloji desteği için geliştirilen bir araştırma platformudur.",
     url: `${BASE}/hakkinda`,
     siteName: "TÜDAP",
     images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: "TÜDAP Hakkında" }],

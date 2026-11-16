@@ -7,7 +7,7 @@ const BASE = "https://dilbilim.org.tr"
 export const metadata: Metadata = {
   title: "Sık Sorulan Sorular — IPA Çevirici & Dilbilim Araçları | TÜDAP",
   description:
-    "TÜDAP hakkında en sık sorulan soruların yanıtları: IPA transkripsiyon doğruluğu, ücretsiz kullanım, veri güvenliği, akademik kullanım ve daha fazlası.",
+    "TÜDAP için sık sorulan sorular: transkripsiyon doğruluğu, kullanım koşulları, veri güvenliği ve iletişim bilgileri.",
   keywords: ["TÜDAP SSS", "IPA çevirici yardım", "dilbilim araçları nasıl kullanılır", "transkripsiyon doğruluğu"],
   alternates: { canonical: `${BASE}/sikca-sorulan-sorular` },
   openGraph: {
@@ -21,11 +21,11 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "TÜDAP nedir?",
-    a: "TÜDAP (Türkçe Dilbilim Araştırma Platformu), Türkiye Türkçesine özgü fonetik transkripsiyon, sözdizimi analizi ve terminoloji araçları sunan ücretsiz bir akademik platformdur.",
+    a: "TÜDAP, Türkiye Türkçesinin sesbilimsel özelliklerine göre çalışan IPA transkripsiyon, sözdizimi analizi ve terminoloji araçlarını tek çatı altında sunan ücretsiz bir araştırma platformudur.",
   },
   {
     q: "IPA transkripsiyon aracı hangi dili destekliyor?",
-    a: "Araç yalnızca Türkiye Türkçesini desteklemektedir. Transkripsiyon kuralları Türkçenin sesbilimsel özelliklerine göre tasarlanmıştır.",
+    a: "Araç öncelikle Türkiye Türkçesi için tasarlanmıştır. Çıktılar Türkçenin sesbilimsel kurallarına göre üretilir; özel durumlarda uzman denetimi önerilir.",
   },
   {
     q: "Transkripsiyon sonuçları ne kadar doğru?",

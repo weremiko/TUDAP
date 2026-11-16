@@ -9,42 +9,63 @@ const BADGE_TIERS: { label: string; threshold: number; Icon: LucideIcon; color: 
 ]
 
 export function CommunityBadges({ points, showProgress = false }: { points: number; showProgress?: boolean }) {
-  const earned = BADGE_TIERS.filter((badge) => points >= badge.threshold)
-  const next = BADGE_TIERS.find((badge) => points < badge.threshold)
+  const safePoints = Number.isFinite(points) ? Math.max(0, points) : 0
+  const earned = BADGE_TIERS.filter((badge) => safePoints >= badge.threshold)
+  const next = BADGE_TIERS.find((badge) => safePoints < badge.threshold)
   const previousThreshold = earned.at(-1)?.threshold ?? 0
+  const progressRange = next ? next.threshold - previousThreshold : 1
   const progress = next
-    ? Math.min(100, ((points - previousThreshold) / (next.threshold - previousThreshold)) * 100)
+    ? Math.min(100, Math.max(0, ((safePoints - previousThreshold) / progressRange) * 100))
     : 100
 
   return (
-    <div className="mt-5 rounded-xl border border-border/70 bg-background/60 p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Trophy className="h-4 w-4 text-accent" />
-          <h3 className="text-sm font-semibold text-foreground">Topluluk rozetleri</h3>
-        </div>
-        <span className="text-xs font-semibold text-accent">{points.toLocaleString('tr-TR')} puan</span>
+    <div className="mt-5 border-t border-border pt-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Trophy className="h-4 w-4 text-accent" />
+        <h3 className="text-sm font-semibold text-foreground">Topluluk rozetleri</h3>
       </div>
-      {earned.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {earned.map(({ label, threshold, Icon, color }) => (
-            <span key={label} title={`${threshold} topluluk puanında kazanıldı`} className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium ${color}`}>
-              <Icon className="h-3.5 w-3.5" aria-hidden="true" />{label}
+
+      <div className="flex flex-wrap gap-2">
+        {BADGE_TIERS.map(({ label, threshold, Icon, color }) => {
+          const unlocked = safePoints >= threshold
+
+          return (
+            <span
+              key={label}
+              title={`${threshold} topluluk puanında kazanılır`}
+              className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                unlocked
+                  ? `${color} border-transparent`
+                  : 'border-border bg-muted/60 text-muted-foreground'
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+              {label}
             </span>
-          ))}
-        </div>
-      ) : (
-        <p className="text-xs text-muted-foreground">İlk rozet 10 topluluk puanında açılır.</p>
-      )}
+          )
+        })}
+      </div>
+
       {showProgress && (next ? (
         <div className="mt-3">
-          <p className="text-xs text-muted-foreground mb-1.5">Sıradaki: {next.label} · {next.threshold - points} puan kaldı</p>
-          <div className="h-1.5 overflow-hidden rounded-full bg-muted" role="progressbar" aria-label={`${next.label} rozeti ilerlemesi`} aria-valuemin={0} aria-valuemax={next.threshold} aria-valuenow={points}>
+          <p className="text-xs text-muted-foreground mb-1.5">
+            Sıradaki: {next.label} · {Math.max(0, next.threshold - safePoints)} puan kaldı
+          </p>
+          <div
+            className="h-1.5 overflow-hidden rounded-full bg-muted"
+            role="progressbar"
+            aria-label={`${next.label} rozeti ilerlemesi`}
+            aria-valuemin={0}
+            aria-valuemax={next.threshold}
+            aria-valuenow={safePoints}
+          >
             <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${progress}%` }} />
           </div>
         </div>
       ) : (
-        <p className="mt-3 text-xs text-muted-foreground">Tüm topluluk rozetleri kazanıldı.</p>
+        <p className="mt-3 text-xs text-muted-foreground">
+          {earned.length > 0 ? 'Tüm topluluk rozetleri kazanıldı.' : 'İlk rozet 10 topluluk puanında açılır.'}
+        </p>
       ))}
     </div>
   )

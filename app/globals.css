@@ -1,5 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
-@import url("https://fonts.cdnfonts.com/css/waldenburg");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@400;500;600;700&display=swap");
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -81,8 +80,8 @@
 }
 
 @theme inline {
-  --font-sans: "Inter", "Segoe UI", sans-serif;
-  --font-serif: "Waldenburg", "Georgia", serif;
+  --font-sans: "Manrope", "Segoe UI", sans-serif;
+  --font-serif: "Cormorant Garamond", "Georgia", serif;
   --font-mono: "SFMono-Regular", "Consolas", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -127,11 +126,17 @@
     @apply border-border outline-ring/50;
   }
   html {
-    font-family: "Inter", "Segoe UI", sans-serif;
+    font-family: "Manrope", "Segoe UI", sans-serif;
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground;
-    font-family: "Inter", "Segoe UI", sans-serif;
+    font-family: "Manrope", "Segoe UI", sans-serif;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   h1,
   h2,
@@ -139,8 +144,23 @@
   h4,
   h5,
   h6 {
-    font-family: "Waldenburg", "Georgia", serif;
-    letter-spacing: -0.02em;
+    font-family: "Cormorant Garamond", "Georgia", serif;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    text-wrap: balance;
+  }
+  p,
+  li,
+  dd,
+  dt {
+    text-wrap: pretty;
+  }
+  a {
+    text-underline-offset: 0.18em;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 18%, transparent);
+    color: var(--foreground);
   }
 }
 
