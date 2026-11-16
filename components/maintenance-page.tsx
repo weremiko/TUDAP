@@ -28,12 +28,16 @@ function getLeadershipInitials(name: string) {
   return getInitials(personName || name)
 }
 
-function getLaunchDate(month: string, locale: Locale) {
-  if (!month) return null
-  const [year, monthNumber] = month.split('-').map(Number)
-  if (!year || !monthNumber) return null
-  return new Intl.DateTimeFormat(locale === 'en' ? 'en' : 'tr-TR', { month: 'long', year: 'numeric' })
-    .format(new Date(Date.UTC(year, monthNumber - 1, 1)))
+function getLaunchDate(value: string, locale: Locale) {
+  if (!value) return null
+  const date = new Date(`${value}T00:00:00Z`)
+  if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== value) return null
+  return new Intl.DateTimeFormat(locale === 'en' ? 'en-GB' : 'tr-TR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(date)
 }
 
 function MemberRow({ member, locale }: { member: Member; locale: Locale }) {
@@ -97,7 +101,7 @@ function MaintenanceContent({ locale, settings, teamMembers, leadership }: { loc
   const isEnglish = locale === 'en'
   const title = isEnglish ? settings.titleEn : settings.titleTr
   const description = isEnglish ? settings.descriptionEn : settings.descriptionTr
-  const launchDate = getLaunchDate(settings.launchMonth, locale)
+  const launchDate = getLaunchDate(settings.launchDate, locale)
 
   return (
     <main lang={locale} className="min-h-screen bg-background text-foreground">
@@ -134,10 +138,8 @@ function MaintenanceContent({ locale, settings, teamMembers, leadership }: { loc
             <div className="mt-6 flex flex-col items-start gap-3 text-sm">
               <a href="mailto:iletisim@dilbilim.org.tr" className="underline decoration-border underline-offset-4 hover:text-accent">iletisim@dilbilim.org.tr</a>
               <a href="https://instagram.com/tudaporg" target="_blank" rel="noopener noreferrer" className="underline decoration-border underline-offset-4 hover:text-accent">Instagram</a>
+              <Link href={isEnglish ? '/en/brand' : '/kurumsal-kimlik'} className="underline decoration-border underline-offset-4 hover:text-accent">{isEnglish ? 'Brand assets' : 'Kurumsal kimlik ve logolar'}</Link>
             </div>
-            <Link href="/sign-in" className="mt-7 w-fit text-xs text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground">
-              {isEnglish ? 'Administrator sign in' : 'Yönetici girişi'}
-            </Link>
           </aside>
         </div>
 

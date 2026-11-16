@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { siteSettings, user } from '@/lib/db/schema'
 
-const PUBLIC_ADMIN_PATHS = ['/admin', '/sign-in', '/sign-up', '/api/auth', '/api/health', '/api/healthz']
+const PUBLIC_MAINTENANCE_EXEMPT_PATHS = ['/admin', '/sign-in', '/sign-up', '/api/auth', '/api/health', '/api/healthz', '/kurumsal-kimlik', '/en/brand']
 const MAINTENANCE_HEADERS = {
   'Retry-After': '3600',
   'X-Robots-Tag': 'noindex, nofollow, noarchive',
@@ -54,7 +54,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next({ request: { headers: requestHeaders } })
   }
 
-  if (PUBLIC_ADMIN_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
+  if (PUBLIC_MAINTENANCE_EXEMPT_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
     return NextResponse.next()
   }
 

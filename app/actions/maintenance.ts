@@ -13,9 +13,13 @@ const KEYS = {
   descriptionTr: 'maintenance_description_tr',
   titleEn: 'maintenance_title_en',
   descriptionEn: 'maintenance_description_en',
-  launchMonth: 'maintenance_launch_month',
+  launchDate: 'maintenance_launch_date',
   showTeam: 'maintenance_show_team',
 } as const
+
+const LEGACY_LAUNCH_MONTH_KEY = 'maintenance_launch_month'
+const LEGACY_DESCRIPTION_TR = 'Türkçenin ses yapısı, terimleri ve araştırmaları için açık bir çalışma alanı hazırlıyoruz. Aralık ayında resmî açılışımızı yapacağız.'
+const LEGACY_DESCRIPTION_EN = 'We are preparing an open workspace for Turkish sounds, terminology and research. The platform will officially launch in December.'
 
 export type MaintenanceSettings = {
   enabled: boolean
@@ -23,33 +27,43 @@ export type MaintenanceSettings = {
   descriptionTr: string
   titleEn: string
   descriptionEn: string
-  launchMonth: string
+  launchDate: string
   showTeam: boolean
 }
 
 const DEFAULTS: MaintenanceSettings = {
   enabled: false,
   titleTr: 'TÜDAP hazırlanıyor',
-  descriptionTr: 'Türkçenin ses yapısı, terimleri ve araştırmaları için açık bir çalışma alanı hazırlıyoruz. Aralık ayında resmî açılışımızı yapacağız.',
+  descriptionTr: 'Türkçenin ses yapısı, terimleri ve araştırmaları için açık bir çalışma alanı hazırlıyoruz. Resmî açılışımız 15 Aralık 2026’da.',
   titleEn: 'TÜDAP is getting ready',
-  descriptionEn: 'We are preparing an open workspace for Turkish sounds, terminology and research. The platform will officially launch in December.',
-  launchMonth: '2026-12',
+  descriptionEn: 'We are preparing an open workspace for Turkish sounds, terminology and research. The platform officially launches on December 15, 2026.',
+  launchDate: '2026-12-15',
   showTeam: true,
+}
+
+function isValidDateOnly(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  const date = new Date(`${value}T00:00:00Z`)
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value
 }
 
 export async function getMaintenanceSettings(): Promise<MaintenanceSettings> {
   try {
     const rows = await db.select({ key: siteSettings.key, value: siteSettings.value })
       .from(siteSettings)
-      .where(inArray(siteSettings.key, Object.values(KEYS)))
+      .where(inArray(siteSettings.key, [...Object.values(KEYS), LEGACY_LAUNCH_MONTH_KEY]))
     const values = new Map(rows.map(({ key, value }) => [key, value]))
+    const storedLaunchDate = values.get(KEYS.launchDate)
+    const legacyMonth = values.get(LEGACY_LAUNCH_MONTH_KEY)
+    const storedDescriptionTr = values.get(KEYS.descriptionTr)
+    const storedDescriptionEn = values.get(KEYS.descriptionEn)
     return {
       enabled: values.get(KEYS.enabled) === 'true',
       titleTr: values.get(KEYS.titleTr) ?? DEFAULTS.titleTr,
-      descriptionTr: values.get(KEYS.descriptionTr) ?? DEFAULTS.descriptionTr,
+      descriptionTr: storedDescriptionTr === LEGACY_DESCRIPTION_TR ? DEFAULTS.descriptionTr : storedDescriptionTr ?? DEFAULTS.descriptionTr,
       titleEn: values.get(KEYS.titleEn) ?? DEFAULTS.titleEn,
-      descriptionEn: values.get(KEYS.descriptionEn) ?? DEFAULTS.descriptionEn,
-      launchMonth: values.get(KEYS.launchMonth) ?? DEFAULTS.launchMonth,
+      descriptionEn: storedDescriptionEn === LEGACY_DESCRIPTION_EN ? DEFAULTS.descriptionEn : storedDescriptionEn ?? DEFAULTS.descriptionEn,
+      launchDate: storedLaunchDate ?? (legacyMonth === '2026-12' ? DEFAULTS.launchDate : legacyMonth ? '' : DEFAULTS.launchDate),
       showTeam: values.get(KEYS.showTeam) !== 'false',
     }
   } catch (error) {
@@ -80,12 +94,12 @@ export async function saveMaintenanceSettings(input: MaintenanceSettings) {
   const descriptionTr = String(input.descriptionTr ?? '').trim().slice(0, 1200)
   const titleEn = String(input.titleEn ?? '').trim().slice(0, 140)
   const descriptionEn = String(input.descriptionEn ?? '').trim().slice(0, 1200)
-  const launchMonth = String(input.launchMonth ?? '').trim()
+  const launchDate = String(input.launchDate ?? '').trim()
   if (!titleTr || !descriptionTr || !titleEn || !descriptionEn) {
     throw new Error('Türkçe ve İngilizce başlık ile açıklamaları doldurun.')
   }
-  if (launchMonth && !/^\d{4}-(0[1-9]|1[0-2])$/.test(launchMonth)) {
-    throw new Error('Lansman tarihi ay/yıl biçiminde olmalıdır.')
+  if (launchDate && !isValidDateOnly(launchDate)) {
+    throw new Error('Lansman tarihi geçerli bir gün/ay/yıl olmalıdır.')
   }
 
   await db.transaction(async (tx) => {
@@ -101,7 +115,7 @@ export async function saveMaintenanceSettings(input: MaintenanceSettings) {
       { key: KEYS.descriptionTr, value: descriptionTr, updatedAt: now },
       { key: KEYS.titleEn, value: titleEn, updatedAt: now },
       { key: KEYS.descriptionEn, value: descriptionEn, updatedAt: now },
-      { key: KEYS.launchMonth, value: launchMonth, updatedAt: now },
+      { key: KEYS.launchDate, value: launchDate, updatedAt: now },
       { key: KEYS.showTeam, value: String(input.showTeam), updatedAt: now },
     ]
 

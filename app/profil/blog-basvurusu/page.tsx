@@ -11,7 +11,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { ArrowLeft, Send } from 'lucide-react'
+import { ArrowLeft, Download, Send } from 'lucide-react'
 
 export default function BlogApplicationPage() {
   const router = useRouter()
@@ -46,6 +46,12 @@ export default function BlogApplicationPage() {
       <main className="container mx-auto max-w-3xl px-4 py-10 md:py-14 flex-1">
         <Link href="/profil" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-7"><ArrowLeft className="h-4 w-4" />Profile dön</Link>
         <div className="mb-8"><p className="text-xs uppercase tracking-[0.2em] text-accent font-medium">TÜDAP İçerikler</p><h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground mt-2">İçerik başvurusu</h1><p className="text-sm text-muted-foreground mt-2">Yazı, video, slayt, podcast veya belge içeriğinizi gönderin. Yayından önce editör incelemesi yapılır.</p></div>
+        <div className="mb-6 flex flex-col gap-3 border-y border-border py-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">Başvurunuzu hazırlarken TÜDAP İçerik Yazım Yönergesi’ni kullanabilirsiniz.</p>
+          <a href="/documents/icerik-yazim-yonergesi.docx" download="TUDAP-Icerik-Yazim-Yonergesi.docx" className="inline-flex w-fit items-center gap-2 text-sm font-medium text-foreground underline decoration-border underline-offset-4 hover:text-accent">
+            <Download className="size-4" aria-hidden="true" />Yönergeyi indir (DOCX)
+          </a>
+        </div>
         <Card className="p-6">
           <form onSubmit={submit} className="space-y-5">
             <div className="space-y-2"><Label htmlFor="content-type">İçerik türü</Label><select id="content-type" value={contentType} onChange={(event) => { setContentType(event.target.value as typeof contentType); setMediaUrl('') }} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="article">Yazı</option><option value="video">Video</option><option value="slides">Slayt</option><option value="audio">Podcast</option><option value="document">Belge / PDF</option></select></div>
