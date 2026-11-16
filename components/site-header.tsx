@@ -78,35 +78,65 @@ export function SiteHeader() {
   }
 
   return (
+<<<<<<< HEAD
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+      <div className="h-1 bg-primary" />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+=======
     <header className="sticky top-0 z-50 border-b border-border bg-background">
       <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
+>>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
 
         {/* Desktop */}
+<<<<<<< HEAD
+        <div className="hidden md:flex items-center justify-between gap-8 py-3.5">
+=======
         <div className="hidden lg:flex items-center justify-between gap-5 py-4">
+>>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
 
           <Link href={isEnglish ? "/en" : "/"} className="group flex shrink-0 items-center gap-3">
+<<<<<<< HEAD
+            <img src="/tudap-symbol.png" alt="TÜDAP" className="h-10 w-10 object-contain" />
+=======
             <img src="/tudap-symbol.png" alt="TÜDAP" className="h-11 w-11 object-contain" />
             <span className="font-serif text-[1.7rem] leading-none tracking-[-0.04em] text-foreground">TÜDAP</span>
+>>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
             <span className="sr-only">{isEnglish ? "Turkish Linguistics Research Platform" : "Türkçe Dilbilim Araştırma Platformu"}</span>
           </Link>
 
+<<<<<<< HEAD
+          <nav className="flex items-center gap-1 rounded-lg border border-border/70 bg-muted/35 p-1">
+=======
           <nav className="flex items-center gap-1">
+>>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
             <div className="relative">
               <button
                 onClick={() => setToolsDropdownOpen(!toolsDropdownOpen)}
+<<<<<<< HEAD
+                className={`flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${toolsDropdownOpen || TOOL_LINKS.some(({ href }) => pathname === href) ? "bg-background text-primary shadow-sm" : "text-foreground hover:bg-background/80 hover:text-primary"}`}
+=======
                 className={`flex items-center gap-1 rounded px-2.5 py-2 text-xs font-medium transition-colors ${toolsDropdownOpen || TOOL_LINKS.some(({ href }) => pathname === href) ? "text-primary" : "text-foreground hover:text-primary"}`}
+>>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
               >
                   {isEnglish ? "Tools" : "Araçlar"}
                 <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${toolsDropdownOpen ? "rotate-180" : ""}`} />
               </button>
               {toolsDropdownOpen && (
+<<<<<<< HEAD
+                <div className="absolute top-full left-0 mt-2 w-72 rounded-lg border border-border bg-background p-1.5 shadow-xl shadow-foreground/5 z-50">
+=======
                 <div className="absolute top-full left-0 mt-2 w-72 border border-border bg-background p-1.5 shadow-xl z-50">
+>>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
                   {toolLinks.map(({ href, label }) => (
                     <Link
                       key={href}
                       href={href}
                       onClick={() => setToolsDropdownOpen(false)}
+<<<<<<< HEAD
+                      className={`block rounded-md px-3 py-2.5 text-sm transition-colors ${
+=======
                       className={`block px-3 py-2.5 text-sm transition-colors ${
+>>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
                         pathname === href ? "bg-primary/10 font-medium text-primary" : "text-foreground hover:bg-muted/60 hover:text-primary"
                       }`}
                     >
@@ -121,7 +151,11 @@ export function SiteHeader() {
               <Link
                 key={href}
                 href={href}
+<<<<<<< HEAD
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${pathname === href ? "bg-background text-primary shadow-sm" : "text-foreground hover:bg-background/80 hover:text-primary"}`}
+=======
                 className={`whitespace-nowrap px-2.5 py-2 text-xs font-medium transition-colors ${pathname === href ? "text-primary" : "text-foreground hover:text-primary"}`}
+>>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
               >
                 {label}
               </Link>
@@ -129,7 +163,7 @@ export function SiteHeader() {
           </nav>
 
           {/* Auth area */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 border-l border-border pl-5">
             <LangSwitcher pathname={pathname} />
             {session?.user ? (
               <>
