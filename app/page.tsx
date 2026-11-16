@@ -94,7 +94,7 @@ export default async function Home() {
       <AnnouncementPopup announcement={announcement} />
 
       {/* Hero */}
-      <section className="border-b border-border bg-muted/30">
+      <section className="border-y border-border/80 bg-muted/20">
         <div className="container mx-auto min-h-[570px] max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
           <div className="max-w-4xl">
             <div className="mb-7 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.22em] text-accent">
