@@ -55,7 +55,6 @@ export function CorporateIdentityPage({ locale }: { locale: Locale }) {
         downloads: 'Logo files',
         original: 'Original PNG · 6250 × 6250 px',
         download: 'Download',
-        note: 'The download links serve the files supplied by TÜDAP without resizing or recompression. The white, single-color versions are intended for dark backgrounds.',
         home: 'Home',
       }
     : {
@@ -66,7 +65,6 @@ export function CorporateIdentityPage({ locale }: { locale: Locale }) {
         downloads: 'Logo dosyaları',
         original: 'Özgün PNG · 6250 × 6250 px',
         download: 'İndir',
-        note: 'İndirme bağlantıları TÜDAP’ın gönderdiği dosyaları yeniden boyutlandırmadan veya sıkıştırmadan sunar. Tek renk beyaz sürümler koyu zeminlerde kullanılmalıdır.',
         home: 'Ana sayfa',
       }
 
@@ -121,7 +119,6 @@ export function CorporateIdentityPage({ locale }: { locale: Locale }) {
               </article>
             ))}
           </div>
-          <p className="mt-6 max-w-3xl text-xs leading-5 text-muted-foreground">{t.note}</p>
         </section>
       </main>
       <SiteFooter />

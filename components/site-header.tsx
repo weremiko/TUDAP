@@ -78,40 +78,35 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-border bg-background">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10">
 
         {/* Desktop */}
-        <div className="hidden md:flex items-center justify-between gap-6 py-4">
+        <div className="hidden lg:flex items-center justify-between gap-5 py-4">
 
           <Link href={isEnglish ? "/en" : "/"} className="group flex shrink-0 items-center gap-3">
-            <img src="/tudap-symbol.png" alt="TÜDAP" className="h-10 w-10 object-contain" />
-            <div className="flex flex-col leading-none">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                {isEnglish ? "Research Platform" : "Dilbilim Platformu"}
-              </span>
-              <span className="font-serif text-2xl leading-none tracking-[-0.05em] text-foreground">TÜDAP</span>
-            </div>
+            <img src="/tudap-symbol.png" alt="TÜDAP" className="h-11 w-11 object-contain" />
+            <span className="font-serif text-[1.7rem] leading-none tracking-[-0.04em] text-foreground">TÜDAP</span>
             <span className="sr-only">{isEnglish ? "Turkish Linguistics Research Platform" : "Türkçe Dilbilim Araştırma Platformu"}</span>
           </Link>
 
-          <nav className="hidden xl:flex items-center gap-2 rounded-full border border-border/70 bg-muted/40 px-2 py-1.5">
+          <nav className="flex items-center gap-1">
             <div className="relative">
               <button
                 onClick={() => setToolsDropdownOpen(!toolsDropdownOpen)}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] transition-colors ${toolsDropdownOpen || TOOL_LINKS.some(({ href }) => pathname === href) ? "bg-background text-primary shadow-sm" : "text-foreground/80 hover:bg-background hover:text-primary"}`}
+                className={`flex items-center gap-1 rounded px-2.5 py-2 text-xs font-medium transition-colors ${toolsDropdownOpen || TOOL_LINKS.some(({ href }) => pathname === href) ? "text-primary" : "text-foreground hover:text-primary"}`}
               >
                   {isEnglish ? "Tools" : "Araçlar"}
                 <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${toolsDropdownOpen ? "rotate-180" : ""}`} />
               </button>
               {toolsDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-72 rounded-2xl border border-border bg-background p-1.5 shadow-[0_20px_50px_-30px_rgba(0,0,0,0.35)] z-50">
+                <div className="absolute top-full left-0 mt-2 w-72 border border-border bg-background p-1.5 shadow-xl z-50">
                   {toolLinks.map(({ href, label }) => (
                     <Link
                       key={href}
                       href={href}
                       onClick={() => setToolsDropdownOpen(false)}
-                      className={`block rounded-xl px-3 py-2.5 text-sm transition-colors ${
+                      className={`block px-3 py-2.5 text-sm transition-colors ${
                         pathname === href ? "bg-primary/10 font-medium text-primary" : "text-foreground hover:bg-muted/60 hover:text-primary"
                       }`}
                     >
@@ -126,7 +121,7 @@ export function SiteHeader() {
               <Link
                 key={href}
                 href={href}
-                className={`rounded-full px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] transition-colors ${pathname === href ? "bg-background text-primary shadow-sm" : "text-foreground/80 hover:bg-background hover:text-primary"}`}
+                className={`whitespace-nowrap px-2.5 py-2 text-xs font-medium transition-colors ${pathname === href ? "text-primary" : "text-foreground hover:text-primary"}`}
               >
                 {label}
               </Link>
@@ -170,9 +165,12 @@ export function SiteHeader() {
         </div>
 
         {/* Mobile */}
-        <div className="md:hidden flex items-center justify-between py-3.5">
+        <div className="lg:hidden flex items-center justify-between py-3.5">
           <Link href={isEnglish ? "/en" : "/"} className="block">
-            <img src="/tudap-symbol.png" alt="TÜDAP" className="h-9 w-9 object-contain" />
+            <span className="flex items-center gap-2">
+              <img src="/tudap-symbol.png" alt="TÜDAP" className="h-9 w-9 object-contain" />
+              <span className="font-serif text-2xl leading-none tracking-[-0.04em] text-foreground">TÜDAP</span>
+            </span>
             <span className="sr-only">{isEnglish ? "Turkish Linguistics Research Platform" : "Türkçe Dilbilim Araştırma Platformu"}</span>
           </Link>
           <Button
@@ -188,7 +186,7 @@ export function SiteHeader() {
 
         {/* Mobile panel */}
         {mobileOpen && (
-          <nav className="md:hidden border-t border-border py-4 space-y-0.5">
+          <nav className="lg:hidden border-t border-border py-4 space-y-0.5">
             <p className="px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-semibold text-accent">{isEnglish ? "Tools" : "Araçlar"}</p>
             {toolLinks.map(({ href, label }) => (
               <Link key={href} href={href} onClick={() => setMobileOpen(false)}
