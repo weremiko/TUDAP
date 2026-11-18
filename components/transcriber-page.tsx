@@ -620,7 +620,10 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
                 </div>
               </div>
 
-              <div className="flex-1 min-h-[320px] p-4 font-mono text-sm leading-loose whitespace-pre-wrap break-words text-foreground [font-variant-numeric:tabular-nums] [letter-spacing:0.01em] [font-feature-settings:'kern'_0]">
+              <div
+                className="flex-1 min-h-[320px] p-4 text-sm leading-loose whitespace-pre-wrap break-words text-foreground [font-variant-numeric:tabular-nums] [letter-spacing:0.01em] [font-feature-settings:'kern'_0]"
+                style={{ fontFamily: '"Times New Roman", "Doulos SIL", "Charis SIL", serif' }}
+              >
                 {isProcessing ? (
                   <div className="flex flex-col gap-3 pt-2">
                     {t.loadingSteps.map((step, idx) => (
