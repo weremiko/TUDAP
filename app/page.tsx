@@ -94,82 +94,42 @@ export default async function Home() {
       <AnnouncementPopup announcement={announcement} />
 
       {/* Hero */}
-<<<<<<< HEAD
       <section className="border-y border-border/80 bg-muted/20">
         <div className="container mx-auto min-h-[570px] max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
           <div className="max-w-4xl">
-              <div className="mb-7 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.22em] text-accent">
-                <span className="h-px w-8 bg-accent" />
-                Türkçe Dilbilim Araştırma Platformu
-              </div>
-              <HomeHeroCopy />
-              <p className="mt-7 max-w-lg text-lg leading-relaxed text-muted-foreground">
-                Türkçe metinleri seslerine, yapılarına ve anlamlarına ayıran açık bir çalışma alanı. IPA çevirici, terim sözlüğü ve akademik içerikler tek yerde.
-              </p>
-              <div className="mt-9 flex flex-wrap items-center gap-4">
-=======
-      <section className="border-b border-border bg-background">
-        <div className="mx-auto grid max-w-[1440px] items-center gap-8 px-4 py-8 sm:px-6 md:grid-cols-[1fr_0.9fr] md:gap-10 lg:px-10 lg:py-12">
-          <div className="relative z-10 py-4 md:py-10">
-            <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Türkçe Dilbilim Araştırma Platformu</p>
-            <HomeHeroCopy />
-            <p className="mt-7 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Türkçenin seslerini, sözcük yapısını ve anlamını araştırmak için açık kaynaklar ve araçlar.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-5">
->>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
-                <Link href="/cevirici">
-                  <Button size="lg" className="h-12 rounded-none px-6 text-sm font-medium">
-                    Metinle başla
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link href="/terim-sozlugu" className="text-sm font-medium text-foreground transition-colors hover:text-accent">
-                  Terim sözlüğü <span aria-hidden="true">→</span>
-                </Link>
+            <div className="mb-7 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.22em] text-accent">
+              <span className="h-px w-8 bg-accent" />
+              Türkçe Dilbilim Araştırma Platformu
             </div>
-<<<<<<< HEAD
-
+            <HomeHeroCopy />
+            <p className="mt-7 max-w-lg text-lg leading-relaxed text-muted-foreground">
+              Türkçe metinleri seslerine, yapılarına ve anlamlarına ayıran açık bir çalışma alanı. IPA çevirici, terim sözlüğü ve akademik içerikler tek yerde.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <Link href="/cevirici">
+                <Button size="lg" className="h-12 rounded-full px-7 text-sm font-medium">
+                  Metinle başla
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/terim-sozlugu" className="text-sm font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:text-accent hover:decoration-accent">
+                Terim sözlüğüne git
+              </Link>
+            </div>
+          </div>
           <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-border pt-5 text-sm text-muted-foreground">
             <span><strong className="font-semibold text-foreground">700+</strong> dilbilim terimi</span>
             <span><strong className="font-semibold text-foreground">Ücretsiz</strong> araçlar</span>
             <span><strong className="font-semibold text-foreground">Türkçe</strong> odaklı</span>
-=======
-          </div>
-          <div className="relative -mx-4 overflow-hidden sm:mx-0">
-            <img
-              src="/og-image.png"
-              alt="TÜDAP logosu ve fonetik semboller"
-              className="aspect-square w-full object-cover"
-              fetchPriority="high"
-            />
->>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
           </div>
         </div>
-<<<<<<< HEAD
         <div className="container mx-auto max-w-6xl border-t border-border px-4 py-4 sm:px-6 lg:px-8">
           <form action="/terim-sozlugu" className="flex max-w-xl items-center gap-3">
-=======
-        <div className="border-t border-border">
-          <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-10">
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground">
-              <span><strong className="font-semibold text-foreground">700+</strong> dilbilim terimi</span>
-              <span><strong className="font-semibold text-foreground">Ücretsiz</strong> araçlar</span>
-              <span><strong className="font-semibold text-foreground">Türkçe</strong> odaklı</span>
-            </div>
-            <form action="/terim-sozlugu" className="flex w-full max-w-md items-center gap-3 md:w-auto">
->>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
             <label htmlFor="hero-term-search" className="sr-only">Terim ara</label>
-<<<<<<< HEAD
             <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Terim ara</span>
             <input id="hero-term-search" name="q" type="search" placeholder="ör. biçimbirim" className="min-w-0 flex-1 border-0 border-b border-border bg-transparent px-1 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-accent" />
             <button type="submit" className="text-sm font-medium text-accent hover:underline">Ara</button>
-=======
-            <input id="hero-term-search" name="q" type="search" placeholder="Terim ara, ör. biçimbirim" className="min-w-0 flex-1 border-0 border-b border-border bg-transparent px-1 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-accent" />
-            <button type="submit" className="text-sm font-medium text-accent hover:underline">Ara <span aria-hidden="true">→</span></button>
->>>>>>> 6f6b8925dff0a3ba59fd8f4ff3da6257267fd791
           </form>
-          </div>
         </div>
       </section>
 
