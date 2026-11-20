@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap");
-
 .kn-page {
   --kn-bg: #09090b;
   --kn-fg: #f3f3f0;
@@ -263,4 +261,207 @@
   .kn-ticket-title { font-size: 56px; }
   .kn-ticket-column { margin: 0 !important; }
   @page { size: A4; margin: 20mm; }
+}
+
+.kn-page {
+  --kn-bg: #f7f7f4;
+  --kn-fg: #171715;
+  --kn-dim: #696965;
+  --kn-line: #d7d7d2;
+  --kn-acid: #e85d3f;
+  background: var(--kn-bg);
+  color: var(--kn-fg);
+  font-family: "Manrope", "Avenir Next", sans-serif;
+}
+.kn-mono,
+.kn-eyebrow,
+.kn-section-top,
+.kn-label,
+.kn-hero-bottom,
+.kn-panel-title,
+.kn-preview-top,
+.kn-field label,
+.kn-footer-links,
+.kn-footer-bottom,
+.kn-ticket-kicker,
+.kn-ticket-meta,
+.kn-ticket-attendee small,
+.kn-stub-caption,
+.kn-ticket-stub-left > span:last-child,
+.kn-ticket-id,
+.kn-register-note,
+.kn-verify-link { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; letter-spacing: .035em; }
+.kn-nav { position: absolute; height: 82px; padding-inline: 7%; border-color: #ffffff30; }
+.kn-brand { gap: 12px; }
+.kn-brand-mark { font-family: Georgia, serif; font-size: 41px; font-weight: 400; letter-spacing: -.08em; }
+.kn-brand-mark span { color: #ff7657; }
+.kn-brand-caption { font-size: 11px; letter-spacing: .03em; }
+.kn-brand-caption b { color: #d1d1cb; }
+.kn-brand-caption small { color: #a7a7a1; font-size: 8px; letter-spacing: .07em; }
+.kn-nav-links { gap: 28px; color: #e0e0dc; font-size: 10px; letter-spacing: .035em; }
+.kn-nav-cta { gap: 24px; padding: 14px 17px; background: #f7f7f4; color: #171715 !important; }
+.kn-nav-cta:hover,
+.kn-primary:hover { background: #ff7657; }
+.kn-hero { height: min(900px,100svh); min-height: 700px; padding-inline: 7%; background: #050605; }
+.kn-hero::before { z-index: -1; background: linear-gradient(90deg,#050605 4%,#050605e8 36%,#05060520 76%,#05060530); }
+.kn-hero-art { position: absolute; z-index: 0; inset: 0 0 0 auto; display: grid; width: 68%; place-items: center; pointer-events: none; }
+.kn-hero-art img { display: block; width: min(55vw,690px); height: 88%; object-fit: contain; mix-blend-mode: screen; }
+.kn-hero-copy { z-index: 2; width: min(700px,62%); padding-top: 40px; }
+.kn-eyebrow { gap: 13px; color: #d1d1cb; font-size: 10px; letter-spacing: .055em; }
+.kn-eyebrow-line { width: 28px; margin-left: 0; background: #777772; }
+.kn-hero h1 { margin: 34px 0 28px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(56px,7vw,106px); font-weight: 400; letter-spacing: -.045em; line-height: 1.02; }
+.kn-hero h1 em { color: #ff7657; -webkit-text-stroke: 0; }
+.kn-hero-sub { max-width: 410px; margin-bottom: 30px; color: #c1c1bb; font-size: 15px; line-height: 1.8; }
+.kn-hero-sub span { color: white; }
+.kn-primary { min-height: 52px; gap: 28px; padding: 15px 19px; background: #f7f7f4; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 10px; letter-spacing: .035em; }
+.kn-text-link { gap: 13px; border-color: #777; color: #e0e0dc !important; font-size: 10px; letter-spacing: .035em; }
+.kn-hero-bottom { right: 7%; left: 7%; border-color: #ffffff38; padding-top: 18px; color: #d1d1cb; font-size: 9px; letter-spacing: .035em; }
+.kn-hero-bottom-left { gap: 28px; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 10px; letter-spacing: .025em; }
+.kn-section { padding: 95px 10%; background: var(--kn-bg); }
+.kn-section-top { border-color: var(--kn-line); color: var(--kn-dim); font-size: 9px; letter-spacing: .055em; }
+.kn-intro-grid { grid-template-columns: 1fr .8fr; gap: 10%; margin-top: 75px; }
+.kn-intro-grid h2,
+.kn-register-head h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(43px,5.4vw,76px); font-weight: 400; letter-spacing: -.045em; line-height: 1.08; }
+.kn-intro-grid h2 span { color: #777771; }
+.kn-intro-copy { padding-top: 7px; }
+.kn-intro-copy p { margin-bottom: 20px; color: #555550; font-size: 15px; line-height: 1.8; }
+.kn-intro-copy strong { color: #171715; }
+.kn-external { gap: 32px; border-color: #aaa9a1; font-size: 9px; letter-spacing: .04em; }
+.kn-details { padding-top: 60px; background: #eeeee9; }
+.kn-detail-grid { margin-top: 54px; border-color: #cecec8; }
+.kn-detail { min-height: 240px; border-color: #cecec8; padding: 22px 24px 24px 0; }
+.kn-detail + .kn-detail { padding-left: 25px; }
+.kn-detail-num,
+.kn-detail-heading { color: #777771; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 10px; letter-spacing: .035em; }
+.kn-detail-heading { margin-top: 35px; }
+.kn-detail strong { margin-top: 12px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(34px,4vw,56px); font-weight: 400; letter-spacing: -.035em; line-height: 1.08; white-space: normal; }
+.kn-detail p { margin: auto 0 0; color: #666660; font-size: 12px; line-height: 1.7; }
+.kn-detail-location { max-width: 300px; font-size: clamp(31px,3.2vw,45px) !important; }
+.kn-detail-access { font-size: clamp(32px,3.4vw,48px) !important; }
+.kn-detail-unit { color: #777771; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: .3em; letter-spacing: .03em; vertical-align: middle; }
+.kn-register { padding: 95px 10% 105px; background: #f7f7f4; color: #171715; }
+.kn-label { color: #555550; font-size: 9px; letter-spacing: .045em; }
+.kn-register-head h2 { margin-top: 24px; }
+.kn-register-head h2 i { color: #e85d3f; }
+.kn-register-note { width: 250px; color: #666660; font-size: 10px; line-height: 1.7; }
+.kn-register-note p { margin-top: 12px; font-family: "Manrope", "Avenir Next", sans-serif; font-size: 13px; }
+.kn-register-grid { grid-template-columns: 1fr .9fr; gap: 28px; margin-top: 56px; }
+.kn-form-panel { padding: 32px; background: #fff; box-shadow: none; }
+.kn-panel-title,
+.kn-preview-top { border-color: #deded9; padding-bottom: 19px; color: #666660; font-size: 9px; letter-spacing: .04em; }
+.kn-secure { color: #527348; }
+.kn-form { margin-top: 30px; }
+.kn-field { margin-bottom: 20px; }
+.kn-field label { margin-bottom: 9px; color: #555550; font-size: 9px; letter-spacing: .035em; }
+.kn-field input,
+.kn-field select { height: 52px; border-color: #d8d8d2; background: #fff; font-size: 13px; }
+.kn-field input:focus,
+.kn-field select:focus { border-color: #171715; }
+.kn-consent { color: #666660; font-size: 11px; }
+.kn-consent input { accent-color: #e85d3f; }
+.kn-submit { height: 58px; background: #171715; font-size: 10px; letter-spacing: .04em; }
+.kn-submit:hover { background: #e85d3f; }
+.kn-under-submit { color: #777771; font-size: 8px; letter-spacing: .025em; }
+.kn-ticket-stage { min-height: 540px; }
+.kn-ticket { max-width: 460px; background: #080908; box-shadow: 0 15px 40px #00000012; transform: none !important; }
+.kn-ticket-main { height: 300px; padding: 25px 27px 15px; background: #080908; }
+.kn-ticket-main::before { background: linear-gradient(130deg,transparent 58%,#e85d3f18); }
+.kn-ticket-wave { display: none; }
+.kn-ticket-kicker,
+.kn-ticket-meta { font-size: 9px; letter-spacing: .055em; }
+.kn-ticket-kicker-star { color: #ff7657; }
+.kn-ticket-title { margin-top: 24px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(39px,4vw,58px); font-weight: 400; letter-spacing: -.04em; }
+.kn-ticket-title span { color: #ff7657; }
+.kn-ticket-meta { color: #cecec8; }
+.kn-ticket-attendee small { color: #aaa9a1; font-size: 8px; letter-spacing: .04em; }
+.kn-ticket-attendee strong { font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 400; }
+.kn-ticket-attendee span { color: #cecec8; }
+.kn-ticket-stub { min-height: 130px; border-color: #c8c8c2; background: #f7f7f4; }
+.kn-ticket-stub::before,
+.kn-ticket-stub::after { background: #f7f7f4; }
+.kn-stub-caption,
+.kn-ticket-stub-left > span:last-child { color: #666660; font-size: 8px; letter-spacing: .025em; }
+.kn-ticket-date { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
+.kn-ticket-date span { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.kn-ticket-id { background: #f7f7f4; color: #777771; font-size: 8px; }
+.kn-explainer { border-color: #d5d5cf; }
+.kn-explainer-icon { color: #e85d3f; }
+.kn-explainer p { color: #666660; }
+.kn-success { background: #171715; }
+.kn-success h3 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; letter-spacing: -.04em; }
+.kn-success h3 span { color: #ff7657; }
+.kn-secondary { border-color: #777; font-size: 9px; }
+.kn-ticket-reference { border-color: #41413c; }
+.kn-verify-link { color: #ff927b !important; }
+.kn-closing { padding: 85px 10% 80px; background: #eeeee9; }
+.kn-closing > span { color: #666660; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 9px; letter-spacing: .05em; }
+.kn-closing > div { margin-top: 24px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(44px,7vw,88px); font-weight: 400; letter-spacing: -.045em; line-height: 1.08; }
+.kn-closing em { color: #777771; }
+.kn-closing > a { right: 10%; bottom: 76px; width: 46px; height: 46px; border-color: #aaa9a1; border-radius: 0; color: #171715; font-size: 20px; }
+.kn-footer { border-color: #d7d7d2; padding: 35px 10% 20px; background: #f7f7f4; }
+.kn-footer-mark { font-family: Georgia, "Times New Roman", serif; font-size: 24px; font-weight: 400; letter-spacing: -.025em; }
+.kn-footer-mark span { color: #777771; }
+.kn-footer-links { color: #555550; font-size: 9px; letter-spacing: .03em; }
+.kn-footer-bottom { border-color: #deded9; color: #777771; font-size: 8px; letter-spacing: .025em; }
+.kn-dialog { background: #f7f7f4; }
+.kn-modal-ok { background: #171715; }
+
+@media (max-width: 700px) {
+  .kn-nav { height: 70px; padding-inline: 6%; }
+  .kn-brand-caption { max-width: 190px; font-size: 9px; }
+  .kn-brand-caption small { font-size: 7px; }
+  .kn-nav-links { gap: 0; }
+  .kn-nav-cta { padding: 12px; font-size: 8px; }
+  .kn-hero { min-height: 790px; padding: 105px 6% 96px; }
+  .kn-hero::before { background: linear-gradient(90deg,#050605 5%,#050605d9 62%,#05060570); }
+  .kn-hero-art { top: 20%; width: 100%; height: 58%; opacity: .63; }
+  .kn-hero-art img { width: 100%; height: 100%; object-position: center; }
+  .kn-hero-copy { width: 100%; padding-top: 24px; }
+  .kn-eyebrow { font-size: 8px; }
+  .kn-hero h1 { margin: 35px 0 22px; font-size: clamp(49px,12vw,76px); }
+  .kn-hero-sub { max-width: 310px; font-size: 13px; }
+  .kn-hero-actions { gap: 15px; }
+  .kn-hero-bottom { right: 6%; left: 6%; }
+  .kn-hero-bottom-left { font-size: 8px; }
+  .kn-section { padding: 68px 7%; }
+  .kn-section-top { font-size: 8px; }
+  .kn-intro-grid { grid-template-columns: 1fr; gap: 25px; margin-top: 50px; }
+  .kn-intro-grid h2,
+  .kn-register-head h2 { font-size: clamp(42px,10vw,64px); }
+  .kn-details { padding-top: 44px; }
+  .kn-detail-grid { margin-top: 35px; }
+  .kn-detail { min-height: 205px; padding: 20px 0; }
+  .kn-detail + .kn-detail { padding-left: 0; }
+  .kn-detail-heading { margin-top: 24px; }
+  .kn-detail strong { font-size: 42px; }
+  .kn-detail-location { font-size: 34px !important; }
+  .kn-detail-access { font-size: 38px !important; }
+  .kn-register { padding: 68px 6% 75px; }
+  .kn-register-note { width: 100%; max-width: 310px; margin-top: 25px; }
+  .kn-register-grid { grid-template-columns: 1fr; gap: 18px; margin-top: 38px; }
+  .kn-form-panel { padding: 22px; }
+  .kn-form-row { grid-template-columns: 1fr; gap: 0; }
+  .kn-ticket-column { margin-top: 14px; }
+  .kn-ticket-stage { min-height: 490px; }
+  .kn-ticket { max-width: 460px; }
+  .kn-ticket-main { height: 290px; }
+  .kn-closing { padding: 68px 7% 80px; }
+  .kn-closing > div { font-size: clamp(43px,10vw,68px); }
+  .kn-closing > a { right: 7%; bottom: 31px; }
+  .kn-footer { padding: 28px 7% 18px; }
+  .kn-footer-links { justify-content: flex-start; gap: 16px; margin-top: 24px; font-size: 8px; }
+  .kn-footer-bottom { margin-top: 35px; font-size: 7px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kn-page *,
+  .kn-page *::before,
+  .kn-page *::after { animation: none !important; transition: none !important; }
+}
+
+@media print {
+  .kn-ticket { width: 160mm; max-width: 160mm; }
+  .kn-ticket-main { height: 99mm; }
+  .kn-ticket-stub { min-height: 48mm; }
+  .kn-ticket-title { font-size: 56px; }
 }

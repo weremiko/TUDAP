@@ -107,45 +107,41 @@ export function KeynoteSite() {
     canvas.height = 860
     const context = canvas.getContext("2d")
     if (!context) return
-    const gradient = context.createLinearGradient(0, 0, 1100, 860)
-    gradient.addColorStop(0, "#25082c")
-    gradient.addColorStop(.6, "#19142e")
-    gradient.addColorStop(1, "#363458")
-    context.fillStyle = gradient
+    context.fillStyle = "#080908"
     context.fillRect(0, 0, 1600, 690)
-    context.fillStyle = "#d8d5e4"
+    context.fillStyle = "#d1d1cb"
     context.font = "23px monospace"
-    context.fillText("TÜDAP / OFFICIAL ACCESS PASS", 60, 80)
+    context.fillText("TÜDAP / KEYNOTE’26", 60, 80)
     context.textAlign = "right"
-    context.fillText("15 DEC 2026", 1540, 80)
+    context.fillText("15 ARALIK 2026", 1540, 80)
     context.textAlign = "left"
     context.fillStyle = "white"
     context.font = "bold 136px Arial"
     context.fillText("KEYNOTE", 50, 245)
-    context.fillStyle = "#d7fa63"
+    context.fillStyle = "#ff7657"
     context.font = "bold 80px Arial"
     context.fillText("’26", 820, 245)
     context.fillStyle = "#d7d4e6"
     context.font = "25px monospace"
-    context.fillText("TÜDAP LANSMANI", 62, 300)
+    context.fillText("TÜRKÇE DİLBİLİM ARAŞTIRMA PLATFORMU", 62, 300)
     context.fillStyle = "#aaa8c3"
     context.font = "18px monospace"
-    context.fillText("KATILIMCI / ATTENDEE", 62, 465)
+    context.fillText("KATILIMCI", 62, 465)
     context.fillStyle = "white"
     context.font = "bold 53px Arial"
     context.fillText(`${ticket.firstName} ${ticket.lastName}`.slice(0, 43), 60, 532)
-    context.fillStyle = "#c6c4d2"
+    context.fillStyle = "#cecec8"
     context.font = "24px Arial"
     context.fillText(`${ticket.department} / ${ticket.institution}`.slice(0, 80), 62, 584)
-    context.fillStyle = "#f7f6f2"
+    context.fillStyle = "#f7f7f4"
     context.fillRect(0, 690, 1600, 170)
     context.fillStyle = "#15151a"
     context.font = "bold 70px Arial"
     context.fillText("15", 62, 777)
     context.font = "24px monospace"
-    context.fillText("ARALIK / DECEMBER", 165, 766)
+    context.fillText("ARALIK 2026", 165, 766)
     context.font = "20px monospace"
-    context.fillText("KÖYCEĞİZ, MERKEZ KÜTÜPHANE", 165, 802)
+    context.fillText("KÖYCEĞİZ / MERKEZ KÜTÜPHANE", 165, 802)
     context.fillStyle = "#777"
     context.font = "19px monospace"
     context.fillText(ticket.id, 62, 838)
@@ -174,65 +170,59 @@ export function KeynoteSite() {
     <div className="kn-page">
       <header className="kn-nav">
         <a href="#top" className="kn-brand" aria-label="KEYNOTE 26 ana sayfa">
-          <span className="kn-brand-mark">K<span>.</span></span>
-          <span className="kn-brand-caption">KEYNOTE <b>26</b><small>TÜDAP LANSMANI</small></span>
+          <span className="kn-brand-mark">T<span>.</span></span>
+          <span className="kn-brand-caption">TÜDAP <b>/ KEYNOTE’26</b><small>TÜRKÇE DİLBİLİM ARAŞTIRMA PLATFORMU</small></span>
         </a>
         <nav className="kn-nav-links">
-          <a className="kn-nav-link" href="#about">ETKİNLİK HAKKINDA</a>
-          <span className="kn-nav-rule" />
-          <a className="kn-nav-cta" href="#register">YERİNİ AYIRT <span aria-hidden="true">↗</span></a>
+          <a className="kn-nav-link" href="#about">ETKİNLİK</a>
+          <a className="kn-nav-link" href="#details">BİLGİLER</a>
+          <a className="kn-nav-cta" href="#register">KAYIT OL <span aria-hidden="true">↗</span></a>
         </nav>
       </header>
 
       <main className="kn-main" id="top">
         <section className="kn-hero">
-          <div className="kn-scene" aria-hidden="true"><div className="kn-prism"><div className="kn-prism-core" /><div className="kn-prism-flare" /><div className="kn-prism-edge" /></div></div>
+          <div className="kn-hero-art" aria-hidden="true">{posterImage && <img src={posterImage} alt="" />}</div>
           <div className="kn-hero-copy">
-            <div className="kn-eyebrow"><span className="kn-dot" /> TÜRKÇE DİLBİLİM ARAŞTIRMA PLATFORMU SUNAR <span className="kn-eyebrow-line" /> 001 / 026</div>
-            <h1>Bir dil.<br /><em>Sonsuz</em><br /> olasılık.</h1>
-            <p className="kn-hero-sub">Dilbilimde dijital gelecek <span>kuruluyor.</span> Yeni bir düşünce biçimine, yeni bir başlangıca tanıklık et.</p>
+            <div className="kn-eyebrow">TÜDAP LANSMANI <span className="kn-eyebrow-line" /> 15 ARALIK 2026</div>
+            <h1>Dilbilimde<br /><em>dijital gelecek</em><br />kuruluyor.</h1>
+            <p className="kn-hero-sub">Türkçe Dilbilim Araştırma Platformu’nun lansman buluşması. <span>Köyceğiz Merkez Kütüphane</span></p>
             <div className="kn-hero-actions">
-              <a href="#register" className="kn-primary">ETKİNLİĞE KAYIT OL <span>↗</span></a>
-              <a href="#about" className="kn-text-link">ETKİNLİĞİ KEŞFET <span>↓</span></a>
+              <a href="#register" className="kn-primary">KAYIT FORMUNA GEÇ <span>↘</span></a>
+              <a href="#details" className="kn-text-link">ETKİNLİK BİLGİLERİ <span>↓</span></a>
             </div>
           </div>
-          <div className="kn-hero-side"><span>KEYNOTE / 2026</span><span>15.12.2026 — KONYA, TR</span></div>
           <div className="kn-hero-bottom">
-            <div className="kn-hero-bottom-left"><span className="kn-section-index">01 / LANSMAN</span><div>15 ARALIK 2026 <span>/</span> KÖYCEĞİZ, MERKEZ KÜTÜPHANE</div></div>
-            <div className="kn-scroll-cue">KAYDIRARAK KEŞFET <span>↓</span></div>
+            <div className="kn-hero-bottom-left"><span className="kn-section-index">KEYNOTE’26</span><div>15 ARALIK 2026 <span>/</span> KÖYCEĞİZ, MERKEZ KÜTÜPHANE</div></div>
+            <div className="kn-scroll-cue">TÜDAP <span>↘</span></div>
           </div>
         </section>
 
-        <section className="kn-section" id="about">
-          <div className="kn-section-top"><span>01 / MANİFESTO</span><span>GELENEKTEN GELECEĞE</span></div>
+        <section className="kn-section kn-about" id="about">
+          <div className="kn-section-top"><span>ETKİNLİK HAKKINDA</span><span>TÜDAP / 2026</span></div>
           <div className="kn-intro-grid">
-            <h2>Bir lansmandan<br /><span>çok daha fazlası.</span></h2>
+            <h2>TÜDAP’ın<br /><span>lansman buluşması.</span></h2>
             <div className="kn-intro-copy">
-              <p>Dil değişir. Teknoloji gelişir. Düşünce sınırlarını aşar. <strong>KEYNOTE’26</strong>, Türkçe Dilbilim Araştırma Platformu’nun yeni dönemine açılan kapı.</p>
-              <p>Dilbilimin geleceğine dair merakın, fikirlerin ve yeni bağlantıların aynı salonda buluştuğu bir başlangıç.</p>
-              <a href="https://dilbilim.org.tr" target="_blank" rel="noopener noreferrer" className="kn-external">TÜDAP’I KEŞFET <span>↗</span></a>
+              <p><strong>KEYNOTE’26</strong>, Türkçe Dilbilim Araştırma Platformu’nun lansman etkinliği.</p>
+              <p>Dilbilimde dijital geleceği konuşmak üzere 15 Aralık’ta Köyceğiz Merkez Kütüphane’de buluşuyoruz.</p>
+              <a href="https://dilbilim.org.tr" target="_blank" rel="noopener noreferrer" className="kn-external">TÜDAP.ORG.TR <span>↗</span></a>
             </div>
           </div>
-          <div className="kn-statement"><div className="kn-statement-glow" /><span>LANGUAGE IS THE INTERFACE.</span><strong>GELECEK<br />ŞİMDİ BAŞLIYOR<span className="kn-acid">.</span></strong></div>
         </section>
 
-        <section className="kn-section kn-details">
-          <div className="kn-section-top"><span>02 / DETAYLAR</span><span>TEK GÜN. YENİ BİR BAŞLANGIÇ.</span></div>
+        <section className="kn-section kn-details" id="details">
+          <div className="kn-section-top"><span>ETKİNLİK BİLGİLERİ</span><span>KEYNOTE’26</span></div>
           <div className="kn-detail-grid">
-            <article className="kn-detail"><span className="kn-detail-num">[ 01 ]</span><span className="kn-detail-heading">TARİH</span><strong>15<span className="kn-detail-unit">/12</span><span className="kn-detail-year">2026</span></strong><p>Salı, 15 Aralık</p></article>
-            <article className="kn-detail"><span className="kn-detail-num">[ 02 ]</span><span className="kn-detail-heading">KONUM</span><strong className="kn-detail-location">Köyceğiz<br />Merkez<br />Kütüphane</strong><p>Necmettin Erbakan Üniversitesi · Konya</p></article>
-            <article className="kn-detail"><span className="kn-detail-num">[ 03 ]</span><span className="kn-detail-heading">KATILIM</span><strong className="kn-detail-access">KAYIT<span className="kn-acid">↗</span></strong><p>Kayıt sonrasında kişiye özel dijital bilet</p></article>
-          </div>
-          <div className="kn-poster-row">
-            <div><span className="kn-label">KEYNOTE’26 / TÜDAP</span><h3>Kimliğimiz.<br />Ortak geleceğimiz.</h3><p>KEYNOTE’26, TÜDAP’ın dijital geleceğe attığı yeni adımın buluşma noktası.</p></div>
-            <div className="kn-poster-frame">{posterImage ? <img src={posterImage} alt="KEYNOTE’26 TÜDAP lansman etkinliği afişi" /> : <div className="kn-prism" aria-hidden="true"><div className="kn-prism-core" /><div className="kn-prism-flare" /><div className="kn-prism-edge" /></div>}<span>OFFICIAL VISUAL / 2026</span></div>
+            <article className="kn-detail"><span className="kn-detail-num">01</span><span className="kn-detail-heading">TARİH</span><strong>15<span className="kn-detail-unit"> ARALIK</span></strong><p>2026</p></article>
+            <article className="kn-detail"><span className="kn-detail-num">02</span><span className="kn-detail-heading">YER</span><strong className="kn-detail-location">Köyceğiz<br />Merkez Kütüphane</strong><p>Köyceğiz</p></article>
+            <article className="kn-detail"><span className="kn-detail-num">03</span><span className="kn-detail-heading">KATILIM</span><strong className="kn-detail-access">Ön kayıt</strong><p>Kayıt tamamlandığında QR biletin oluşturulur.</p></article>
           </div>
         </section>
 
         <section className="kn-register" id="register">
           <div className="kn-register-head">
-            <div><span className="kn-label"><span className="kn-dot" /> 03 / KATILIM</span><h2>Gelecekte<br /><i>yerini al.</i></h2></div>
-            <div className="kn-register-note"><span>15 ARALIK / 2026</span><p>Bilgilerini doldur, sana özel dijital biletini anında oluştur.</p></div>
+            <div><span className="kn-label">KATILIM / ÖN KAYIT</span><h2>Etkinliğe<br /><i>kaydol.</i></h2></div>
+            <div className="kn-register-note"><span>15 ARALIK 2026</span><p>Bilgilerini doldur. Kişisel QR biletin kayıt tamamlandığında oluşturulacak.</p></div>
           </div>
           <div className="kn-register-grid">
             <div className="kn-form-panel" hidden={Boolean(ticket)}>
@@ -260,8 +250,8 @@ export function KeynoteSite() {
               <div className="kn-preview-top"><span>02 — DİJİTAL BİLETİN</span><span>ÖNİZLEME / CANLI</span></div>
               <div className="kn-ticket-stage" onPointerMove={markTilt}>
                 <div className="kn-ticket" ref={ticketCard}>
-                  <div className="kn-ticket-main"><div className="kn-ticket-kicker"><span>TÜDAP / 2026</span><span>ACCESS PASS <span className="kn-ticket-kicker-star">✳</span></span></div><div className="kn-ticket-title">KEYNOTE<span>’26</span></div><div className="kn-ticket-wave" /><div className="kn-ticket-meta"><span>LANSMAN ETKİNLİĞİ</span><span>15.12.2026</span></div><div className="kn-ticket-attendee"><small>KATILIMCI / ATTENDEE</small><strong>{previewName}</strong><span>{previewDetails}</span></div></div>
-                  <div className="kn-ticket-stub"><div className="kn-ticket-stub-left"><span className="kn-stub-caption">GİRİŞ BİLETİ / ADMIT ONE</span><strong className="kn-ticket-date">15<span>ARA</span></strong><span>KÖYCEĞİZ<br />MERKEZ KÜTÜPHANE</span></div><div className="kn-qr">{qr ? <img src={qr} alt="Bilet doğrulama QR kodu" /> : <span aria-hidden="true">✳</span>}</div></div>
+                  <div className="kn-ticket-main"><div className="kn-ticket-kicker"><span>TÜDAP / 2026</span><span>GİRİŞ BİLETİ <span className="kn-ticket-kicker-star">●</span></span></div><div className="kn-ticket-title">KEYNOTE<span>’26</span></div><div className="kn-ticket-wave" /><div className="kn-ticket-meta"><span>LANSMAN ETKİNLİĞİ</span><span>15.12.2026</span></div><div className="kn-ticket-attendee"><small>KATILIMCI</small><strong>{previewName}</strong><span>{previewDetails}</span></div></div>
+                  <div className="kn-ticket-stub"><div className="kn-ticket-stub-left"><span className="kn-stub-caption">ETKİNLİK GİRİŞİ</span><strong className="kn-ticket-date">15<span>ARA</span></strong><span>KÖYCEĞİZ<br />MERKEZ KÜTÜPHANE</span></div><div className="kn-qr">{qr ? <img src={qr} alt="Bilet doğrulama QR kodu" /> : <span aria-hidden="true">●</span>}</div></div>
                   <div className="kn-ticket-id">NO. {ticket?.id ?? "— — — — — —"}</div>
                 </div>
               </div>
@@ -272,10 +262,10 @@ export function KeynoteSite() {
           {ticket && <div className="kn-success" aria-live="polite"><span className="kn-label"><span className="kn-dot" /> KAYDIN BAŞARIYLA ALINDI</span><h3>Görüşmek<br />üzere<span>!</span></h3><p>Kişisel giriş biletin hazır. Biletini indirip etkinlik günü girişte QR kodunu gösterebilirsin.</p><div className="kn-success-actions"><button type="button" className="kn-primary" onClick={downloadTicket}>BİLETİ PNG OLARAK İNDİR <span>↓</span></button><button type="button" className="kn-secondary" onClick={() => window.print()}>YAZDIR / PDF KAYDET ↗</button></div><div className="kn-ticket-reference"><span>BİLET NUMARAN</span><strong>{ticket.id}</strong></div><a className="kn-verify-link" href={ticket.verifyUrl} target="_blank" rel="noopener noreferrer">BİLET DOĞRULAMA SAYFASI ↗</a></div>}
         </section>
 
-        <section className="kn-closing"><span>GELECEK BİRLİKTE YAZILIR.</span><div>SEE YOU<br />AT <em>KEYNOTE.</em></div><a href="#top" aria-label="Yukarı çık">↑</a></section>
+        <section className="kn-closing"><span>TÜDAP / KEYNOTE’26</span><div>Köyceğiz’de<br /><em>görüşmek üzere.</em></div><a href="#top" aria-label="Yukarı çık">↑</a></section>
       </main>
 
-      <footer className="kn-footer"><div className="kn-footer-mark">KEYNOTE<span>’26</span></div><div className="kn-footer-links"><Link href="/" target="_top">DİLBİLİM.ORG.TR ↗</Link><a href="https://www.instagram.com/tudaporg/" target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a><button type="button" onClick={() => setPrivacyOpen(true)}>GİZLİLİK / KVKK</button></div><div className="kn-footer-bottom"><span>© 2026 TÜDAP</span><span>DESIGNED FOR WHAT’S NEXT.</span></div></footer>
+      <footer className="kn-footer"><div className="kn-footer-mark">TÜDAP<span> / KEYNOTE’26</span></div><div className="kn-footer-links"><Link href="/" target="_top">TÜDAP ANA SAYFA ↗</Link><a href="https://www.instagram.com/tudaporg/" target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a><button type="button" onClick={() => setPrivacyOpen(true)}>GİZLİLİK / KVKK</button></div><div className="kn-footer-bottom"><span>© 2026 TÜDAP</span><span>15 ARALIK 2026 · KÖYCEĞİZ</span></div></footer>
 
       <dialog className="kn-dialog" ref={privacyDialog} onClose={() => setPrivacyOpen(false)}>
         <button type="button" className="kn-dialog-close" aria-label="Kapat" onClick={() => setPrivacyOpen(false)}>×</button>
