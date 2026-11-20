@@ -17,6 +17,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const [emailConfirmation, setEmailConfirmation] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const [challenge, setChallenge] = useState<{ challenge: string; question: string; signature: string } | null>(null)
   const [challengeAnswer, setChallengeAnswer] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -44,6 +45,10 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
       setError('Şifreler eşleşmiyor.')
       return
     }
+    if (isSignUp && !termsAccepted) {
+      setError('Kayıt olmak için Kullanım Koşulları’nı kabul etmelisiniz.')
+      return
+    }
     if (!challenge || !challengeAnswer.trim()) {
       setError('Lütfen matematik sorusunu yanıtlayın.')
       return
@@ -51,7 +56,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     setLoading(true)
 
     const { error } = isSignUp
-      ? await authClient.signUp.email({ email, password, name, emailConfirmation, passwordConfirmation, challenge: challenge.challenge, challengeSignature: challenge.signature, challengeAnswer } as never)
+      ? await authClient.signUp.email({ email, password, name, emailConfirmation, passwordConfirmation, acceptTerms: termsAccepted, challenge: challenge.challenge, challengeSignature: challenge.signature, challengeAnswer } as never)
       : await authClient.signIn.email({ email, password, challenge: challenge.challenge, challengeSignature: challenge.signature, challengeAnswer } as never)
 
     setLoading(false)
@@ -143,6 +148,24 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
               <Label htmlFor="challengeAnswer" className="whitespace-nowrap">{challenge?.question ?? 'Soru yükleniyor…'}</Label>
               <Input id="challengeAnswer" type="text" inputMode="numeric" value={challengeAnswer} onChange={(e) => setChallengeAnswer(e.target.value)} required placeholder="Cevap" className="max-w-24" />
             </div>
+
+            {isSignUp && (
+              <label htmlFor="termsAccepted" className="flex items-start gap-2.5 text-sm leading-6 text-muted-foreground">
+                <input
+                  id="termsAccepted"
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  required
+                  className="mt-1 size-4 shrink-0 accent-primary"
+                />
+                <span>
+                  <Link href="/kullanim-kosullari" target="_blank" className="text-foreground underline underline-offset-4">Kullanım Koşulları</Link>
+                  ’nı kabul ediyorum. <Link href="/gizlilik-politikasi" target="_blank" className="text-foreground underline underline-offset-4">Gizlilik Politikası</Link>
+                  kişisel verilerin işlenmesi hakkında bilgi verir.
+                </span>
+              </label>
+            )}
 
             {error && (
               <p className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md px-3 py-2" role="alert">

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { OPEN_COOKIE_SETTINGS_EVENT } from "@/components/cookie-consent"
 
 const TOOL_LINKS = [
   { href: "/cevirici",      label: "Sesbilimsel Abece Çeviricisi" },
@@ -12,6 +13,7 @@ const TOOL_LINKS = [
 const PLATFORM_LINKS = [
   { href: "/blog", label: "Blog" },
   { href: "/ajanda", label: "Ajanda" },
+  { href: "/keynote", label: "KEYNOTE’26" },
   { href: "/hakkinda", label: "Platform Hakkında" },
   { href: "/takimimiz", label: "Takımımız" },
   { href: "/iletisim", label: "İletişim" },
@@ -34,6 +36,7 @@ const PLATFORM_LINKS_EN = [
 const LEGAL_LINKS_EN = [
   { href: "/en/privacy-policy", label: "Privacy policy" },
   { href: "/en/terms-of-use", label: "Terms of use" },
+  { href: "/en/cookie-policy", label: "Cookie policy" },
 ]
 
 export function SiteFooter() {
@@ -111,9 +114,16 @@ export function SiteFooter() {
           <p className="text-xs text-muted-foreground">
             © 2026 TÜDAP — {isEnglish ? "Turkish Linguistics Research Platform" : "Türkçe Dilbilim Araştırma Platformu"}
           </p>
-          <p className="text-xs text-muted-foreground">
-            dilbilim.org.tr
-          </p>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event(OPEN_COOKIE_SETTINGS_EVENT))}
+              className="text-xs text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
+            >
+              {isEnglish ? "Cookie settings" : "Çerez tercihleri"}
+            </button>
+            <p className="text-xs text-muted-foreground">dilbilim.org.tr</p>
+          </div>
         </div>
       </div>
     </footer>

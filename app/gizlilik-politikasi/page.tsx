@@ -18,16 +18,20 @@ const SECTIONS = [
     body: "Hata bildiri gönderdiğinizde, mesajınız, email adresiniz (eğer gönderildiyse) ve ilgili URL'yi emniyetli şekilde kaydederiz. Bu veriler sadece platform sorunlarını çözmek amacıyla kullanıcılar ve sistem yöneticileri tarafından incelenebilir.",
   },
   {
+    title: "KEYNOTE’26 Etkinlik Kaydı",
+    body: "KEYNOTE’26 kaydında ad, soyad, e-posta, kurum, bölüm ve katılımcı türü bilgileri; etkinlik kaydı, dijital bilet oluşturma ve giriş doğrulaması için işlenir. Aydınlatma onayınızın zamanı ve metin sürümü de kayıtla birlikte saklanır. Bilet doğrulama bağlantısı bileti taşıyan kişiye ad, soyad, kurum ve bölüm bilgisini gösterebilir; QR kodunuzu başkalarıyla paylaşmayın. Kayıt e-postası gönderilmez. Etkinlik veri sorumlusu ve saklama süresi organizatör tarafından yayın öncesinde ayrıca doğrulanmalıdır.",
+  },
+  {
     title: "İçerik Başvuruları ve Medya Dosyaları",
     body: "Üyelerin gönderdiği içerik başvurularındaki başlık, açıklama, metin ve hesap bilgileri başvuruyu değerlendirmek için saklanır. Video, podcast ve PDF dosyaları private Vercel Blob depolamasında tutulur. Dosyalar yalnızca yayımlanmış içeriklerde veya başvuruyu yapan üye ve yetkili moderatörler tarafından görüntülenebilir; medya bağlantıları kısa ömürlü imzalı erişimle sunulur.",
   },
   {
     title: "Çerezler ve Yerel Depolama",
-    body: "Platform, önceki oturumunuzu geri yüklemek amacıyla tarayıcınızın localStorage alanını kullanmaktadır. Bu veriler yalnızca kendi cihazınızda tutulur ve üçüncü taraflarla paylaşılmaz.",
+    body: "Better Auth, oturum açma ve güvenlik için gerekli oturum çerezlerini kullanır. Transkripsiyon taslağı ve tercihleri ile duyuru kapatma bilgisi tarayıcınızın localStorage alanında tutulabilir. Google AdSense reklam kodu yalnızca çerez tercih bandında açıkça kabul etmeniz halinde yüklenir; tercihinizi sayfa altındaki Çerez tercihleri bağlantısından değiştirebilirsiniz.",
   },
   {
     title: "Üçüncü Taraf Hizmetler",
-    body: "Vercel Analytics anonimleştirilmiş ziyaretçi istatistiklerini toplar. Medya dosyaları Vercel Blob depolama hizmetinde tutulur. Bu hizmetler kendi altyapıları üzerinden veri işler.",
+    body: "Uygulama Vercel üzerinde barındırılır; veritabanı Neon/PostgreSQL, yüklenen medya dosyaları Vercel Blob hizmetlerini kullanır. Vercel Analytics bu uygulamada etkin değildir. Google AdSense yalnızca reklam tercihine izin veren ziyaretçiler için yüklenir ve Google, kendi gizlilik açıklamalarına göre veri işleyebilir.",
   },
   {
     title: "Veri Saklama ve Güvenliği",
@@ -51,7 +55,7 @@ export default function GizlilikPage() {
         <div className="space-y-2 mb-10">
           <p className="text-xs uppercase tracking-widest text-accent font-medium">Yasal</p>
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">Gizlilik Politikası</h1>
-          <p className="text-sm text-muted-foreground">Son güncelleme: Haziran 2026</p>
+          <p className="text-sm text-muted-foreground">Son güncelleme: Kasım 2026</p>
         </div>
         <div className="space-y-8">
           {SECTIONS.map(({ title, body }) => (

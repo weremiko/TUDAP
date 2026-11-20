@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const SECTIONS = [
   {
     title: "Kabul",
-    body: "Bu platformu kullanarak aşağıdaki koşulları kabul etmiş sayılırsınız. Koşulları kabul etmiyorsanız platformu kullanmayınız.",
+    body: "Hesap oluştururken Kullanım Koşulları’nı açıkça kabul etmeniz gerekir. Platformu kullanmaya devam etmeniz de bu koşullara tabi olduğunuz anlamına gelir. Koşulları kabul etmiyorsanız platformu kullanmayınız.",
   },
   {
     title: "Kullanım Amacı",
@@ -51,7 +51,7 @@ export default function KullanimPage() {
         <div className="space-y-2 mb-10">
           <p className="text-xs uppercase tracking-widest text-accent font-medium">Yasal</p>
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">Kullanım Koşulları</h1>
-          <p className="text-sm text-muted-foreground">Son güncelleme: Haziran 2026</p>
+          <p className="text-sm text-muted-foreground">Son güncelleme: Kasım 2026</p>
         </div>
         <div className="space-y-8">
           {SECTIONS.map(({ title, body }) => (

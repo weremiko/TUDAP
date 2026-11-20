@@ -15,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/terim-sozlugu`,           lastModified: now, changeFrequency: "weekly",  priority: 0.9 },
     { url: `${BASE}/blog`,                    lastModified: now, changeFrequency: "daily",   priority: 0.85 },
     { url: `${BASE}/ajanda`,                  lastModified: now, changeFrequency: "daily",   priority: 0.8 },
+    { url: `${BASE}/keynote`,                 lastModified: now, changeFrequency: "monthly", priority: 0.75 },
     { url: `${BASE}/hakkinda`,                lastModified: now, changeFrequency: "monthly", priority: 0.65 },
     { url: `${BASE}/iletisim`,                lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/sikca-sorulan-sorular`,   lastModified: now, changeFrequency: "monthly", priority: 0.65 },

@@ -16,30 +16,28 @@ export default function CerezPage() {
         <div className="space-y-2 mb-10">
           <p className="text-xs uppercase tracking-widest text-accent font-medium">Yasal</p>
           <h1 className="text-3xl md:text-4xl font-serif font-bold text-foreground">Çerez Politikası</h1>
-          <p className="text-sm text-muted-foreground">Son güncelleme: Haziran 2026</p>
+          <p className="text-sm text-muted-foreground">Son güncelleme: Kasım 2026</p>
         </div>
         <div className="space-y-8">
           <div>
             <h2 className="text-base font-semibold text-foreground mb-2">Çerez Kullanımı</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              TÜDAP, geleneksel anlamda çerez (cookie) kullanmamaktadır. Oturum bilgileriniz yalnızca tarayıcınızın{" "}
-              <code className="text-xs bg-muted px-1 py-0.5 rounded font-mono">localStorage</code> alanında saklanır.
-              Bu depolama yöntemi sunucularımıza herhangi bir veri göndermez.
+              Hesabınız açıkken oturumun sürdürülmesi ve güvenliğin sağlanması için gerekli oturum çerezleri kullanılır. Ayrıca çevirici taslağı ve tercihleri, duyuru kapatma bilgisi ve çerez tercihiniz tarayıcınızdaki{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded font-mono">localStorage</code> alanında saklanabilir. Bu yerel kayıtlar sunucuya otomatik olarak gönderilmez; ancak uygulamada ayrıca gönderdiğiniz metinler sorgu kaydı kapsamında işlenebilir.
             </p>
           </div>
           <div>
-            <h2 className="text-base font-semibold text-foreground mb-2">Analitik</h2>
+            <h2 className="text-base font-semibold text-foreground mb-2">İsteğe Bağlı Reklam Hizmeti</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Vercel Analytics aracılığıyla anonimleştirilmiş sayfa görüntüleme verileri toplanmaktadır.
-              Bu veriler kişisel tanımlama içermez ve yalnızca platformun kullanım istatistiklerini ölçmek amacıyla kullanılır.
+              Google AdSense reklam kodu, yalnızca çerez tercih bandında “Kabul et” seçildiğinde yüklenir. “Reddet” seçeneği reklam kodunun yüklenmesini engeller. Tercihinizi sayfanın altındaki “Çerez tercihleri” bağlantısından değiştirebilirsiniz. Google’ın veri kullanımı hakkında{" "}
+              <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google’ın ortak sitelerdeki veri kullanımı açıklamasını</a>{" "}
+              inceleyebilirsiniz.
             </p>
           </div>
           <div>
-            <h2 className="text-base font-semibold text-foreground mb-2">Yerel Depolamayı Temizleme</h2>
+            <h2 className="text-base font-semibold text-foreground mb-2">Tercihi Değiştirme ve Verileri Temizleme</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Tarayıcınızın geliştirici araçları üzerinden{" "}
-              <code className="text-xs bg-muted px-1 py-0.5 rounded font-mono">localStorage</code> alanını
-              dilediğiniz zaman temizleyebilirsiniz.
+              Reklam tercihinizi sayfanın altındaki “Çerez tercihleri” bağlantısından değiştirebilirsiniz. Daha önce yüklenmiş üçüncü taraf çerezlerini tarayıcı ayarlarınızdan ayrıca silebilirsiniz. Yerel kayıtları silmek için tarayıcınızın site verilerini temizleyin.
             </p>
           </div>
           <div>

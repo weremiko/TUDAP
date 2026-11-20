@@ -105,6 +105,21 @@ export const moderatorActionLogs = pgTable('moderator_action_logs', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
+export const keynoteRegistrations = pgTable('keynote_registrations', {
+  id: text('id').primaryKey(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+  email: text('email').notNull().unique(),
+  department: text('department').notNull(),
+  institution: text('institution').notNull(),
+  role: text('role').notNull(),
+  consent: boolean('consent').notNull(),
+  consentVersion: text('consent_version').notNull(),
+  consentedAt: timestamp('consented_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  checkedInAt: timestamp('checked_in_at', { withTimezone: true }),
+})
+
 export const errorReports = pgTable('error_reports', {
   id: serial('id').primaryKey(),
   message: text('message').notNull(),

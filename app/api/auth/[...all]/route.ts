@@ -20,6 +20,9 @@ async function limitedPost(request: NextRequest) {
 		if (pathname.endsWith('/sign-up/email') && (body.email !== body.emailConfirmation || body.password !== body.passwordConfirmation)) {
 			return NextResponse.json({ error: 'E-posta veya şifre tekrar alanları eşleşmiyor.' }, { status: 400 })
 		}
+		if (pathname.endsWith('/sign-up/email') && body.acceptTerms !== true) {
+			return NextResponse.json({ error: 'Kullanım Koşulları kabul edilmelidir.' }, { status: 400 })
+		}
 		if (pathname.endsWith('/sign-up/email') && !isAllowedEmail(email)) {
 			return NextResponse.json({ error: 'Bu e-posta sağlayıcısına izin verilmiyor.' }, { status: 400 })
 		}

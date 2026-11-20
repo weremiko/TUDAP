@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { headers } from "next/headers"
 import { Inter } from "next/font/google"
+import { CookieConsent } from "@/components/cookie-consent"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
@@ -100,11 +101,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="tr" className={`${inter.variable} bg-background`}>
       <head>
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1996929774645844"
-          crossOrigin="anonymous"
-        />
         {structuredData.map((schema, i) => (
           <script
             key={i}
@@ -123,6 +119,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         )}
         {children}
+        <CookieConsent />
       </body>
     </html>
   )
