@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import qrcode from "qrcode-generator"
+import { SiteHeader } from "@/components/site-header"
+import { SiteFooter } from "@/components/site-footer"
 
 type Ticket = {
   id: string
@@ -11,28 +14,6 @@ type Ticket = {
   department: string
   institution: string
   verifyUrl: string
-}
-
-type QrCodeApi = { toDataURL: (text: string, options?: Record<string, unknown>) => Promise<string> }
-
-declare global {
-  interface Window { QRCode?: QrCodeApi }
-}
-
-function loadQrLibrary() {
-  if (window.QRCode) return Promise.resolve(window.QRCode)
-  return new Promise<QrCodeApi>((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>('script[data-keynote-qr]')
-    const script = existing ?? document.createElement("script")
-    const onLoad = () => window.QRCode ? resolve(window.QRCode) : reject(new Error("QR kütüphanesi yüklenemedi."))
-    script.addEventListener("load", onLoad, { once: true })
-    script.addEventListener("error", () => reject(new Error("QR kütüphanesi yüklenemedi.")), { once: true })
-    if (!existing) {
-      script.src = "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"
-      script.dataset.keynoteQr = "true"
-      document.head.appendChild(script)
-    }
-  })
 }
 
 export function KeynoteSite() {
@@ -51,7 +32,6 @@ export function KeynoteSite() {
   const [loading, setLoading] = useState(false)
   const [privacyOpen, setPrivacyOpen] = useState(false)
   const privacyDialog = useRef<HTMLDialogElement>(null)
-  const ticketCard = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const dialog = privacyDialog.current
@@ -81,7 +61,6 @@ export function KeynoteSite() {
 
     setLoading(true)
     try {
-      const qrApi = await loadQrLibrary()
       const response = await fetch("/api/keynote/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -90,7 +69,10 @@ export function KeynoteSite() {
       const result = await response.json() as { ticket?: Ticket; error?: string }
       if (!response.ok || !result.ticket) throw new Error(result.error || "Kayıt oluşturulamadı.")
 
-      const qrData = await qrApi.toDataURL(result.ticket.verifyUrl, { errorCorrectionLevel: "H", margin: 1, width: 360 })
+      const code = qrcode(0, "H")
+      code.addData(result.ticket.verifyUrl)
+      code.make()
+      const qrData = code.createDataURL(8, 4)
       setTicket(result.ticket)
       setQr(qrData)
     } catch (submitError) {
@@ -157,28 +139,9 @@ export function KeynoteSite() {
     link.click()
   }
 
-  const markTilt = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (window.innerWidth < 700 || !ticketCard.current) return
-    const bounds = event.currentTarget.getBoundingClientRect()
-    const x = ((event.clientX - bounds.left) / bounds.width - .5) * 2
-    const y = ((event.clientY - bounds.top) / bounds.height - .5) * 2
-    ticketCard.current.style.setProperty("--tiltx", `${-y * 7}deg`)
-    ticketCard.current.style.setProperty("--tilty", `${x * 9}deg`)
-  }
-
   return (
     <div className="kn-page">
-      <header className="kn-nav">
-        <a href="#top" className="kn-brand" aria-label="KEYNOTE 26 ana sayfa">
-          <span className="kn-brand-mark">T<span>.</span></span>
-          <span className="kn-brand-caption">TÜDAP <b>/ KEYNOTE’26</b><small>TÜRKÇE DİLBİLİM ARAŞTIRMA PLATFORMU</small></span>
-        </a>
-        <nav className="kn-nav-links">
-          <a className="kn-nav-link" href="#about">ETKİNLİK</a>
-          <a className="kn-nav-link" href="#details">BİLGİLER</a>
-          <a className="kn-nav-cta" href="#register">KAYIT OL <span aria-hidden="true">↗</span></a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main className="kn-main" id="top">
         <section className="kn-hero">
@@ -248,8 +211,8 @@ export function KeynoteSite() {
 
             <div className="kn-ticket-column">
               <div className="kn-preview-top"><span>02 — DİJİTAL BİLETİN</span><span>ÖNİZLEME / CANLI</span></div>
-              <div className="kn-ticket-stage" onPointerMove={markTilt}>
-                <div className="kn-ticket" ref={ticketCard}>
+              <div className="kn-ticket-stage">
+                <div className="kn-ticket">
                   <div className="kn-ticket-main"><div className="kn-ticket-kicker"><span>TÜDAP / 2026</span><span>GİRİŞ BİLETİ <span className="kn-ticket-kicker-star">●</span></span></div><div className="kn-ticket-title">KEYNOTE<span>’26</span></div><div className="kn-ticket-wave" /><div className="kn-ticket-meta"><span>LANSMAN ETKİNLİĞİ</span><span>15.12.2026</span></div><div className="kn-ticket-attendee"><small>KATILIMCI</small><strong>{previewName}</strong><span>{previewDetails}</span></div></div>
                   <div className="kn-ticket-stub"><div className="kn-ticket-stub-left"><span className="kn-stub-caption">ETKİNLİK GİRİŞİ</span><strong className="kn-ticket-date">15<span>ARA</span></strong><span>KÖYCEĞİZ<br />MERKEZ KÜTÜPHANE</span></div><div className="kn-qr">{qr ? <img src={qr} alt="Bilet doğrulama QR kodu" /> : <span aria-hidden="true">●</span>}</div></div>
                   <div className="kn-ticket-id">NO. {ticket?.id ?? "— — — — — —"}</div>
@@ -265,7 +228,7 @@ export function KeynoteSite() {
         <section className="kn-closing"><span>TÜDAP / KEYNOTE’26</span><div>Köyceğiz’de<br /><em>görüşmek üzere.</em></div><a href="#top" aria-label="Yukarı çık">↑</a></section>
       </main>
 
-      <footer className="kn-footer"><div className="kn-footer-mark">TÜDAP<span> / KEYNOTE’26</span></div><div className="kn-footer-links"><Link href="/" target="_top">TÜDAP ANA SAYFA ↗</Link><a href="https://www.instagram.com/tudaporg/" target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a><button type="button" onClick={() => setPrivacyOpen(true)}>GİZLİLİK / KVKK</button></div><div className="kn-footer-bottom"><span>© 2026 TÜDAP</span><span>15 ARALIK 2026 · KÖYCEĞİZ</span></div></footer>
+      <SiteFooter />
 
       <dialog className="kn-dialog" ref={privacyDialog} onClose={() => setPrivacyOpen(false)}>
         <button type="button" className="kn-dialog-close" aria-label="Kapat" onClick={() => setPrivacyOpen(false)}>×</button>

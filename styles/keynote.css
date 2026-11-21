@@ -5,13 +5,13 @@
   --kn-line: #29292d;
   --kn-acid: #d7fa63;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: clip;
   background: var(--kn-bg);
   color: var(--kn-fg);
   font-family: "Manrope", Arial, sans-serif;
 }
 .kn-page *, .kn-page *::before, .kn-page *::after { box-sizing: border-box; }
-.kn-page a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.kn-main a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
 .kn-page button, .kn-page input, .kn-page select { font: inherit; }
 .kn-page button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .kn-mono { font-family: "DM Mono", monospace; letter-spacing: .09em; }
@@ -264,14 +264,14 @@
 }
 
 .kn-page {
-  --kn-bg: #f7f7f4;
-  --kn-fg: #171715;
-  --kn-dim: #696965;
-  --kn-line: #d7d7d2;
-  --kn-acid: #e85d3f;
-  background: var(--kn-bg);
+  --kn-bg: var(--background);
+  --kn-fg: var(--foreground);
+  --kn-dim: var(--muted-foreground);
+  --kn-line: var(--border);
+  --kn-acid: var(--accent);
+  background: var(--background);
   color: var(--kn-fg);
-  font-family: "Manrope", "Avenir Next", sans-serif;
+  font-family: "Manrope", "Segoe UI", sans-serif;
 }
 .kn-mono,
 .kn-eyebrow,
@@ -302,15 +302,15 @@
 .kn-nav-cta { gap: 24px; padding: 14px 17px; background: #f7f7f4; color: #171715 !important; }
 .kn-nav-cta:hover,
 .kn-primary:hover { background: #ff7657; }
-.kn-hero { height: min(900px,100svh); min-height: 700px; padding-inline: 7%; background: #050605; }
-.kn-hero::before { z-index: -1; background: linear-gradient(90deg,#050605 4%,#050605e8 36%,#05060520 76%,#05060530); }
+.kn-hero { height: min(820px,100svh); min-height: 650px; padding-inline: 7%; background: var(--primary); }
+.kn-hero::before { z-index: -1; background: linear-gradient(105deg,color-mix(in srgb,var(--primary) 98%,black) 4%,var(--primary) 44%,color-mix(in srgb,var(--primary) 76%,var(--accent)) 100%); }
 .kn-hero-art { position: absolute; z-index: 0; inset: 0 0 0 auto; display: grid; width: 68%; place-items: center; pointer-events: none; }
 .kn-hero-art img { display: block; width: min(55vw,690px); height: 88%; object-fit: contain; mix-blend-mode: screen; }
 .kn-hero-copy { z-index: 2; width: min(700px,62%); padding-top: 40px; }
 .kn-eyebrow { gap: 13px; color: #d1d1cb; font-size: 10px; letter-spacing: .055em; }
 .kn-eyebrow-line { width: 28px; margin-left: 0; background: #777772; }
-.kn-hero h1 { margin: 34px 0 28px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(56px,7vw,106px); font-weight: 400; letter-spacing: -.045em; line-height: 1.02; }
-.kn-hero h1 em { color: #ff7657; -webkit-text-stroke: 0; }
+.kn-hero h1 { margin: 34px 0 28px; font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(56px,7vw,106px); font-weight: 500; letter-spacing: -.045em; line-height: 1.02; }
+.kn-hero h1 em { color: #ef9b7f; -webkit-text-stroke: 0; }
 .kn-hero-sub { max-width: 410px; margin-bottom: 30px; color: #c1c1bb; font-size: 15px; line-height: 1.8; }
 .kn-hero-sub span { color: white; }
 .kn-primary { min-height: 52px; gap: 28px; padding: 15px 19px; background: #f7f7f4; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 10px; letter-spacing: .035em; }
@@ -321,32 +321,32 @@
 .kn-section-top { border-color: var(--kn-line); color: var(--kn-dim); font-size: 9px; letter-spacing: .055em; }
 .kn-intro-grid { grid-template-columns: 1fr .8fr; gap: 10%; margin-top: 75px; }
 .kn-intro-grid h2,
-.kn-register-head h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(43px,5.4vw,76px); font-weight: 400; letter-spacing: -.045em; line-height: 1.08; }
+.kn-register-head h2 { margin: 0; font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(43px,5.4vw,76px); font-weight: 500; letter-spacing: -.045em; line-height: 1.08; }
 .kn-intro-grid h2 span { color: #777771; }
 .kn-intro-copy { padding-top: 7px; }
 .kn-intro-copy p { margin-bottom: 20px; color: #555550; font-size: 15px; line-height: 1.8; }
 .kn-intro-copy strong { color: #171715; }
 .kn-external { gap: 32px; border-color: #aaa9a1; font-size: 9px; letter-spacing: .04em; }
-.kn-details { padding-top: 60px; background: #eeeee9; }
+.kn-details { padding-top: 60px; background: var(--secondary); }
 .kn-detail-grid { margin-top: 54px; border-color: #cecec8; }
 .kn-detail { min-height: 240px; border-color: #cecec8; padding: 22px 24px 24px 0; }
 .kn-detail + .kn-detail { padding-left: 25px; }
 .kn-detail-num,
 .kn-detail-heading { color: #777771; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 10px; letter-spacing: .035em; }
 .kn-detail-heading { margin-top: 35px; }
-.kn-detail strong { margin-top: 12px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(34px,4vw,56px); font-weight: 400; letter-spacing: -.035em; line-height: 1.08; white-space: normal; }
+.kn-detail strong { margin-top: 12px; font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(34px,4vw,56px); font-weight: 500; letter-spacing: -.035em; line-height: 1.08; white-space: normal; }
 .kn-detail p { margin: auto 0 0; color: #666660; font-size: 12px; line-height: 1.7; }
 .kn-detail-location { max-width: 300px; font-size: clamp(31px,3.2vw,45px) !important; }
 .kn-detail-access { font-size: clamp(32px,3.4vw,48px) !important; }
 .kn-detail-unit { color: #777771; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: .3em; letter-spacing: .03em; vertical-align: middle; }
-.kn-register { padding: 95px 10% 105px; background: #f7f7f4; color: #171715; }
+.kn-register { padding: 95px 10% 105px; background: var(--background); color: var(--foreground); }
 .kn-label { color: #555550; font-size: 9px; letter-spacing: .045em; }
 .kn-register-head h2 { margin-top: 24px; }
-.kn-register-head h2 i { color: #e85d3f; }
+.kn-register-head h2 i { color: var(--accent); }
 .kn-register-note { width: 250px; color: #666660; font-size: 10px; line-height: 1.7; }
 .kn-register-note p { margin-top: 12px; font-family: "Manrope", "Avenir Next", sans-serif; font-size: 13px; }
 .kn-register-grid { grid-template-columns: 1fr .9fr; gap: 28px; margin-top: 56px; }
-.kn-form-panel { padding: 32px; background: #fff; box-shadow: none; }
+.kn-form-panel { padding: 32px; border: 1px solid var(--border); background: var(--card); box-shadow: none; }
 .kn-panel-title,
 .kn-preview-top { border-color: #deded9; padding-bottom: 19px; color: #666660; font-size: 9px; letter-spacing: .04em; }
 .kn-secure { color: #527348; }
@@ -354,13 +354,13 @@
 .kn-field { margin-bottom: 20px; }
 .kn-field label { margin-bottom: 9px; color: #555550; font-size: 9px; letter-spacing: .035em; }
 .kn-field input,
-.kn-field select { height: 52px; border-color: #d8d8d2; background: #fff; font-size: 13px; }
+.kn-field select { height: 52px; border-color: var(--input); background: var(--background); color: var(--foreground); font-size: 13px; }
 .kn-field input:focus,
-.kn-field select:focus { border-color: #171715; }
+.kn-field select:focus { border-color: var(--ring); }
 .kn-consent { color: #666660; font-size: 11px; }
-.kn-consent input { accent-color: #e85d3f; }
-.kn-submit { height: 58px; background: #171715; font-size: 10px; letter-spacing: .04em; }
-.kn-submit:hover { background: #e85d3f; }
+.kn-consent input { accent-color: var(--primary); }
+.kn-submit { height: 58px; background: var(--primary); font-size: 10px; letter-spacing: .04em; }
+.kn-submit:hover { background: var(--accent); }
 .kn-under-submit { color: #777771; font-size: 8px; letter-spacing: .025em; }
 .kn-ticket-stage { min-height: 540px; }
 .kn-ticket { max-width: 460px; background: #080908; box-shadow: 0 15px 40px #00000012; transform: none !important; }
@@ -370,7 +370,7 @@
 .kn-ticket-kicker,
 .kn-ticket-meta { font-size: 9px; letter-spacing: .055em; }
 .kn-ticket-kicker-star { color: #ff7657; }
-.kn-ticket-title { margin-top: 24px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(39px,4vw,58px); font-weight: 400; letter-spacing: -.04em; }
+.kn-ticket-title { margin-top: 24px; font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(39px,4vw,58px); font-weight: 500; letter-spacing: -.04em; }
 .kn-ticket-title span { color: #ff7657; }
 .kn-ticket-meta { color: #cecec8; }
 .kn-ticket-attendee small { color: #aaa9a1; font-size: 8px; letter-spacing: .04em; }
@@ -381,7 +381,7 @@
 .kn-ticket-stub::after { background: #f7f7f4; }
 .kn-stub-caption,
 .kn-ticket-stub-left > span:last-child { color: #666660; font-size: 8px; letter-spacing: .025em; }
-.kn-ticket-date { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
+.kn-ticket-date { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; }
 .kn-ticket-date span { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
 .kn-ticket-id { background: #f7f7f4; color: #777771; font-size: 8px; }
 .kn-explainer { border-color: #d5d5cf; }
@@ -393,9 +393,9 @@
 .kn-secondary { border-color: #777; font-size: 9px; }
 .kn-ticket-reference { border-color: #41413c; }
 .kn-verify-link { color: #ff927b !important; }
-.kn-closing { padding: 85px 10% 80px; background: #eeeee9; }
+.kn-closing { padding: 85px 10% 80px; background: var(--secondary); }
 .kn-closing > span { color: #666660; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 9px; letter-spacing: .05em; }
-.kn-closing > div { margin-top: 24px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(44px,7vw,88px); font-weight: 400; letter-spacing: -.045em; line-height: 1.08; }
+.kn-closing > div { margin-top: 24px; font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(44px,7vw,88px); font-weight: 500; letter-spacing: -.045em; line-height: 1.08; }
 .kn-closing em { color: #777771; }
 .kn-closing > a { right: 10%; bottom: 76px; width: 46px; height: 46px; border-color: #aaa9a1; border-radius: 0; color: #171715; font-size: 20px; }
 .kn-footer { border-color: #d7d7d2; padding: 35px 10% 20px; background: #f7f7f4; }
@@ -412,9 +412,9 @@
   .kn-brand-caption small { font-size: 7px; }
   .kn-nav-links { gap: 0; }
   .kn-nav-cta { padding: 12px; font-size: 8px; }
-  .kn-hero { min-height: 790px; padding: 105px 6% 96px; }
-  .kn-hero::before { background: linear-gradient(90deg,#050605 5%,#050605d9 62%,#05060570); }
-  .kn-hero-art { top: 20%; width: 100%; height: 58%; opacity: .63; }
+  .kn-hero { min-height: 760px; padding: 78px 6% 96px; }
+  .kn-hero::before { background: linear-gradient(100deg,color-mix(in srgb,var(--primary) 96%,black) 5%,var(--primary) 65%,color-mix(in srgb,var(--primary) 65%,var(--accent))); }
+  .kn-hero-art { top: 22%; width: 100%; height: 55%; opacity: .52; }
   .kn-hero-art img { width: 100%; height: 100%; object-position: center; }
   .kn-hero-copy { width: 100%; padding-top: 24px; }
   .kn-eyebrow { font-size: 8px; }
