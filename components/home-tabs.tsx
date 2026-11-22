@@ -5,22 +5,7 @@ import { ArrowRight, BookText, Calendar, Languages, Newspaper, UsersRound } from
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-const TABS = [
-  { value: "tools", label: "Araçlar", icon: Languages },
-  { value: "resources", label: "Kaynaklar", icon: BookText },
-  { value: "platform", label: "Platform", icon: UsersRound },
-]
-
-const PANELS = {
-  resources: [
-    { href: "/blog", icon: Newspaper, title: "İçerikler", desc: "Dilbilim araştırmaları, yazılar ve platform güncellemeleri." },
-    { href: "/ajanda", icon: Calendar, title: "Etkinlik Ajandası", desc: "Seminer, konferans ve çalıştayları takip edin." },
-  ],
-  platform: [
-    { href: "/hakkinda", icon: BookText, title: "Hakkında", desc: "TÜDAP’ın amacı, yaklaşımı ve geliştirme süreci." },
-    { href: "/takimimiz", icon: UsersRound, title: "Takımımız", desc: "Platformun akademik ve teknik gelişimine katkı sunan ekip." },
-  ],
-}
+type HomeContent = Record<string, string>
 
 function PanelCard({ href, icon: Icon, title, desc }: { href: string; icon: typeof BookText; title: string; desc: string }) {
   return (
@@ -39,11 +24,27 @@ function PanelCard({ href, icon: Icon, title, desc }: { href: string; icon: type
   )
 }
 
-export function HomeTabs() {
+export function HomeTabs({ content }: { content: HomeContent }) {
+  const tabs = [
+    { value: "tools", label: content.tab_tools, icon: Languages },
+    { value: "resources", label: content.tab_resources, icon: BookText },
+    { value: "platform", label: content.tab_platform, icon: UsersRound },
+  ]
+  const panels = {
+    resources: [
+      { href: content.resource_blog_href, icon: Newspaper, title: content.resource_blog_title, desc: content.resource_blog_desc },
+      { href: content.resource_agenda_href, icon: Calendar, title: content.resource_agenda_title, desc: content.resource_agenda_desc },
+    ],
+    platform: [
+      { href: content.platform_about_href, icon: BookText, title: content.platform_about_title, desc: content.platform_about_desc },
+      { href: content.platform_team_href, icon: UsersRound, title: content.platform_team_title, desc: content.platform_team_desc },
+    ],
+  }
+
   return (
     <Tabs defaultValue="tools" className="gap-7">
       <TabsList className="h-auto w-full justify-start gap-2 rounded-2xl border border-border/80 bg-muted/30 p-1.5">
-        {TABS.map(({ value, label, icon: Icon }) => (
+        {tabs.map(({ value, label, icon: Icon }) => (
           <TabsTrigger key={value} value={value} className="h-11 flex-none rounded-xl border border-transparent px-4 text-sm data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-[0_10px_24px_-18px_rgba(15,23,42,0.5)] data-[state=active]:shadow-sm data-[state=active]:shadow-black/5 data-[state=inactive]:text-muted-foreground">
             <Icon className="h-4 w-4" />
             {label}
@@ -52,16 +53,16 @@ export function HomeTabs() {
       </TabsList>
 
       <TabsContent value="tools" className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <PanelCard href="/cevirici" icon={Languages} title="Sesbilimsel Abece Çeviricisi" desc="Türkçe metinleri IPA formatına çevirin." />
-        <PanelCard href="/terim-sozlugu" icon={BookText} title="Dilbilim Terimleri Sözlüğü" desc="700+ terim, Türkçe örnekler ve akademik açıklamalar." />
+        <PanelCard href={content.tool_transcriber_href} icon={Languages} title={content.tool_transcriber_title} desc={content.tool_transcriber_desc} />
+        <PanelCard href={content.tool_glossary_href} icon={BookText} title={content.tool_glossary_title} desc={content.tool_glossary_desc} />
       </TabsContent>
 
       <TabsContent value="resources" className="grid gap-5 sm:grid-cols-2">
-        {PANELS.resources.map((panel) => <PanelCard key={panel.href} {...panel} />)}
+        {panels.resources.map((panel) => <PanelCard key={panel.href} {...panel} />)}
       </TabsContent>
 
       <TabsContent value="platform" className="grid gap-5 sm:grid-cols-2">
-        {PANELS.platform.map((panel) => <PanelCard key={panel.href} {...panel} />)}
+        {panels.platform.map((panel) => <PanelCard key={panel.href} {...panel} />)}
       </TabsContent>
     </Tabs>
   )

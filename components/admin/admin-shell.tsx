@@ -21,6 +21,7 @@ import {
   History,
   Wrench,
   Ticket,
+  House,
 } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
@@ -30,6 +31,7 @@ import { cn } from "@/lib/utils"
 const allNavItems = [
   { label: "Genel Bakış",    href: "/admin",             icon: LayoutDashboard, roles: ['admin', 'moderator'] },
   { label: "Kullanıcılar",    href: "/admin/kullanicilar", icon: Users,           roles: ['admin'] },
+  { label: "Ana Sayfa",       href: "/admin/anasayfa",     icon: House,           roles: ['admin'] },
   { label: "KEYNOTE Kayıtları", href: "/admin/keynote",    icon: Ticket,          roles: ['admin'] },
   { label: "Sözlük Yönetimi", href: "/admin/sozluk",      icon: BookOpen,        roles: ['admin', 'moderator'] },
   { label: "Sabit Çeviriler", href: "/admin/sabit-ceviriler", icon: Zap,        roles: ['admin', 'moderator'] },

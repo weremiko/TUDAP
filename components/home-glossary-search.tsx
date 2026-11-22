@@ -6,36 +6,31 @@ import { ArrowRight, Search } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
-const PROMPTS = [
-  "örn. ünlü uyumu, morfem, ergatiflik...",
-  "Dilbilgisi değil, dilbilim terimleri...",
-  "TDK'de bulamadığınız o teorik terimi yazın...",
-  "Chomsky amcanın sözdizimi ağacından bir yaprak seçin...",
-  "Dil yetisi (I-language) burada devreye giriyor...",
-]
-
-export function HomeGlossarySearch() {
+export function HomeGlossarySearch({ content }: { content: Record<string, string> }) {
   const [value, setValue] = useState("")
   const [scrollOffset, setScrollOffset] = useState(0)
   const [promptIndex, setPromptIndex] = useState(0)
   const [prompt, setPrompt] = useState("")
   const [deleting, setDeleting] = useState(false)
+  const promptLines = content.glossary_prompts
 
   useEffect(() => {
-    const target = PROMPTS[promptIndex]
+    const prompts = promptLines.split("\n").map((item) => item.trim()).filter(Boolean)
+    if (prompts.length === 0) return
+    const target = prompts[promptIndex % prompts.length]
     const delay = deleting ? 35 : 75
     const timer = window.setTimeout(() => {
       if (!deleting && prompt === target) {
         setDeleting(true)
       } else if (deleting && prompt === "") {
         setDeleting(false)
-        setPromptIndex((index) => (index + 1) % PROMPTS.length)
+        setPromptIndex((index) => (index + 1) % prompts.length)
       } else {
         setPrompt(target.slice(0, prompt.length + (deleting ? -1 : 1)))
       }
     }, prompt === target && !deleting ? 1600 : delay)
     return () => window.clearTimeout(timer)
-  }, [deleting, prompt, promptIndex])
+  }, [deleting, prompt, promptIndex, promptLines])
 
   useEffect(() => {
     const handleScroll = () => setScrollOffset(Math.min(70, window.scrollY * 0.08))
@@ -51,16 +46,16 @@ export function HomeGlossarySearch() {
       <div className="container relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <Card className="border-primary/20 bg-primary/[0.04] p-6 sm:p-8">
           <div className="max-w-2xl">
-            <p className="text-xs uppercase tracking-[0.2em] text-accent font-semibold">Hızlı arama</p>
-            <h2 className="mt-2 text-2xl font-serif font-bold text-foreground">Bir terim arayın, kavramı keşfedin.</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Türkçe dilbilim terimleri arasında hızlıca arama yapın.</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-accent font-semibold">{content.glossary_eyebrow}</p>
+            <h2 className="mt-2 text-2xl font-serif font-bold text-foreground">{content.glossary_title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{content.glossary_description}</p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <div className="relative flex-1">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input value={value} onChange={(event) => setValue(event.target.value)} placeholder={prompt || "Bir terim arayın..."} aria-label="Sözlükte terim ara" className="h-11 border-border bg-background pl-10" />
+                <Input value={value} onChange={(event) => setValue(event.target.value)} placeholder={prompt || "Bir terim arayın..."} aria-label={content.glossary_input_label} className="h-11 border-border bg-background pl-10" />
               </div>
               <Link href={searchHref} className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
-                Ara <ArrowRight className="h-4 w-4" />
+                {content.glossary_search_button} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>

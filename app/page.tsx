@@ -11,41 +11,51 @@ import { HomeHeroCopy } from "@/components/home-hero-copy"
 import { getBlogPosts } from "@/app/actions/blog"
 import { getActiveAnnouncement } from "@/app/actions/announcements"
 import { getEvents } from "@/app/actions/events"
+import { getPageSections } from "@/app/actions/page-content"
 import { AnnouncementPopup } from "@/components/announcement-popup"
 import type { Metadata } from "next"
 
 const BASE = "https://dilbilim.org.tr"
 
-export const metadata: Metadata = {
-  title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu | IPA Çevirici & Terim Sözlüğü",
-   description:
-    "Türkçe Dilbilim Araştırma Platformu: ücretsiz IPA fonetik transkripsiyon aracı, 700+ madde başı, akademik içerikler ve etkinlik ajandası.",
-  keywords: [
-    "türkçe dilbilim", "IPA çevirici", "fonetik transkripsiyon", "türkçe IPA",
-    "sesbilimsel transkripsiyon", "dilbilim terimleri sözlüğü", "dilbilim araçları",
-    "sesbilim", "sözdizimi", "morfoloji", "anlambilim", "türkçe ses bilgisi",
-    "dilbilim semineri", "dilbilim konferansı", "TÜDAP", "dilbilim.org.tr",
-    "uluslararası fonetik alfabe", "türkçe dilbilgisi akademik",
-  ],
-  alternates: {
-    canonical: BASE,
-    languages: { "en": `${BASE}/en`, "tr": BASE, "x-default": BASE },
-  },
-  openGraph: {
-    title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu | IPA Çevirici & Terim Sözlüğü",
-    description: "Türkçe dilbilim araçları: IPA fonetik transkripsiyon, 700+ terim sözlüğü, akademik içerikler ve etkinlik ajandası.",
-    url: BASE,
-    siteName: "TÜDAP",
-    locale: "tr_TR",
-    type: "website",
-    images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: "TÜDAP — Türkçe Dilbilim Araştırma Platformu" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "TÜDAP — Türkçe Dilbilim Araştırma Platformu",
-    description: "Ücretsiz IPA fonetik transkripsiyon, 700+ terim, akademik içerikler ve etkinlik ajandası.",
-    images: [`${BASE}/og-image.png`],
-  },
+const DEFAULT_HOME_TITLE = "TÜDAP — Türkçe Dilbilim Araştırma Platformu | IPA Çevirici & Terim Sözlüğü"
+const DEFAULT_HOME_DESCRIPTION = "Türkçe Dilbilim Araştırma Platformu: ücretsiz IPA fonetik transkripsiyon aracı, 700+ madde başı, akademik içerikler ve etkinlik ajandası."
+
+export async function generateMetadata(): Promise<Metadata> {
+  const sections = await getPageSections("anasayfa")
+  const content = Object.fromEntries(sections.map(({ key, content }) => [key, content]))
+  const title = content.seo_title || DEFAULT_HOME_TITLE
+  const description = content.seo_description || DEFAULT_HOME_DESCRIPTION
+
+  return {
+    title,
+    description,
+    keywords: [
+      "türkçe dilbilim", "IPA çevirici", "fonetik transkripsiyon", "türkçe IPA",
+      "sesbilimsel transkripsiyon", "dilbilim terimleri sözlüğü", "dilbilim araçları",
+      "sesbilim", "sözdizimi", "morfoloji", "anlambilim", "türkçe ses bilgisi",
+      "dilbilim semineri", "dilbilim konferansı", "TÜDAP", "dilbilim.org.tr",
+      "uluslararası fonetik alfabe", "türkçe dilbilgisi akademik",
+    ],
+    alternates: {
+      canonical: BASE,
+      languages: { "en": `${BASE}/en`, "tr": BASE, "x-default": BASE },
+    },
+    openGraph: {
+      title,
+      description,
+      url: BASE,
+      siteName: "TÜDAP",
+      locale: "tr_TR",
+      type: "website",
+      images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: "TÜDAP — Türkçe Dilbilim Araştırma Platformu" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${BASE}/og-image.png`],
+    },
+  }
 }
 
 const homepageJsonLd = [
@@ -76,11 +86,13 @@ const homepageJsonLd = [
 ]
 
 export default async function Home() {
-  const [{ posts: latestPosts }, announcement, allEvents] = await Promise.all([
+  const [{ posts: latestPosts }, announcement, allEvents, homeSections] = await Promise.all([
     getBlogPosts(1, 6, true),
     getActiveAnnouncement(),
     getEvents(),
+    getPageSections("anasayfa"),
   ])
+  const home = Object.fromEntries(homeSections.map(({ key, content }) => [key, content]))
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const upcomingEvents = allEvents.filter((event) => new Date(event.endDate ?? event.date) >= today)
@@ -99,53 +111,51 @@ export default async function Home() {
           <div className="max-w-4xl">
             <div className="mb-7 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.22em] text-accent">
               <span className="h-px w-8 bg-accent" />
-              Türkçe Dilbilim Araştırma Platformu
+              {home.hero_eyebrow}
             </div>
-            <HomeHeroCopy />
+            <HomeHeroCopy headlines={home.hero_headlines} />
             <p className="mt-7 max-w-lg text-lg leading-relaxed text-muted-foreground">
-              Türkçe metinleri seslerine, yapılarına ve anlamlarına ayıran açık bir çalışma alanı. IPA çevirici, terim sözlüğü ve akademik içerikler tek yerde.
+              {home.hero_description}
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-4">
-              <Link href="/cevirici">
+              <Link href={home.hero_primary_href}>
                 <Button size="lg" className="h-12 rounded-full px-7 text-sm font-medium">
-                  Metinle başla
+                  {home.hero_primary_label}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/terim-sozlugu" className="text-sm font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:text-accent hover:decoration-accent">
-                Terim sözlüğüne git
+              <Link href={home.hero_secondary_href} className="text-sm font-medium text-foreground underline decoration-border underline-offset-4 transition-colors hover:text-accent hover:decoration-accent">
+                {home.hero_secondary_label}
               </Link>
             </div>
           </div>
           <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-border pt-5 text-sm text-muted-foreground">
-            <span><strong className="font-semibold text-foreground">700+</strong> dilbilim terimi</span>
-            <span><strong className="font-semibold text-foreground">Ücretsiz</strong> araçlar</span>
-            <span><strong className="font-semibold text-foreground">Türkçe</strong> odaklı</span>
+            {[1, 2, 3].map((index) => <span key={index}><strong className="font-semibold text-foreground">{home[`stat_${index}_value`]}</strong> {home[`stat_${index}_label`]}</span>)}
           </div>
         </div>
         <div className="container mx-auto max-w-6xl border-t border-border px-4 py-4 sm:px-6 lg:px-8">
           <form action="/terim-sozlugu" className="flex max-w-xl items-center gap-3">
-            <label htmlFor="hero-term-search" className="sr-only">Terim ara</label>
-            <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Terim ara</span>
-            <input id="hero-term-search" name="q" type="search" placeholder="ör. biçimbirim" className="min-w-0 flex-1 border-0 border-b border-border bg-transparent px-1 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-accent" />
-            <button type="submit" className="text-sm font-medium text-accent hover:underline">Ara</button>
+            <label htmlFor="hero-term-search" className="sr-only">{home.term_search_label}</label>
+            <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{home.term_search_label}</span>
+            <input id="hero-term-search" name="q" type="search" placeholder={home.term_search_placeholder} className="min-w-0 flex-1 border-0 border-b border-border bg-transparent px-1 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-accent" />
+            <button type="submit" className="text-sm font-medium text-accent hover:underline">{home.term_search_button}</button>
           </form>
         </div>
       </section>
 
-      <HomeRoadmap events={upcomingEvents} />
+      <HomeRoadmap events={upcomingEvents} content={home} />
 
       {/* Tool cards */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-16 sm:py-20">
         <div className="mb-10 space-y-1">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Araçlar</p>
-          <h2 className="text-2xl font-serif font-bold text-foreground">Neler yapabilirsiniz?</h2>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">{home.tools_eyebrow}</p>
+          <h2 className="text-2xl font-serif font-bold text-foreground">{home.tools_title}</h2>
         </div>
-        <HomeTabs />
+        <HomeTabs content={home} />
       </section>
 
-      <HomeBlogSlider posts={latestPosts} />
-      <HomeGlossarySearch />
+      <HomeBlogSlider posts={latestPosts} content={home} />
+      <HomeGlossarySearch content={home} />
 
       <SiteFooter />
     </div>

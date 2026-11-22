@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card"
 
 type BlogPost = { id: number; slug: string; title: string; excerpt: string | null; createdAt: Date; authorName: string }
 
-export function HomeBlogSlider({ posts }: { posts: BlogPost[] }) {
+export function HomeBlogSlider({ posts, content }: { posts: BlogPost[]; content: Record<string, string> }) {
   const railRef = useRef<HTMLDivElement>(null)
 
   const scroll = (direction: "left" | "right") => {
@@ -21,8 +21,8 @@ export function HomeBlogSlider({ posts }: { posts: BlogPost[] }) {
       <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mb-7 flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-accent font-semibold">Güncel okumalar</p>
-            <h2 className="mt-2 text-2xl font-serif font-bold text-foreground">Son içerikler</h2>
+            <p className="text-xs uppercase tracking-[0.2em] text-accent font-semibold">{content.blog_eyebrow}</p>
+            <h2 className="mt-2 text-2xl font-serif font-bold text-foreground">{content.blog_title}</h2>
           </div>
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => scroll("left")} aria-label="Önceki yazılar" className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-colors hover:border-primary hover:text-primary">
