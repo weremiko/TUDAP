@@ -6,6 +6,8 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { keynoteRegistrations, user } from "@/lib/db/schema"
 import { ensureKeynoteTable } from "@/lib/keynote"
+import { getPageSections } from "@/app/actions/page-content"
+import { KeynoteHeroEditor } from "@/components/admin/keynote-hero-editor"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 
@@ -22,10 +24,11 @@ export default async function AdminKeynotePage() {
   if (currentUser?.role !== "admin") redirect("/admin")
 
   await ensureKeynoteTable()
-  const registrations = await db
-    .select()
-    .from(keynoteRegistrations)
-    .orderBy(desc(keynoteRegistrations.createdAt))
+  const [registrations, heroSections] = await Promise.all([
+    db.select().from(keynoteRegistrations).orderBy(desc(keynoteRegistrations.createdAt)),
+    getPageSections("keynote"),
+  ])
+  const heroValues = Object.fromEntries(heroSections.map(({ key, content }) => [key, content]))
   const checkedInCount = registrations.filter((registration) => registration.checkedInAt).length
 
   return (
@@ -46,6 +49,8 @@ export default async function AdminKeynotePage() {
           <div><p className="text-sm text-muted-foreground">Giriş yapan</p><p className="text-2xl font-semibold">{checkedInCount}</p></div>
         </Card>
       </div>
+
+      <KeynoteHeroEditor initialValues={heroValues} />
 
       {registrations.length === 0 ? (
         <Card className="p-10 text-center text-sm text-muted-foreground">Henüz KEYNOTE kaydı yok.</Card>

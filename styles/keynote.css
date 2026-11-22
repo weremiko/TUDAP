@@ -268,7 +268,9 @@
   --kn-fg: var(--foreground);
   --kn-dim: var(--muted-foreground);
   --kn-line: var(--border);
-  --kn-acid: var(--accent);
+  --kn-acid: #1c3e68;
+  --kn-blue: #15355c;
+  --kn-blue-light: #315d8a;
   background: var(--background);
   color: var(--kn-fg);
   font-family: "Manrope", "Segoe UI", sans-serif;
@@ -294,23 +296,23 @@
 .kn-nav { position: absolute; height: 82px; padding-inline: 7%; border-color: #ffffff30; }
 .kn-brand { gap: 12px; }
 .kn-brand-mark { font-family: Georgia, serif; font-size: 41px; font-weight: 400; letter-spacing: -.08em; }
-.kn-brand-mark span { color: #ff7657; }
+.kn-brand-mark span { color: var(--kn-blue-light); }
 .kn-brand-caption { font-size: 11px; letter-spacing: .03em; }
 .kn-brand-caption b { color: #d1d1cb; }
 .kn-brand-caption small { color: #a7a7a1; font-size: 8px; letter-spacing: .07em; }
 .kn-nav-links { gap: 28px; color: #e0e0dc; font-size: 10px; letter-spacing: .035em; }
 .kn-nav-cta { gap: 24px; padding: 14px 17px; background: #f7f7f4; color: #171715 !important; }
 .kn-nav-cta:hover,
-.kn-primary:hover { background: #ff7657; }
-.kn-hero { height: min(820px,100svh); min-height: 650px; padding-inline: 7%; background: var(--primary); }
-.kn-hero::before { z-index: -1; background: linear-gradient(105deg,color-mix(in srgb,var(--primary) 98%,black) 4%,var(--primary) 44%,color-mix(in srgb,var(--primary) 76%,var(--accent)) 100%); }
+.kn-primary:hover { background: #315d8a; }
+.kn-hero { height: min(820px,100svh); min-height: 650px; padding-inline: 7%; background: var(--kn-blue); }
+.kn-hero::before { z-index: -1; background: linear-gradient(105deg,#102746 4%,var(--kn-blue) 48%,#254b76 100%); }
 .kn-hero-art { position: absolute; z-index: 0; inset: 0 0 0 auto; display: grid; width: 68%; place-items: center; pointer-events: none; }
 .kn-hero-art img { display: block; width: min(55vw,690px); height: 88%; object-fit: contain; mix-blend-mode: screen; }
 .kn-hero-copy { z-index: 2; width: min(700px,62%); padding-top: 40px; }
 .kn-eyebrow { gap: 13px; color: #d1d1cb; font-size: 10px; letter-spacing: .055em; }
 .kn-eyebrow-line { width: 28px; margin-left: 0; background: #777772; }
 .kn-hero h1 { margin: 34px 0 28px; font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(56px,7vw,106px); font-weight: 500; letter-spacing: -.045em; line-height: 1.02; }
-.kn-hero h1 em { color: #ef9b7f; -webkit-text-stroke: 0; }
+.kn-hero h1 .kn-title-accent { color: #a9c8e8; }
 .kn-hero-sub { max-width: 410px; margin-bottom: 30px; color: #c1c1bb; font-size: 15px; line-height: 1.8; }
 .kn-hero-sub span { color: white; }
 .kn-primary { min-height: 52px; gap: 28px; padding: 15px 19px; background: #f7f7f4; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 10px; letter-spacing: .035em; }
@@ -342,7 +344,7 @@
 .kn-register { padding: 95px 10% 105px; background: var(--background); color: var(--foreground); }
 .kn-label { color: #555550; font-size: 9px; letter-spacing: .045em; }
 .kn-register-head h2 { margin-top: 24px; }
-.kn-register-head h2 i { color: var(--accent); }
+.kn-register-head h2 i { color: var(--kn-blue-light); }
 .kn-register-note { width: 250px; color: #666660; font-size: 10px; line-height: 1.7; }
 .kn-register-note p { margin-top: 12px; font-family: "Manrope", "Avenir Next", sans-serif; font-size: 13px; }
 .kn-register-grid { grid-template-columns: 1fr .9fr; gap: 28px; margin-top: 56px; }
@@ -360,18 +362,18 @@
 .kn-consent { color: #666660; font-size: 11px; }
 .kn-consent input { accent-color: var(--primary); }
 .kn-submit { height: 58px; background: var(--primary); font-size: 10px; letter-spacing: .04em; }
-.kn-submit:hover { background: var(--accent); }
+.kn-submit:hover { background: var(--kn-blue-light); }
 .kn-under-submit { color: #777771; font-size: 8px; letter-spacing: .025em; }
 .kn-ticket-stage { min-height: 540px; }
 .kn-ticket { max-width: 460px; background: #080908; box-shadow: 0 15px 40px #00000012; transform: none !important; }
 .kn-ticket-main { height: 300px; padding: 25px 27px 15px; background: #080908; }
-.kn-ticket-main::before { background: linear-gradient(130deg,transparent 58%,#e85d3f18); }
+.kn-ticket-main::before { background: linear-gradient(130deg,transparent 58%,#315d8a30); }
 .kn-ticket-wave { display: none; }
 .kn-ticket-kicker,
 .kn-ticket-meta { font-size: 9px; letter-spacing: .055em; }
-.kn-ticket-kicker-star { color: #ff7657; }
+.kn-ticket-kicker-star { color: #a9c8e8; }
 .kn-ticket-title { margin-top: 24px; font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(39px,4vw,58px); font-weight: 500; letter-spacing: -.04em; }
-.kn-ticket-title span { color: #ff7657; }
+.kn-ticket-title span { color: #a9c8e8; }
 .kn-ticket-meta { color: #cecec8; }
 .kn-ticket-attendee small { color: #aaa9a1; font-size: 8px; letter-spacing: .04em; }
 .kn-ticket-attendee strong { font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 400; }
@@ -385,14 +387,14 @@
 .kn-ticket-date span { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
 .kn-ticket-id { background: #f7f7f4; color: #777771; font-size: 8px; }
 .kn-explainer { border-color: #d5d5cf; }
-.kn-explainer-icon { color: #e85d3f; }
+.kn-explainer-icon { color: var(--kn-blue-light); }
 .kn-explainer p { color: #666660; }
 .kn-success { background: #171715; }
 .kn-success h3 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; letter-spacing: -.04em; }
-.kn-success h3 span { color: #ff7657; }
+.kn-success h3 span { color: #a9c8e8; }
 .kn-secondary { border-color: #777; font-size: 9px; }
 .kn-ticket-reference { border-color: #41413c; }
-.kn-verify-link { color: #ff927b !important; }
+.kn-verify-link { color: #a9c8e8 !important; }
 .kn-closing { padding: 85px 10% 80px; background: var(--secondary); }
 .kn-closing > span { color: #666660; font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 9px; letter-spacing: .05em; }
 .kn-closing > div { margin-top: 24px; font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(44px,7vw,88px); font-weight: 500; letter-spacing: -.045em; line-height: 1.08; }
@@ -413,7 +415,7 @@
   .kn-nav-links { gap: 0; }
   .kn-nav-cta { padding: 12px; font-size: 8px; }
   .kn-hero { min-height: 760px; padding: 78px 6% 96px; }
-  .kn-hero::before { background: linear-gradient(100deg,color-mix(in srgb,var(--primary) 96%,black) 5%,var(--primary) 65%,color-mix(in srgb,var(--primary) 65%,var(--accent))); }
+  .kn-hero::before { background: linear-gradient(100deg,#102746 5%,var(--kn-blue) 65%,#254b76); }
   .kn-hero-art { top: 22%; width: 100%; height: 55%; opacity: .52; }
   .kn-hero-art img { width: 100%; height: 100%; object-position: center; }
   .kn-hero-copy { width: 100%; padding-top: 24px; }

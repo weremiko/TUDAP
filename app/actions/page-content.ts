@@ -54,6 +54,14 @@ const DEFAULT_SECTIONS: Record<string, Array<{ key: string; label: string; conte
     { key: 'akademik_danisman', label: 'Akademik Danışman bilgisi', content: '' },
     { key: 'akademik_danisman_fotograf', label: 'Akademik Danışman fotoğrafı (URL)', content: '' },
   ],
+  keynote: [
+    { key: 'hero_eyebrow', label: 'Hero üst etiketi', content: 'TÜDAP LANSMANI · 15 ARALIK 2026' },
+    { key: 'hero_title', label: 'Hero başlığı', content: 'Dilbilimde\ndijital gelecek\nkuruluyor.' },
+    { key: 'hero_description', label: 'Hero açıklaması', content: 'Türkçe Dilbilim Araştırma Platformu’nun lansman buluşması.' },
+    { key: 'hero_date', label: 'Etkinlik tarihi', content: '15 Aralık 2026' },
+    { key: 'hero_location', label: 'Etkinlik yeri', content: 'Köyceğiz Merkez Kütüphane' },
+    { key: 'hero_poster_url', label: 'Hero afiş URL’si', content: '' },
+  ],
 }
 
 let pageSectionsTableReady: Promise<void> | null = null
@@ -177,4 +185,58 @@ export async function upsertAllPageSections(
   revalidatePath(`/${page === 'hakkinda' ? 'hakkinda' : page === 'takimimiz' ? 'takimimiz' : 'iletisim'}`)
   revalidatePath('/en/about')
   revalidatePath('/en/contact')
+}
+
+export async function upsertKeynoteHero(
+  updates: { key: string; content: string }[]
+): Promise<void> {
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session?.user) throw new Error('Oturum açmanız gerekiyor')
+  const [currentUser] = await db
+    .select({ role: user.role })
+    .from(user)
+    .where(eq(user.id, session.user.id))
+    .limit(1)
+  if (currentUser?.role !== 'admin') throw new Error('Yetkisiz erişim')
+
+  const allowedSections = DEFAULT_SECTIONS.keynote
+  const allowedKeys = new Set(allowedSections.map((section) => section.key))
+  if (updates.length !== allowedSections.length || new Set(updates.map(({ key }) => key)).size !== allowedSections.length || updates.some(({ key, content }) =>
+    !allowedKeys.has(key) || typeof content !== 'string' || content.length > 2000
+  )) {
+    throw new Error('Geçersiz hero içeriği')
+  }
+  const posterUrl = updates.find(({ key }) => key === 'hero_poster_url')?.content.trim()
+  if (posterUrl) {
+    try {
+      const parsedUrl = new URL(posterUrl)
+      if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') throw new Error()
+    } catch {
+      throw new Error('Afiş görseli için geçerli bir http veya https URL’si girin')
+    }
+  }
+
+  await ensurePageSectionsTable()
+  for (const [index, { key, content }] of updates.entries()) {
+    const section = allowedSections.find((item) => item.key === key)!
+    const value = content.trim()
+    const updated = await db
+      .update(pageSections)
+      .set({ content: value, label: section.label, sortOrder: index, updatedAt: new Date() })
+      .where(and(eq(pageSections.page, 'keynote'), eq(pageSections.key, key)))
+
+    if (updated.rowCount === 0) {
+      await db.insert(pageSections).values({
+        page: 'keynote',
+        key,
+        label: section.label,
+        content: value,
+        sortOrder: index,
+      })
+    }
+  }
+
+  await recordModeratorAction(session.user.id, 'update-keynote-hero', 'page-content', undefined, 'KEYNOTE hero')
+  revalidatePath('/keynote')
+  revalidatePath('/admin/keynote')
 }

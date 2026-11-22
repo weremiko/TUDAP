@@ -16,7 +16,16 @@ type Ticket = {
   verifyUrl: string
 }
 
-export function KeynoteSite() {
+type KeynoteHero = {
+  eyebrow: string
+  title: string
+  description: string
+  date: string
+  location: string
+  posterUrl: string
+}
+
+export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
@@ -41,11 +50,15 @@ export function KeynoteSite() {
   }, [privacyOpen])
 
   useEffect(() => {
+    if (hero.posterUrl.trim()) {
+      setPosterImage(hero.posterUrl.trim())
+      return
+    }
     fetch("/keynote-poster.b64")
       .then((response) => response.ok ? response.text() : Promise.reject(new Error("Poster yüklenemedi.")))
       .then((encoded) => setPosterImage(`data:image/jpeg;base64,${encoded.replace(/\s/g, "")}`))
       .catch(() => setPosterImage(""))
-  }, [])
+  }, [hero.posterUrl])
 
   const previewName = [firstName.trim(), lastName.trim()].filter(Boolean).join(" ") || "AD SOYAD"
   const previewDetails = [department.trim(), institution.trim()].filter(Boolean).join(" / ") || "BÖLÜM / KURUM"
@@ -100,7 +113,7 @@ export function KeynoteSite() {
     context.fillStyle = "white"
     context.font = "bold 136px Arial"
     context.fillText("KEYNOTE", 50, 245)
-    context.fillStyle = "#ff7657"
+    context.fillStyle = "#a9c8e8"
     context.font = "bold 80px Arial"
     context.fillText("’26", 820, 245)
     context.fillStyle = "#d7d4e6"
@@ -147,16 +160,16 @@ export function KeynoteSite() {
         <section className="kn-hero">
           <div className="kn-hero-art" aria-hidden="true">{posterImage && <img src={posterImage} alt="" />}</div>
           <div className="kn-hero-copy">
-            <div className="kn-eyebrow">TÜDAP LANSMANI <span className="kn-eyebrow-line" /> 15 ARALIK 2026</div>
-            <h1>Dilbilimde<br /><em>dijital gelecek</em><br />kuruluyor.</h1>
-            <p className="kn-hero-sub">Türkçe Dilbilim Araştırma Platformu’nun lansman buluşması. <span>Köyceğiz Merkez Kütüphane</span></p>
+            <div className="kn-eyebrow">{hero.eyebrow} <span className="kn-eyebrow-line" /> {hero.date}</div>
+            <h1>{hero.title.split("\n").map((line, index) => <span key={`${index}-${line}`} className={index === 1 ? "kn-title-accent" : undefined}>{line}{index < hero.title.split("\n").length - 1 && <br />}</span>)}</h1>
+            <p className="kn-hero-sub">{hero.description} <span>{hero.location}</span></p>
             <div className="kn-hero-actions">
               <a href="#register" className="kn-primary">KAYIT FORMUNA GEÇ <span>↘</span></a>
               <a href="#details" className="kn-text-link">ETKİNLİK BİLGİLERİ <span>↓</span></a>
             </div>
           </div>
           <div className="kn-hero-bottom">
-            <div className="kn-hero-bottom-left"><span className="kn-section-index">KEYNOTE’26</span><div>15 ARALIK 2026 <span>/</span> KÖYCEĞİZ, MERKEZ KÜTÜPHANE</div></div>
+            <div className="kn-hero-bottom-left"><span className="kn-section-index">KEYNOTE’26</span><div>{hero.date} <span>/</span> {hero.location}</div></div>
             <div className="kn-scroll-cue">TÜDAP <span>↘</span></div>
           </div>
         </section>
