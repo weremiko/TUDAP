@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { TranscriberPage } from "@/components/transcriber-page"
+import { serializeJsonLd } from "@/lib/structured-data"
 
 const BASE = "https://dilbilim.org.tr"
 
@@ -64,7 +65,7 @@ const jsonLd = {
 export default function TranscriberRoute() {
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
       <TranscriberPage lang="tr" />
     </>
   )

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import PusulaTool from "@/components/pusula-tool"
+import { serializeJsonLd } from "@/lib/structured-data"
 
 const BASE = "https://dilbilim.org.tr"
 
@@ -34,7 +35,7 @@ export default function PusulaPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} />
       <PusulaTool />
     </>
   )

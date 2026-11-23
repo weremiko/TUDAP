@@ -8,6 +8,7 @@ import { keynoteRegistrations, user } from "@/lib/db/schema"
 import { ensureKeynoteTable } from "@/lib/keynote"
 import { getPageSections } from "@/app/actions/page-content"
 import { KeynoteHeroEditor } from "@/components/admin/keynote-hero-editor"
+import { KeynoteCheckIn } from "@/components/admin/keynote-check-in"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 
@@ -51,6 +52,7 @@ export default async function AdminKeynotePage() {
       </div>
 
       <KeynoteHeroEditor initialValues={heroValues} />
+      <KeynoteCheckIn />
 
       {registrations.length === 0 ? (
         <Card className="p-10 text-center text-sm text-muted-foreground">Henüz KEYNOTE kaydı yok.</Card>

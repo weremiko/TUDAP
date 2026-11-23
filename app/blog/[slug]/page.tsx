@@ -5,6 +5,8 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { getBlogPostBySlug } from "@/app/actions/blog"
 import { getContentMediaUrl } from "@/lib/content-media"
+import { MarkdownContent } from "@/components/markdown-content"
+import { serializeJsonLd } from "@/lib/structured-data"
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -44,42 +46,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
     },
   }
-}
-
-function renderMarkdown(text: string): string {
-  const escaped = text.replace(/[&<>"']/g, (character) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
-  })[character]!)
-
-  return escaped
-    // Headings
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    // Bold & italic
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Blockquote
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-    // Unordered list items — wrap consecutive ones in <ul>
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>[\s\S]+?<\/li>)(\n(?!<li>)|$)/g, '<ul>$1</ul>')
-    // Horizontal rule
-    .replace(/^---$/gm, '<hr/>')
-    // Double newline = paragraph break
-    .split(/\n\n+/)
-    .map(block => {
-      block = block.trim()
-      if (!block) return ''
-      // Don't wrap already-tagged blocks
-      if (/^<(h[1-3]|ul|blockquote|hr)/.test(block)) return block
-      return `<p>${block.replace(/\n/g, '<br/>')}</p>`
-    })
-    .join('\n')
 }
 
 function getMediaEmbed(type: string, mediaUrl: string | null) {
@@ -138,7 +104,7 @@ export default async function BlogPostPage({ params }: Props) {
     <div className="min-h-screen bg-background flex flex-col">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleSchema) }}
       />
       <SiteHeader />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl py-14 flex-1">
@@ -205,7 +171,7 @@ export default async function BlogPostPage({ params }: Props) {
             )}
           </section>
         )}
-        <div
+        <MarkdownContent
           className="
             prose prose-sm max-w-none
             prose-headings:font-serif prose-headings:text-foreground
@@ -216,7 +182,7 @@ export default async function BlogPostPage({ params }: Props) {
             prose-hr:border-border
             prose-a:text-primary prose-a:no-underline hover:prose-a:underline
           "
-          dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }}
+          text={post.content}
         />
       </main>
       <SiteFooter />

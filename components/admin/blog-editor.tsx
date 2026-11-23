@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import { createBlogPost, updateBlogPost } from "@/app/actions/blog"
 import { ContentMediaUpload } from "@/components/content-media-upload"
+import { MarkdownContent } from "@/components/markdown-content"
 import Link from "next/link"
 
 interface BlogEditorProps {
@@ -143,30 +144,6 @@ export function BlogEditor({ post }: BlogEditorProps) {
 
   const wordCount = form.content.split(/\s+/).filter(Boolean).length
   const readTime = Math.ceil(wordCount / 200) || 0
-
-  // Markdown renderer
-  const renderMarkdown = (text: string): string => {
-    return text
-      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
-      .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-      .replace(/^\d+\. (.+)$/gm, '<li class="list-decimal">$1</li>')
-      .replace(/^- (.+)$/gm, '<li class="list-disc">$1</li>')
-      .replace(/(<li[\s\S]+?<\/li>)(\n(?!<li)|$)/g, '<ul>$1</ul>')
-      .replace(/^---$/gm, '<hr/>')
-      .split(/\n\n+/)
-      .map(block => {
-        block = block.trim()
-        if (!block) return ''
-        if (/^<(h[1-3]|ul|blockquote|hr)/.test(block)) return block
-        return `<p>${block.replace(/\n/g, '<br/>')}</p>`
-      })
-      .join('\n')
-  }
 
   const ToolbarBtn = ({
     onClick, title, children
@@ -359,7 +336,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
 
           {/* Editor / Preview */}
           {preview ? (
-            <article
+            <MarkdownContent
               className="
                 prose prose-sm max-w-none
                 prose-headings:font-serif prose-headings:text-foreground
@@ -371,7 +348,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 prose-a:text-primary prose-a:no-underline hover:prose-a:underline
                 min-h-[600px] py-4
               "
-              dangerouslySetInnerHTML={{ __html: renderMarkdown(form.content) }}
+              text={form.content}
             />
           ) : (
             <textarea

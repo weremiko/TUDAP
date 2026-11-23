@@ -13,6 +13,7 @@ import { getActiveAnnouncement } from "@/app/actions/announcements"
 import { getEvents } from "@/app/actions/events"
 import { getPageSections } from "@/app/actions/page-content"
 import { AnnouncementPopup } from "@/components/announcement-popup"
+import { serializeJsonLd } from "@/lib/structured-data"
 import type { Metadata } from "next"
 
 const BASE = "https://dilbilim.org.tr"
@@ -100,7 +101,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {homepageJsonLd.map((schema, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />
       ))}
       <SiteHeader />
       <AnnouncementPopup announcement={announcement} />

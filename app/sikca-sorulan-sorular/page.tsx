@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
+import { serializeJsonLd } from "@/lib/structured-data"
 
 const BASE = "https://dilbilim.org.tr"
 
@@ -58,7 +59,7 @@ const faqJsonLd = {
 export default function SSSPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }} />
       <SiteHeader />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl py-14 flex-1">
         <div className="space-y-2 mb-10">

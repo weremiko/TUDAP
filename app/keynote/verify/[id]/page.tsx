@@ -15,7 +15,7 @@ export default async function KeynoteTicketVerification({ params, searchParams }
   if (validSignature) {
     await ensureKeynoteTable()
     const result = await db.execute(sql`
-      SELECT id, first_name, last_name, department, institution, checked_in_at
+      SELECT id, checked_in_at
       FROM keynote_registrations WHERE id = ${id} LIMIT 1
     `)
     ticket = (result.rows[0] as Record<string, unknown> | undefined) ?? null
@@ -33,9 +33,7 @@ export default async function KeynoteTicketVerification({ params, searchParams }
         </h1>
         {valid && ticket ? (
           <>
-            <p className="mt-7 text-2xl font-medium">{String(ticket.first_name)} {String(ticket.last_name)}</p>
-            <p className="mt-2 text-sm text-white/65">{String(ticket.department)} · {String(ticket.institution)}</p>
-            <p className="mt-6 border-t border-white/15 pt-5 font-mono text-sm text-white/60">{String(ticket.id)}</p>
+            <p className="mt-7 text-sm text-white/65">Bilet numarası: <span className="font-mono">{String(ticket.id)}</span></p>
             <p className="mt-5 text-sm text-white/65">15 Aralık 2026 · Köyceğiz, Merkez Kütüphane</p>
           </>
         ) : (

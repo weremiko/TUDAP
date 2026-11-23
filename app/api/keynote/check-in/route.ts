@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       UPDATE keynote_registrations
       SET checked_in_at = NOW()
       WHERE id = ${data.id} AND checked_in_at IS NULL
-      RETURNING id, first_name, last_name, email, department, institution, role, created_at, checked_in_at
+        RETURNING id, checked_in_at
     `)
     const ticket = result.rows[0] as Record<string, unknown> | undefined
     if (!ticket) {

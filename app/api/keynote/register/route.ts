@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
   } catch (error) {
     if (typeof error === 'object' && error !== null && 'code' in error && error.code === '23505') {
-      return NextResponse.json({ error: 'Bu e-posta adresiyle zaten kayıt oluşturulmuş. Biletinizi yeniden almak için organizasyonla iletişime geçin.' }, { status: 409 })
+      return NextResponse.json({ error: 'Kayıt işlenemedi. Bilgilerinizi kontrol edip tekrar deneyin.' }, { status: 400 })
     }
     console.error('[keynote-registration]', error)
     return NextResponse.json({ error: 'Kayıt işlenemedi. Lütfen tekrar deneyin.' }, { status: 500 })

@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Calendar, MapPin, Users, Mail, ExternalLink } from 'lucide-react'
+import { serializeJsonLd } from '@/lib/structured-data'
 
 const BASE = "https://dilbilim.org.tr"
 
@@ -77,7 +78,7 @@ export default async function AjandaPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {eventListJsonLd && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(eventListJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(eventListJsonLd) }} />
       )}
       <SiteHeader />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl py-14 flex-1">

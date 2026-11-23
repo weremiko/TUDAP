@@ -19,7 +19,7 @@ const SECTIONS = [
   },
   {
     title: "KEYNOTE’26 Etkinlik Kaydı",
-    body: "KEYNOTE’26 kaydında ad, soyad, e-posta, kurum, bölüm ve katılımcı türü bilgileri; etkinlik kaydı, dijital bilet oluşturma ve giriş doğrulaması için işlenir. Aydınlatma onayınızın zamanı ve metin sürümü de kayıtla birlikte saklanır. Bilet doğrulama bağlantısı bileti taşıyan kişiye ad, soyad, kurum ve bölüm bilgisini gösterebilir; QR kodunuzu başkalarıyla paylaşmayın. Kayıt e-postası gönderilmez. Etkinlik veri sorumlusu ve saklama süresi organizatör tarafından yayın öncesinde ayrıca doğrulanmalıdır.",
+    body: "KEYNOTE’26 kaydında ad, soyad, e-posta, kurum, bölüm ve katılımcı türü bilgileri; etkinlik kaydı, dijital bilet oluşturma ve giriş doğrulaması için işlenir. Aydınlatma onayınızın zamanı ve metin sürümü de kayıtla birlikte saklanır. QR kod tarayıcınızda üretilir ve herkese açık doğrulama sayfasında ad, kurum veya bölüm bilgileriniz gösterilmez. Kayıt e-postası gönderilmez. Etkinlik veri sorumlusu ve saklama süresi organizatör tarafından yayın öncesinde ayrıca doğrulanmalıdır.",
   },
   {
     title: "İçerik Başvuruları ve Medya Dosyaları",

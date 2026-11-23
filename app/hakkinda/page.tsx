@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { getPageSections } from "@/app/actions/page-content"
+import { serializeJsonLd } from "@/lib/structured-data"
 
 const BASE = "https://dilbilim.org.tr"
 
@@ -90,7 +91,7 @@ export default async function HakkindaPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(aboutJsonLd) }} />
       <SiteHeader />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl py-14 flex-1">
         <div className="space-y-2 mb-10">

@@ -1,10 +1,11 @@
 import { get, put } from '@vercel/blob'
 import { NextRequest, NextResponse } from 'next/server'
+import { and, eq, or } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { db } from '@/lib/db'
-import { user } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { blogPosts, user } from '@/lib/db/schema'
+import { isUploadedContentPath } from '@/lib/content-media'
 
 const DEFAULT_MAX_FILE_SIZE = 8 * 1024 * 1024
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
@@ -18,21 +19,37 @@ const MEDIA_RULES: Record<string, { types: Set<string>; maxSize: number }> = {
 
 export async function GET(request: NextRequest) {
   const pathname = request.nextUrl.searchParams.get('pathname')
-  if (!pathname || !pathname.startsWith('uploads/')) return NextResponse.json({ error: 'Geçersiz dosya yolu.' }, { status: 400 })
-
-  const result = await get(pathname, {
-    access: 'private',
-    ifNoneMatch: request.headers.get('if-none-match') ?? undefined,
-  })
-  if (!result) return new NextResponse('Dosya bulunamadı.', { status: 404 })
-  if (result.statusCode === 304) {
-    return new NextResponse(null, { status: 304, headers: { ETag: result.blob.etag, 'Cache-Control': 'public, max-age=31536000, immutable' } })
+  const noStoreHeaders = { 'Cache-Control': 'private, no-store', Vary: 'Cookie' }
+  if (!pathname || !pathname.startsWith('uploads/') || !isUploadedContentPath(pathname)) {
+    return new NextResponse('Not found', { status: 404, headers: noStoreHeaders })
   }
+
+  const session = await auth.api.getSession({ headers: request.headers })
+  let role: string | null = null
+  if (session?.user) {
+    const [account] = await db.select({ role: user.role }).from(user).where(eq(user.id, session.user.id)).limit(1)
+    role = account?.role ?? null
+  }
+  const isOwner = Boolean(session?.user && pathname.startsWith(`uploads/${session.user.id}/`))
+  const isStaff = role === 'admin' || role === 'moderator'
+  const mediaUrl = `/api/uploads?pathname=${encodeURIComponent(pathname)}`
+  const [publishedPost] = await db.select({ id: blogPosts.id }).from(blogPosts).where(and(
+    or(eq(blogPosts.mediaUrl, pathname), eq(blogPosts.mediaUrl, mediaUrl)),
+    eq(blogPosts.published, true),
+    eq(blogPosts.submissionStatus, 'approved'),
+  )).limit(1)
+  if (!publishedPost && !isOwner && !isStaff) {
+    return new NextResponse('Not found', { status: 404, headers: noStoreHeaders })
+  }
+
+  const result = await get(pathname, { access: 'private' })
+  if (!result) return new NextResponse('Not found', { status: 404, headers: noStoreHeaders })
   return new NextResponse(result.stream, {
     headers: {
       'Content-Type': result.blob.contentType,
       ETag: result.blob.etag,
-      'Cache-Control': 'public, max-age=31536000, immutable',
+      'X-Content-Type-Options': 'nosniff',
+      ...noStoreHeaders,
     },
   })
 }

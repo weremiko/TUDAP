@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 import { headers } from "next/headers"
 import { Inter } from "next/font/google"
 import { CookieConsent } from "@/components/cookie-consent"
+import { serializeJsonLd } from "@/lib/structured-data"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
@@ -105,7 +106,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <script
             key={i}
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+            dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
           />
         ))}
       </head>
