@@ -234,6 +234,12 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
             <article className="kn-detail"><span className="kn-detail-num">02</span><span className="kn-detail-heading">YER</span><strong className="kn-detail-location">Köyceğiz<br />Merkez Kütüphane</strong><p>Köyceğiz</p></article>
             <article className="kn-detail"><span className="kn-detail-num">03</span><span className="kn-detail-heading">KATILIM</span><strong className="kn-detail-access">Ön kayıt</strong><p>Kayıt tamamlandığında QR biletin oluşturulur.</p></article>
           </div>
+          <div className="kn-speaker">
+            <div className="kn-speaker-label">DAVETLİ KONUŞMACI / 01</div>
+            <h3>Prof. Dr. Jaklin Kornfilt</h3>
+            <p>Syracuse University · New York, ABD</p>
+            <a href="https://instagram.com/tudaporg" target="_blank" rel="noopener noreferrer">ETKİNLİK DUYURULARINI INSTAGRAM'DA TAKİP ET ↗</a>
+          </div>
         </section>
 
         <section className="kn-register" id="register">
@@ -296,7 +302,7 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
           </div>
         </section>
 
-        <section className="kn-closing"><span>TÜDAP / KEYNOTE’26</span><div>Köyceğiz’de<br /><em>görüşmek üzere.</em></div><a href="#top" aria-label="Yukarı çık">↑</a></section>
+        <section className="kn-closing"><span>TÜDAP / KEYNOTE’26</span><div>Köyceğiz’de<br /><em>görüşmek üzere.</em></div><a className="kn-closing-instagram" href="https://instagram.com/tudaporg" target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a><a className="kn-closing-top" href="#top" aria-label="Yukarı çık">↑</a></section>
       </main>
 
       <SiteFooter />

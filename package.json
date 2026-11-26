@@ -6,7 +6,9 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start"
+    "start": "next start",
+    "test:pusula": "node --experimental-strip-types --test lib/pusula/score.test.ts",
+    "simulate:pusula": "node scripts/pusula-simulate.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

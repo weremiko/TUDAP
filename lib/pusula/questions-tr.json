@@ -1,0 +1,22 @@
+[
+  {"id":1,"axis":"A","reverse":true,"text":"Bir kuramın zarafeti, tek tek örneklerden daha çok şey anlatır."},
+  {"id":2,"axis":"B","reverse":true,"text":"Dil, her şeyden önce kendi iç kuralları olan bir sistemdir."},
+  {"id":3,"axis":"A","reverse":false,"text":"Bir iddiayı ancak yeterince büyük bir veri setinde sınanmış görürsem ciddiye alırım."},
+  {"id":4,"axis":"B","reverse":false,"text":"Bir cümleyi anlamak için kimin kime, nerede söylediğini bilmem gerekir."},
+  {"id":5,"axis":"A","reverse":true,"text":"Kuramıma uymayan bir örnek, kuramı değil örneği şüpheli yapar."},
+  {"id":6,"axis":"B","reverse":true,"text":"Sesbilgisi, biçimbilgisi ve sözdizimi, anlamdan ve bağlamdan bağımsız incelenebilir."},
+  {"id":7,"axis":"A","reverse":false,"text":"Kendi sezgilerime güvenmektense ölçüm, anket ya da deney yapmayı tercih ederim."},
+  {"id":8,"axis":"B","reverse":false,"text":"Dilin toplumsal çeşitliliği (ağız, kuşak farkı, tabaka) beni dil yapısından daha çok heyecanlandırır."},
+  {"id":9,"axis":"A","reverse":true,"text":"Bir çalışmada en heyecan verici kısım model kurma aşamasıdır."},
+  {"id":10,"axis":"B","reverse":false,"text":"Dilbilgisi, insanların dili kullanma biçiminden doğar."},
+  {"id":11,"axis":"A","reverse":false,"text":"Yeni bir veri setinde hipotez kurmadan önce içine dalıp desenleri keşfetmek isterim."},
+  {"id":12,"axis":"B","reverse":true,"text":"Çocukların dili edinebilmesi, doğuştan gelen bir yapıyı varsayar."},
+  {"id":13,"axis":"A","reverse":true,"text":"Dilbilgisinin az sayıda genel ilkeyle açıklanabilmesi gerektiğine inanırım."},
+  {"id":14,"axis":"B","reverse":false,"text":"Sözcük anlamları, kullanıldıkları durumlara bakılmadan sözlükte tam verilemez."},
+  {"id":15,"axis":"A","reverse":false,"text":"Bir makalede önce tablolara, istatistiklere ve ekteki materyale bakarım."},
+  {"id":16,"axis":"B","reverse":true,"text":"Bir dili tanımlamanın en iyi yolu ses ve biçim envanterini eksiksiz çıkarmaktır."},
+  {"id":17,"axis":"B","reverse":false,"text":"Yarım kalan cümleler, tereddütler ve dil karışımı dilbilimin tam merkezindedir."},
+  {"id":18,"axis":"A","reverse":true,"text":"Tartışmaları kurmaca örnek cümleler ve düşünce deneyleriyle çözmeyi severim."},
+  {"id":19,"axis":"A","reverse":false,"text":"Genellemeye uymayan \"ilginç\" biçimleri not etmek, kuram yazmaktan daha değerlidir."},
+  {"id":20,"axis":"B","reverse":true,"text":"Bir ögenin sistemdeki yerini bulmak, nasıl kullanıldığını saymaktan daha öğreticidir."}
+]

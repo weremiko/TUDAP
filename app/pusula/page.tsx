@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import PusulaTool from "@/components/pusula-tool"
+import PusulaTool from "@/components/pusula-tool-spec"
 import { serializeJsonLd } from "@/lib/structured-data"
 
 const BASE = "https://dilbilim.org.tr"

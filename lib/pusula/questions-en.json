@@ -1,0 +1,22 @@
+[
+  {"id":1,"axis":"A","reverse":true,"text":"The elegance of a theory tells us more than individual examples."},
+  {"id":2,"axis":"B","reverse":true,"text":"Language is, above all, a system with its own internal rules."},
+  {"id":3,"axis":"A","reverse":false,"text":"I take a claim seriously only once it has been tested in a sufficiently large data set."},
+  {"id":4,"axis":"B","reverse":false,"text":"To understand a sentence, I need to know who said it to whom and where."},
+  {"id":5,"axis":"A","reverse":true,"text":"An example that does not fit my theory makes the example, rather than the theory, suspect."},
+  {"id":6,"axis":"B","reverse":true,"text":"Phonetics, morphology and syntax can be studied independently of meaning and context."},
+  {"id":7,"axis":"A","reverse":false,"text":"Rather than trust my intuitions, I prefer measurement, surveys or experiments."},
+  {"id":8,"axis":"B","reverse":false,"text":"The social diversity of language—dialect, generation and social class—excites me more than language structure."},
+  {"id":9,"axis":"A","reverse":true,"text":"The most exciting part of a study is the model-building stage."},
+  {"id":10,"axis":"B","reverse":false,"text":"Grammar arises from the ways in which people use language."},
+  {"id":11,"axis":"A","reverse":false,"text":"Before formulating hypotheses in a new data set, I want to explore it and discover patterns."},
+  {"id":12,"axis":"B","reverse":true,"text":"The acquisition of language by children presupposes an innate structure."},
+  {"id":13,"axis":"A","reverse":true,"text":"Grammar should be explainable by a small number of general principles."},
+  {"id":14,"axis":"B","reverse":false,"text":"Word meanings cannot be fully given in a dictionary without looking at the situations in which they are used."},
+  {"id":15,"axis":"A","reverse":false,"text":"In an article, I look at the tables, statistics and supplementary materials first."},
+  {"id":16,"axis":"B","reverse":true,"text":"The best way to describe a language is to produce a complete inventory of its sounds and forms."},
+  {"id":17,"axis":"B","reverse":false,"text":"Unfinished sentences, hesitation and language mixing belong at the center of linguistics."},
+  {"id":18,"axis":"A","reverse":true,"text":"I enjoy resolving debates with constructed example sentences and thought experiments."},
+  {"id":19,"axis":"A","reverse":false,"text":"Noting interesting forms that do not fit a generalization is more valuable than writing theory."},
+  {"id":20,"axis":"B","reverse":true,"text":"Finding an element's place in the system is more instructive than counting how it is used."}
+]

@@ -14,6 +14,7 @@ const PLATFORM_LINKS = [
   { href: "/blog", label: "Blog" },
   { href: "/ajanda", label: "Ajanda" },
   { href: "/keynote", label: "KEYNOTE’26" },
+  { href: "https://instagram.com/tudaporg", label: "Instagram" },
   { href: "/hakkinda", label: "Platform Hakkında" },
   { href: "/takimimiz", label: "Takımımız" },
   { href: "/iletisim", label: "İletişim" },
