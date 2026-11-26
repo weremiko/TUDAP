@@ -36,9 +36,12 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
   const [website, setWebsite] = useState("")
   const [ticket, setTicket] = useState<Ticket | null>(null)
   const [qr, setQr] = useState("")
-  const [posterImage, setPosterImage] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [recoveryEmail, setRecoveryEmail] = useState("")
+  const [recoveryLoading, setRecoveryLoading] = useState(false)
+  const [recoveryMessage, setRecoveryMessage] = useState("")
+  const [saveMessage, setSaveMessage] = useState("")
   const [privacyOpen, setPrivacyOpen] = useState(false)
   const privacyDialog = useRef<HTMLDialogElement>(null)
 
@@ -48,17 +51,6 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
     if (privacyOpen && !dialog.open) dialog.showModal()
     if (!privacyOpen && dialog.open) dialog.close()
   }, [privacyOpen])
-
-  useEffect(() => {
-    if (hero.posterUrl.trim()) {
-      setPosterImage(hero.posterUrl.trim())
-      return
-    }
-    fetch("/keynote-poster.b64")
-      .then((response) => response.ok ? response.text() : Promise.reject(new Error("Poster yüklenemedi.")))
-      .then((encoded) => setPosterImage(`data:image/jpeg;base64,${encoded.replace(/\s/g, "")}`))
-      .catch(() => setPosterImage(""))
-  }, [hero.posterUrl])
 
   const previewName = [firstName.trim(), lastName.trim()].filter(Boolean).join(" ") || "AD SOYAD"
   const previewDetails = [department.trim(), institution.trim()].filter(Boolean).join(" / ") || "BÖLÜM / KURUM"
@@ -150,6 +142,47 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
     link.download = `KEYNOTE26-${ticket.id}.png`
     link.href = canvas.toDataURL("image/png")
     link.click()
+    setSaveMessage("Biletiniz indiriliyor. Mobilde indirme klasörünü veya paylaşım listesini kontrol edin.")
+  }
+
+  const shareTicket = async () => {
+    if (!ticket) return
+    if (!navigator.share) {
+      await downloadTicket()
+      return
+    }
+    try {
+      await navigator.share({
+        title: "KEYNOTE’26 dijital bilet",
+        text: `${ticket.firstName} ${ticket.lastName} için KEYNOTE’26 bilet bilgileri`,
+        url: ticket.verifyUrl,
+      })
+    } catch (shareError) {
+      if (shareError instanceof Error && shareError.name !== "AbortError") {
+        setSaveMessage("Paylaşım açılamadı. Bileti indirip kaydedebilirsiniz.")
+      }
+    }
+  }
+
+  const recoverTicket = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setRecoveryLoading(true)
+    setRecoveryMessage("")
+    try {
+      const response = await fetch("/api/keynote/recover", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: recoveryEmail }),
+      })
+      const result = await response.json() as { message?: string; error?: string }
+      if (!response.ok) throw new Error(result.error || "Geçerli bir e-posta adresi girin.")
+      setRecoveryMessage(result.message || "E-posta adresi kayıtlıysa kurtarma bağlantısı gönderilir.")
+      setRecoveryEmail("")
+    } catch (recoveryError) {
+      setRecoveryMessage(recoveryError instanceof Error ? recoveryError.message : "İstek gönderilemedi.")
+    } finally {
+      setRecoveryLoading(false)
+    }
   }
 
   return (
@@ -158,7 +191,6 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
 
       <main className="kn-main" id="top">
         <section className="kn-hero">
-          <div className="kn-hero-art" aria-hidden="true">{posterImage && <img src={posterImage} alt="" />}</div>
           <div className="kn-hero-copy">
             <div className="kn-eyebrow">{hero.eyebrow} <span className="kn-eyebrow-line" /> {hero.date}</div>
             <h1>{hero.title.split("\n").map((line, index) => <span key={`${index}-${line}`} className={index === 1 ? "kn-title-accent" : undefined}>{line}{index < hero.title.split("\n").length - 1 && <br />}</span>)}</h1>
@@ -200,7 +232,7 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
             <div><span className="kn-label">KATILIM / ÖN KAYIT</span><h2>Etkinliğe<br /><i>kaydol.</i></h2></div>
             <div className="kn-register-note"><span>15 ARALIK 2026</span><p>Bilgilerini doldur. Kişisel QR biletin kayıt tamamlandığında oluşturulacak.</p></div>
           </div>
-          <div className="kn-register-grid">
+          <div className={`kn-register-grid ${ticket ? "kn-register-grid--success" : ""}`}>
             <div className="kn-form-panel" hidden={Boolean(ticket)}>
               <div className="kn-panel-title"><span>01 — KATILIMCI BİLGİLERİ</span><span className="kn-secure">● GÜVENLİ KAYIT</span></div>
               <form className="kn-form" onSubmit={handleSubmit}>
@@ -222,6 +254,8 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
               </form>
             </div>
 
+            {ticket && <div className="kn-success" aria-live="polite"><span className="kn-label"><span className="kn-dot" /> KAYDIN BAŞARIYLA ALINDI</span><h3>Biletin hazır.</h3><p>İndirip telefonuna veya dosya alanına kaydet. Etkinlikte QR kodu göster.</p><div className="kn-success-actions"><button type="button" className="kn-primary" onClick={downloadTicket}>PNG OLARAK İNDİR <span>↓</span></button><button type="button" className="kn-secondary" onClick={shareTicket}>PAYLAŞ / KAYDET <span>↗</span></button><button type="button" className="kn-secondary" onClick={() => window.print()}>YAZDIR / PDF</button></div>{saveMessage && <p className="kn-save-message" role="status">{saveMessage}</p>}<div className="kn-ticket-reference"><span>BİLET NUMARAN</span><strong>{ticket.id}</strong></div><a className="kn-verify-link" href={ticket.verifyUrl} target="_blank" rel="noopener noreferrer">BİLET DOĞRULAMA SAYFASI ↗</a></div>}
+
             <div className="kn-ticket-column">
               <div className="kn-preview-top"><span>02 — DİJİTAL BİLETİN</span><span>ÖNİZLEME / CANLI</span></div>
               <div className="kn-ticket-stage">
@@ -235,7 +269,22 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
             </div>
           </div>
 
-          {ticket && <div className="kn-success" aria-live="polite"><span className="kn-label"><span className="kn-dot" /> KAYDIN BAŞARIYLA ALINDI</span><h3>Görüşmek<br />üzere<span>!</span></h3><p>Kişisel giriş biletin hazır. Biletini indirip etkinlik günü girişte QR kodunu gösterebilirsin.</p><div className="kn-success-actions"><button type="button" className="kn-primary" onClick={downloadTicket}>BİLETİ PNG OLARAK İNDİR <span>↓</span></button><button type="button" className="kn-secondary" onClick={() => window.print()}>YAZDIR / PDF KAYDET ↗</button></div><div className="kn-ticket-reference"><span>BİLET NUMARAN</span><strong>{ticket.id}</strong></div><a className="kn-verify-link" href={ticket.verifyUrl} target="_blank" rel="noopener noreferrer">BİLET DOĞRULAMA SAYFASI ↗</a></div>}
+
+          <div className="kn-recovery">
+            <div>
+              <span className="kn-label">BİLETİNİ KAYBETTİNİZ Mİ?</span>
+              <h3>Tekrar ulaş.</h3>
+              <p>KEYNOTE kaydında kullandığınız e-posta adresini girin.</p>
+            </div>
+            <form onSubmit={recoverTicket}>
+              <label htmlFor="kn-recovery-email">E-POSTA ADRESİ</label>
+              <div className="kn-recovery-row">
+                <input id="kn-recovery-email" type="email" value={recoveryEmail} onChange={(event) => setRecoveryEmail(event.target.value)} placeholder="ornek@universite.edu.tr" required maxLength={254} />
+                <button type="submit" disabled={recoveryLoading}>{recoveryLoading ? "GÖNDERİLİYOR…" : "BİLETİ GÖNDER"}</button>
+              </div>
+              {recoveryMessage && <p className="kn-recovery-message" role="status">{recoveryMessage}</p>}
+            </form>
+          </div>
         </section>
 
         <section className="kn-closing"><span>TÜDAP / KEYNOTE’26</span><div>Köyceğiz’de<br /><em>görüşmek üzere.</em></div><a href="#top" aria-label="Yukarı çık">↑</a></section>

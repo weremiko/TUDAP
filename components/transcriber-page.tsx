@@ -622,7 +622,7 @@ export function TranscriberPage({ lang = "tr" }: { lang?: "tr" | "en" }) {
 
               <div
                 className="flex-1 min-h-[320px] p-4 text-sm leading-loose whitespace-pre-wrap break-words text-foreground [font-variant-numeric:tabular-nums] [letter-spacing:0.01em] [font-feature-settings:'kern'_0]"
-                style={{ fontFamily: '"Times New Roman", "Doulos SIL", "Charis SIL", serif' }}
+                style={{ fontFamily: '"Doulos SIL", "Charis SIL", "Noto Serif", "Noto Sans", serif' }}
               >
                 {isProcessing ? (
                   <div className="flex flex-col gap-3 pt-2">
