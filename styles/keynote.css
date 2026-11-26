@@ -449,7 +449,7 @@
   .kn-hero::before { display: none; }
   .kn-hero-copy { width: 100%; padding-top: 24px; }
   .kn-eyebrow { font-size: 8px; }
-  .kn-hero h1 { margin: 24px 0 16px; font-size: clamp(42px,10vw,58px); line-height: 1.02; }
+  .kn-hero h1 { margin: 16px 0 12px; font-size: clamp(38px,9vw,52px); line-height: 1; }
   .kn-hero-sub { max-width: 310px; font-size: 13px; }
   .kn-hero-actions { gap: 15px; }
   .kn-hero-bottom { right: 6%; left: 6%; }
@@ -472,6 +472,8 @@
   .kn-register { padding: 68px 6% 75px; }
   .kn-register-note { width: 100%; max-width: 310px; margin-top: 25px; }
   .kn-register-grid { grid-template-columns: 1fr; gap: 18px; margin-top: 38px; }
+  .kn-ticket-main { height: 270px; }
+  .kn-ticket-attendee strong { font-size: 20px; }
   .kn-form-panel { padding: 22px; }
   .kn-form-row { grid-template-columns: 1fr; gap: 0; }
   .kn-ticket-column { margin-top: 14px; }
@@ -498,4 +500,45 @@
   .kn-ticket-main { height: 99mm; }
   .kn-ticket-stub { min-height: 48mm; }
   .kn-ticket-title { font-size: 56px; }
+}
+
+/* KEYNOTE: final, single-purpose layout. */
+.kn-scene,
+.kn-prism,
+.kn-statement,
+.kn-poster-row,
+.kn-poster-frame,
+.kn-hero-bottom,
+.kn-closing,
+.kn-scroll-cue { display: none !important; }
+.kn-hero { height: 440px; min-height: 440px; padding: 72px 7% 48px; }
+.kn-hero-copy { width: min(760px,82%); max-width: 760px; padding-top: 0; }
+.kn-hero h1 { margin: 14px 0 12px; max-width: 760px; font-size: clamp(42px,5.2vw,68px); line-height: 1; letter-spacing: -.035em; }
+.kn-hero h1 span { display: inline; }
+.kn-hero-sub { max-width: 520px; margin: 0 0 14px; line-height: 1.5; }
+.kn-hero-actions { gap: 18px; }
+.kn-details { padding-top: 52px; }
+.kn-detail-grid { margin-top: 42px; }
+.kn-detail { min-height: 210px; }
+.kn-register-grid { align-items: start; }
+.kn-ticket-column { min-width: 0; }
+.kn-ticket-stage { min-height: 500px; overflow: visible; }
+.kn-ticket { width: min(100%,480px); transform: none !important; }
+.kn-ticket-main { height: 300px; }
+.kn-success { margin-top: 0; }
+.kn-success h3 { margin: 20px 0 14px; font-size: clamp(34px,5vw,58px); line-height: 1; }
+
+@media (max-width: 700px) {
+  .kn-hero { height: auto; min-height: 390px; padding: 58px 6% 48px; }
+  .kn-hero-copy { width: 100%; }
+  .kn-hero h1 { margin: 12px 0 10px; font-size: clamp(36px,10vw,48px); line-height: 1.02; }
+  .kn-hero-sub { max-width: 290px; margin-bottom: 12px; font-size: 12px; }
+  .kn-hero-actions { gap: 12px; }
+  .kn-hero-actions a { min-height: 46px; }
+  .kn-details { padding-top: 42px; }
+  .kn-register-grid { grid-template-columns: 1fr; }
+  .kn-ticket-stage { min-height: 440px; }
+  .kn-ticket-main { height: 270px; }
+  .kn-ticket-attendee { bottom: 18px; }
+  .kn-success-actions { position: sticky; bottom: 8px; }
 }

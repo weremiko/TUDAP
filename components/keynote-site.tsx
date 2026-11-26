@@ -209,22 +209,6 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
               <a href="#details" className="kn-text-link">ETKİNLİK BİLGİLERİ <span>↓</span></a>
             </div>
           </div>
-          <div className="kn-hero-bottom">
-            <div className="kn-hero-bottom-left"><span className="kn-section-index">KEYNOTE’26</span><div>{hero.date} <span>/</span> {hero.location}</div></div>
-            <div className="kn-scroll-cue">TÜDAP <span>↘</span></div>
-          </div>
-        </section>
-
-        <section className="kn-section kn-about" id="about">
-          <div className="kn-section-top"><span>ETKİNLİK HAKKINDA</span><span>TÜDAP / 2026</span></div>
-          <div className="kn-intro-grid">
-            <h2>TÜDAP’ın<br /><span>lansman buluşması.</span></h2>
-            <div className="kn-intro-copy">
-              <p><strong>KEYNOTE’26</strong>, Türkçe Dilbilim Araştırma Platformu’nun lansman etkinliği.</p>
-              <p>Dilbilimde dijital geleceği konuşmak üzere 15 Aralık’ta Köyceğiz Merkez Kütüphane’de buluşuyoruz.</p>
-              <a href="https://dilbilim.org.tr" target="_blank" rel="noopener noreferrer" className="kn-external">TÜDAP.ORG.TR <span>↗</span></a>
-            </div>
-          </div>
         </section>
 
         <section className="kn-section kn-details" id="details">
@@ -302,7 +286,6 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
           </div>
         </section>
 
-        <section className="kn-closing"><span>TÜDAP / KEYNOTE’26</span><div>Köyceğiz’de<br /><em>görüşmek üzere.</em></div><a className="kn-closing-instagram" href="https://instagram.com/tudaporg" target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a><a className="kn-closing-top" href="#top" aria-label="Yukarı çık">↑</a></section>
       </main>
 
       <SiteFooter />

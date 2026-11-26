@@ -14,9 +14,9 @@ type Linguist = Point & { name: string; initials: string; label: string; descrip
 
 const questions: Question[] = [
   { text: "Çocuklar duyduklarından fazlasını öğrenir.", dx: -1, dy: -0.4 },
-  { text: "Hiç duymadığım bir cümle yine de doğru olabilir.", dx: -0.5, dy: -1 },
+  { text: "Hiç duymadığım bir tümce yine de doğru olabilir.", dx: -0.5, dy: -1 },
   { text: "Argo, bir dilin en ciddi hâlidir.", dx: 1, dy: 0.2 },
-  { text: "Aynı cümleyi iki farklı kişi söylediğinde, aynı cümleyi söylemiş olmazlar.", dx: 1, dy: -0.3 },
+  { text: "Aynı tümceyi iki farklı kişi söylediğinde, aynı tümceyi söylemiş olmazlar.", dx: 1, dy: -0.3 },
   { text: "Konuşucu kendi dili hakkında yanılabilir.", dx: 0.2, dy: 1 },
   { text: "İyi bir model önce güzel olmalı. Doğruluğu sonra gelir.", dx: -0.2, dy: -1 },
   { text: "Dil en çok mutfakta, çay eşliğinde değişir.", dx: 1, dy: 0 },
@@ -25,14 +25,14 @@ const questions: Question[] = [
   { text: "Konuşurken neyi söylemediğimiz, söylediğimizden fazlasını anlatır.", dx: 0.7, dy: -0.7 },
   { text: "Bir makalede fikir yoksa ama tablolar güzelse, o makale yine de iş görür.", dx: 0, dy: 1 },
   { text: "Yapay zekâ dil modelleri bize dil hakkında pek bir şey öğretmez.", dx: -0.7, dy: -0.7 },
-  { text: "Bir kelimenin anlamı sözlükte değil, o kelimeyi söyleyenin elindedir.", dx: 1, dy: -0.2 },
+  { text: "Bir sözcüğün anlamı sözlükte değil, o sözcüğü söyleyenin elindedir.", dx: 1, dy: -0.2 },
   { text: "Bir kuram, doğru olmasından önce çürütülebilir olmalıdır.", dx: 0, dy: 1 },
   { text: "Dilbilgisi hatası diye bir şey yoktur. Yalnızca başka bir dilbilgisi vardır.", dx: 0.7, dy: 0.3 },
   { text: "Bir dilin ölmesi, bir doğal alanın yok olmasından daha ağırdır.", dx: 0.7, dy: 0 },
   { text: "Anadili konuşan herkes aslında kendi küçük dilini konuşur.", dx: -0.4, dy: 0.3 },
   { text: "Sözdizimi, anlamın hizmetçisidir.", dx: 0.5, dy: -0.5 },
   { text: "Çocuk “gittim” yerine “gidiyordum” dediğinde hata yapmaz, mantık yürütür.", dx: -0.7, dy: -0.2 },
-  { text: "Bir cümleyi duyduğumda, onu kuranın kim olduğunu da tahmin ederim.", dx: 1, dy: 0.3 },
+  { text: "Bir tümceyi duyduğumda, onu kuranın kim olduğunu da tahmin ederim.", dx: 1, dy: 0.3 },
 ]
 
 const options = [
@@ -40,7 +40,7 @@ const options = [
   { label: "Pek sanmam", value: -1 },
   { label: "Bu soru dilbilgisel ama anlamsız", value: 0 },
   { label: "Evet gibi", value: 1 },
-  { label: "Tezimin ilk cümlesi bu", value: 2 },
+  { label: "Tezimin ilk tümcesi bu", value: 2 },
 ]
 
 const quads: Record<QuadKey, {
@@ -54,8 +54,8 @@ const quads: Record<QuadKey, {
   },
   tr: {
     title: "Eleştirel Söylemci", place: "Temsil ettiği yer: panel kürsüsü", color: "#2f80d6",
-    description: "Her cümlede bir iktidar ilişkisi görüyorsun ve çoğu zaman haklısın. Bir haber başlığında üç ideoloji buluyorsun, kahve siparişinde dördüncüyü.",
-    tool: "Megafon ve fosforlu kalem", enemy: "“Bu sadece bir cümle” diyen kişi", mantra: "Dil hiçbir zaman masum değildir.", advisor: "“Argümanın sağlam. Kimi hedef aldığını biraz yumuşatalım mı?”", drink: "Üç farklı bardakta çay", sentence: "Tarafsız dil diye bir şey yok.",
+    description: "Her tümcede bir iktidar ilişkisi görüyorsun ve çoğu zaman haklısın. Bir haber başlığında üç ideoloji buluyorsun, kahve siparişinde dördüncüyü.",
+    tool: "Megafon ve fosforlu kalem", enemy: "“Bu sadece bir tümce” diyen kişi", mantra: "Dil hiçbir zaman masum değildir.", advisor: "“Argümanın sağlam. Kimi hedef aldığını biraz yumuşatalım mı?”", drink: "Üç farklı bardakta çay", sentence: "Tarafsız dil diye bir şey yok.",
   },
   bl: {
     title: "Psikodilbilimci", place: "Temsil ettiği yer: laboratuvar", color: "#2c9a57",
@@ -69,24 +69,24 @@ const quads: Record<QuadKey, {
   },
   center: {
     title: "Panel Moderatörü", place: "Temsil ettiği yer: tam orta, sahne arkası", color: "#d89b1c",
-    description: "Herkesin biraz haklı olduğunu düşünüyorsun. Bu yüzden her sempozyuma davet ediliyorsun ve hiçbir tartışmayı kazanmıyorsun. Soru-cevap kısmında “hepimiz aslında aynı şeyi söylüyoruz” cümlesini sen kuruyorsun.",
+    description: "Herkesin biraz haklı olduğunu düşünüyorsun. Bu yüzden her sempozyuma davet ediliyorsun ve hiçbir tartışmayı kazanmıyorsun. Soru-cevap kısmında “hepimiz aslında aynı şeyi söylüyoruz” tümcesini sen kuruyorsun.",
     tool: "Mikrofon ve zaman uyarısı kartı", enemy: "“Yani sen hangi taraftasın?” sorusu", mantra: "Hepsinde bir gerçeklik payı var.", advisor: "“Bu hangi kuramsal çerçeve?” diye soruyor ve cevap vermene izin veriyor.", drink: "Her masadan bir yudum", sentence: "Hepinize teşekkürler, çok verimli bir tartışmaydı.",
   },
 }
 
 const linguists: Linguist[] = [
-  { name: "Noam Chomsky", initials: "Ch", x: -0.8, y: -0.75, label: "Hassas Genç Erkek", description: "Dilbilimi kafanın içine taşıdı ve oraya bir kilit taktı. Şimdi herkes kapıda anahtar arıyor. Çocuk hiç duymadığı cümleyi nasıl kuruyor sorusunu hayat felsefesi yaptı, “ya korpus?” diyene sakin bir tebessümle bakar." },
+  { name: "Noam Chomsky", initials: "Ch", x: -0.8, y: -0.75, label: "Hassas Genç Erkek", description: "Dilbilimi kafanın içine taşıdı ve oraya bir kilit taktı. Şimdi herkes kapıda anahtar arıyor. Çocuk hiç duymadığı tümceyi nasıl kuruyor sorusunu hayat felsefesi yaptı, “ya korpus?” diyene sakin bir tebessümle bakar." },
   { name: "Ray Jackendoff", initials: "Ja", x: -0.5, y: -0.55, label: "Evin İçindeki Muhalefet Lideri", description: "Üretimci ailenin içinden, ama sözdizimini tek başına tahta oturtmayı sevmeyen biri. “Bence şöyle de olabilir” demek için akşam yemeğine bile geliyor." },
-  { name: "Michael Halliday", initials: "Ha", x: 0.6, y: -0.6, label: "Her Şeyi Üçe Bölen Abi", description: "Dilin üç işlevi var, cümlenin de üç anlamı. Sofra kurulsa tabaklar bile metafonksiyonlara göre dizilir." },
-  { name: "Norman Fairclough", initials: "Fa", x: 0.8, y: -0.7, label: "Haber Başlığında Üç İdeoloji Bulan Kişi", description: "Bir haber başlığını okur, ardından o cümleyi kimin, kime, hangi güçle söylediğinin hesabını sorar. Çay içerken bile “peki bunu kim söylüyor?” diye sorar." },
+  { name: "Michael Halliday", initials: "Ha", x: 0.6, y: -0.6, label: "Her Şeyi Üçe Bölen Abi", description: "Dilin üç işlevi var, tümcenin de üç anlamı. Sofra kurulsa tabaklar bile metafonksiyonlara göre dizilir." },
+  { name: "Norman Fairclough", initials: "Fa", x: 0.8, y: -0.7, label: "Haber Başlığında Üç İdeoloji Bulan Kişi", description: "Bir haber başlığını okur, ardından o tümceyi kimin, kime, hangi güçle söylediğinin hesabını sorar. Çay içerken bile “peki bunu kim söylüyor?” diye sorar." },
   { name: "Deborah Cameron", initials: "Ca", x: 0.7, y: -0.3, label: "Dil Bekçilerine Karşı Nöbetçi", description: "“Dil bozuluyor” diyenlerin karşısında. Bu telaşın dilden çok toplumla ilgili olduğunu sakin sakin, ama sivri zekâyla anlatır." },
-  { name: "Willem Levelt", initials: "Le", x: -0.55, y: 0.7, label: "Kafadaki Konuşma Fabrikasını Çizen Mühendis", description: "Bir cümlenin kafada nasıl üretildiğini kutular ve oklarla gösterdi. Dil sürçmeleri onun için gürültü değil, değerli veri." },
+  { name: "Willem Levelt", initials: "Le", x: -0.55, y: 0.7, label: "Kafadaki Konuşma Fabrikasını Çizen Mühendis", description: "Bir tümcenin kafada nasıl üretildiğini kutular ve oklarla gösterdi. Dil sürçmeleri onun için gürültü değil, değerli veri." },
   { name: "Steven Pinker", initials: "Pi", x: -0.65, y: 0.35, label: "Hassas Genç Erkek'in Popüler Bilimci Kuzeni", description: "Dil İçgüdüsü ile dilbilimi havaalanı kitapçılarına taşıdı. Evrimi, sözdizimini ve çocuk dilini aynı kitapta toplayabilen az sayıda kişiden." },
   { name: "Elissa Newport", initials: "Ne", x: -0.35, y: 0.78, label: "Bebeğe Yapay Dil Dinleten Laboratuvar Sakini", description: "Bir bebek bilmediği bir dilin kalıplarını istatistikle yakalayabilir mi? Deneyle bakar, tabloyla anlatır." },
   { name: "William Labov", initials: "La", x: 0.7, y: 0.8, label: "Alışveriş Merkezinde “r” Sayan Adam", description: "New York'ta mağaza çalışanlarının “r” seslerini sayarak dil değişimini toplumsal sınıfla ilişkilendirdi. Bir deney için bir alışveriş merkezi yeter." },
   { name: "Penelope Eckert", initials: "Ec", x: 0.8, y: 0.45, label: "Lise Koridorunun Etnografı", description: "Liselilerin dilini koridorda, kantinde ve kulüplerde gözlemledi. Kimlik bazen tek bir ünlünün biraz daha öne çıkmasında saklıdır." },
   { name: "Joan Bybee", initials: "By", x: 0.25, y: 0.55, label: "Sık Geçen Şey Dilbilgisi Olur Diyen Hoca", description: "Çok kullanılan yapı kalıplaşır, kalıplaşan yapı dilbilgisi olur. Dilbilgisi bir tür tekrar işi: tekrar, tekrar, tekrar." },
-  { name: "John Sinclair", initials: "Si", x: 0.3, y: 0.78, label: "Kelimeleri Komşusundan Tanıyan Sözlükçü", description: "Kelime tek başına yaşamaz diyerek sözlüğü korpustan çıkardı. “Bu kelime nerede, kimlerle geçiyor?” sorusunun hayat boyu abonesi." },
+  { name: "John Sinclair", initials: "Si", x: 0.3, y: 0.78, label: "Sözcükleri Komşusundan Tanıyan Sözlükçü", description: "Sözcük tek başına yaşamaz diyerek sözlüğü korpustan çıkardı. “Bu sözcük nerede, kimlerle geçiyor?” sorusunun hayat boyu abonesi." },
   { name: "Ferdinand de Saussure", initials: "Sa", x: 0.12, y: -0.1, label: "Herkesin Atası, Kimsenin Okumadığı Kitabın Yazarı", description: "Dilbilimi bağımsız bir bilim yaptı. Ünlü kitabını kendisinin değil, öğrencilerinin ders notlarından derlendiğini ise çoğumuz unutuyoruz." },
   { name: "David Crystal", initials: "Cr", x: 0.12, y: 0.1, label: "Her Konuda Bir “Dil Nedir” Kitabı Olan Hoca", description: "Ansiklopediden internet diline kadar yazdı. Dilbilim giriş kitaplarının sessiz hükümdarı." },
 ]
@@ -449,7 +449,7 @@ function ResultView({
 
             <h3 className={styles.sectionLabel}>BU KARE NEYİ TEMSİL EDER</h3>
             <div className={styles.facts}>
-              {[["Aletin", result.tool], ["Kabus senaryon", result.enemy], ["Motton", result.mantra], ["Danışmanın sana der ki", result.advisor], ["İçeceğin", result.drink], ["Favori cümlen", result.sentence]].map(([label, value]) => <div key={label}><b>{label}</b><span>{value}</span></div>)}
+              {[["Aletin", result.tool], ["Kabus senaryon", result.enemy], ["Motton", result.mantra], ["Danışmanın sana der ki", result.advisor], ["İçeceğin", result.drink], ["Favori tümcen", result.sentence]].map(([label, value]) => <div key={label}><b>{label}</b><span>{value}</span></div>)}
             </div>
 
             <h3 className={styles.sectionLabel}>SANA ÖZEL OKUMA ÖNERİSİ</h3>
