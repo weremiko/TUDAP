@@ -174,9 +174,18 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: recoveryEmail }),
       })
-      const result = await response.json() as { message?: string; error?: string }
+      const result = await response.json() as { message?: string; error?: string; ticket?: Ticket }
       if (!response.ok) throw new Error(result.error || "Geçerli bir e-posta adresi girin.")
-      setRecoveryMessage(result.message || "E-posta adresi kayıtlıysa kurtarma bağlantısı gönderilir.")
+      setRecoveryMessage(result.message || "Bu e-posta için eşleşen bir kayıt bulunamadı.")
+      if (result.ticket) {
+        const code = qrcode(0, "H")
+        code.addData(result.ticket.verifyUrl)
+        code.make()
+        setTicket(result.ticket)
+        setQr(code.createDataURL(8, 4))
+        setSaveMessage("Biletiniz bulundu ve açıldı.")
+        window.requestAnimationFrame(() => document.getElementById("register")?.scrollIntoView({ behavior: "smooth", block: "start" }))
+      }
       setRecoveryEmail("")
     } catch (recoveryError) {
       setRecoveryMessage(recoveryError instanceof Error ? recoveryError.message : "İstek gönderilemedi.")
@@ -280,7 +289,7 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
               <label htmlFor="kn-recovery-email">E-POSTA ADRESİ</label>
               <div className="kn-recovery-row">
                 <input id="kn-recovery-email" type="email" value={recoveryEmail} onChange={(event) => setRecoveryEmail(event.target.value)} placeholder="ornek@universite.edu.tr" required maxLength={254} />
-                <button type="submit" disabled={recoveryLoading}>{recoveryLoading ? "GÖNDERİLİYOR…" : "BİLETİ GÖNDER"}</button>
+                <button type="submit" disabled={recoveryLoading}>{recoveryLoading ? "SORGU YAPILIYOR…" : "BİLETİ AÇ"}</button>
               </div>
               {recoveryMessage && <p className="kn-recovery-message" role="status">{recoveryMessage}</p>}
             </form>

@@ -1,4 +1,3 @@
-import nodemailer from 'nodemailer'
 import { NextRequest, NextResponse } from 'next/server'
 import { sql } from 'drizzle-orm'
 import { db } from '@/lib/db'
@@ -20,9 +19,8 @@ function rateLimited(ip: string) {
 export async function POST(request: NextRequest) {
   const ip = request.headers.get('x-real-ip') ?? request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
   if (rateLimited(ip)) {
-    return NextResponse.json({ success: true, message: 'E-posta adresi kayıtlıysa kurtarma bağlantısı gönderilir.' })
+    return NextResponse.json({ success: true, message: 'Bu e-posta için eşleşen bir kayıt varsa bilet açılacaktır.' })
   }
-
   try {
     const raw = await request.text()
     if (raw.length > 2_000) return NextResponse.json({ error: 'Geçersiz istek.' }, { status: 400 })
@@ -36,60 +34,51 @@ export async function POST(request: NextRequest) {
 
     await ensureKeynoteTable()
     const result = await db.execute(sql`
-      SELECT id, first_name, last_name
+      SELECT id, first_name, last_name, email, department, institution
       FROM keynote_registrations
       WHERE lower(email) = ${email}
       LIMIT 1
     `)
-    const registration = result.rows[0] as { id?: string; first_name?: string; last_name?: string } | undefined
+    const registration = result.rows[0] as {
+      id?: string
+      first_name?: string
+      last_name?: string
+      email?: string
+      department?: string
+      institution?: string
+    } | undefined
 
-    const smtpConfigured = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS)
-    let ticketUrl: string | undefined
     if (registration?.id) {
       const signature = signKeynoteTicket(registration.id)
-      ticketUrl = new URL(
+      const verifyUrl = new URL(
         `/keynote/verify/${encodeURIComponent(registration.id)}?sig=${signature}`,
         request.nextUrl.origin,
       ).toString()
 
-      if (!smtpConfigured) {
-        return NextResponse.json({
-          success: true,
-          message: 'E-posta adresi kayıtlıysa kurtarma bağlantısı gönderilir.',
-        })
-      }
-
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || '587'),
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-      })
-
-      const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (character) => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
-      })[character]!)
-      const attendeeName = escapeHtml(`${registration.first_name ?? ''} ${registration.last_name ?? ''}`.trim())
-      const safeTicketUrl = escapeHtml(ticketUrl)
-
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM || 'noreply@dilbilim.org.tr',
-        to: email,
-        subject: 'KEYNOTE’26 - Bilet kurtarma bağlantınız',
-        text: `Merhaba ${registration.first_name ?? ''} ${registration.last_name ?? ''},\n\nKEYNOTE’26 biletinizin doğrulama bağlantısı:\n${ticketUrl}\n\nBu bağlantıyı yalnızca siz saklayın.`,
-        html: `<p>Merhaba ${attendeeName},</p><p>KEYNOTE’26 biletinizi görüntülemek için aşağıdaki bağlantıyı kullanın:</p><p><a href="${safeTicketUrl}">Biletimi görüntüle</a></p><p>Bu bağlantıyı yalnızca siz saklayın.</p>`,
+      return NextResponse.json({
+        success: true,
+        message: 'Kayıt bulundu. Biletiniz açılıyor.',
+        ticket: {
+          id: registration.id,
+          firstName: registration.first_name ?? '',
+          lastName: registration.last_name ?? '',
+          email: registration.email ?? email,
+          department: registration.department ?? '',
+          institution: registration.institution ?? '',
+          verifyUrl,
+        },
       })
     }
 
     return NextResponse.json({
       success: true,
-      message: 'E-posta adresi kayıtlıysa kurtarma bağlantısı gönderilir.',
+      message: 'Bu e-posta için eşleşen bir kayıt bulunamadı.',
     })
   } catch (error) {
     console.error('[keynote-recovery]', error)
     return NextResponse.json({
       success: true,
-      message: 'E-posta adresi kayıtlıysa kurtarma bağlantısı gönderilir.',
+      message: 'Bu e-posta için eşleşen bir kayıt bulunamadı.',
     })
   }
 }
