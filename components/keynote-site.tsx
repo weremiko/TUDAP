@@ -269,7 +269,7 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
           </div>
           <div className={`kn-register-grid ${ticket ? "kn-register-grid--success" : ""}`}>
             <div className="kn-form-panel" hidden={Boolean(ticket)}>
-              <div className="kn-panel-title"><span>01 — KATILIMCI BİLGİLERİ</span><span className="kn-secure">● GÜVENLİ KAYIT</span></div>
+              <div className="kn-panel-title"><span>01 — KATILIMCI BİLGİLERİ</span><span className="kn-secure">15 Aralık, Salı. 15.00</span></div>
               <form className="kn-form" onSubmit={handleSubmit}>
                 <div className="kn-form-row">
                   <div className="kn-field"><label htmlFor="kn-first-name">ADIN <b>*</b></label><input id="kn-first-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Adın" autoComplete="given-name" required minLength={2} maxLength={120} /></div>
