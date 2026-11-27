@@ -90,54 +90,90 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
   const downloadTicket = async () => {
     if (!ticket || !qr) return
     const canvas = document.createElement("canvas")
-    canvas.width = 1600
-    canvas.height = 860
+    canvas.width = 1800
+    canvas.height = 1050
     const context = canvas.getContext("2d")
     if (!context) return
-    context.fillStyle = "#080908"
-    context.fillRect(0, 0, 1600, 690)
-    context.fillStyle = "#d1d1cb"
-    context.font = "23px monospace"
-    context.fillText("TÜDAP / KEYNOTE’26", 60, 80)
+    const drawWrapped = (value: string, x: number, y: number, maxWidth: number, lineHeight: number, fontSize: number, color: string, maxLines = 2) => {
+      context.font = `${fontSize}px Arial, sans-serif`
+      context.fillStyle = color
+      const words = value.trim().split(/\s+/)
+      const lines: string[] = []
+      let line = ""
+      for (const word of words) {
+        const candidate = line ? `${line} ${word}` : word
+        if (context.measureText(candidate).width > maxWidth && line) {
+          lines.push(line)
+          line = word
+        } else line = candidate
+      }
+      if (line) lines.push(line)
+      const visibleLines = lines.slice(0, maxLines)
+      if (lines.length > maxLines) {
+        let last = visibleLines[maxLines - 1]
+        while (last && context.measureText(`${last}…`).width > maxWidth) last = last.slice(0, -1)
+        visibleLines[maxLines - 1] = `${last.trimEnd()}…`
+      }
+      visibleLines.forEach((text, index) => context.fillText(text, x, y + index * lineHeight, maxWidth))
+      return y + visibleLines.length * lineHeight
+    }
+
+    context.fillStyle = "#15355c"
+    context.fillRect(0, 0, 1200, 1050)
+    context.fillStyle = "#eef3f8"
+    context.fillRect(1200, 0, 600, 1050)
+    context.fillStyle = "#ffffff"
+    context.font = "600 24px Arial, sans-serif"
+    context.fillText("TÜDAP  /  DİLBİLİM ARAŞTIRMA PLATFORMU", 76, 82)
     context.textAlign = "right"
-    context.fillText("15 ARALIK 2026", 1540, 80)
+    context.fillStyle = "#c5d5e6"
+    context.font = "500 22px Arial, sans-serif"
+    context.fillText("15 ARALIK 2026", 1120, 82)
     context.textAlign = "left"
-    context.fillStyle = "white"
-    context.font = "bold 136px Arial"
-    context.fillText("KEYNOTE", 50, 245)
-    context.fillStyle = "#a9c8e8"
-    context.font = "bold 80px Arial"
-    context.fillText("’26", 820, 245)
-    context.fillStyle = "#d7d4e6"
-    context.font = "25px monospace"
-    context.fillText("TÜRKÇE DİLBİLİM ARAŞTIRMA PLATFORMU", 62, 300)
-    context.fillStyle = "#aaa8c3"
-    context.font = "18px monospace"
-    context.fillText("KATILIMCI", 62, 465)
-    context.fillStyle = "white"
-    context.font = "bold 53px Arial"
-    context.fillText(`${ticket.firstName} ${ticket.lastName}`.slice(0, 43), 60, 532)
-    context.fillStyle = "#cecec8"
-    context.font = "24px Arial"
-    context.fillText(`${ticket.department} / ${ticket.institution}`.slice(0, 80), 62, 584)
-    context.fillStyle = "#f7f7f4"
-    context.fillRect(0, 690, 1600, 170)
-    context.fillStyle = "#15151a"
-    context.font = "bold 70px Arial"
-    context.fillText("15", 62, 777)
-    context.font = "24px monospace"
-    context.fillText("ARALIK 2026", 165, 766)
-    context.font = "20px monospace"
-    context.fillText("KÖYCEĞİZ / MERKEZ KÜTÜPHANE", 165, 802)
-    context.fillStyle = "#777"
-    context.font = "19px monospace"
-    context.fillText(ticket.id, 62, 838)
+
+    context.fillStyle = "#b8cce1"
+    context.font = "700 18px Arial, sans-serif"
+    context.fillText("DİJİTAL KATILIM BİLETİ", 76, 190)
+    context.fillStyle = "#ffffff"
+    context.font = "700 112px Georgia, serif"
+    context.fillText("KEYNOTE’26", 70, 315, 1050)
+    context.fillStyle = "#9ebde0"
+    context.fillRect(78, 350, 1040, 2)
+
+    context.fillStyle = "#b8cce1"
+    context.font = "700 17px Arial, sans-serif"
+    context.fillText("KATILIMCI", 78, 430)
+    const nameBottom = drawWrapped(`${ticket.firstName} ${ticket.lastName}`, 78, 505, 1030, 70, 62, "#ffffff", 2)
+    const detailsBottom = drawWrapped(`${ticket.department} · ${ticket.institution}`, 80, nameBottom + 18, 1020, 34, 24, "#dce7f1", 2)
+    context.fillStyle = "#b8cce1"
+    context.font = "700 17px Arial, sans-serif"
+    context.fillText("ETKİNLİK", 78, Math.max(760, detailsBottom + 55))
+    context.fillStyle = "#ffffff"
+    context.font = "600 28px Arial, sans-serif"
+    context.fillText("15 Aralık 2026  ·  Köyceğiz Merkez Kütüphane", 78, Math.max(805, detailsBottom + 100), 1030)
+    context.fillStyle = "#b8cce1"
+    context.font = "500 18px monospace"
+    context.fillText(ticket.id, 78, 990)
+
+    context.fillStyle = "#15355c"
+    context.font = "700 20px Arial, sans-serif"
+    context.textAlign = "center"
+    context.fillText("GİRİŞ QR KODU", 1500, 150)
     const qrImage = new Image()
     qrImage.src = qr
     await qrImage.decode()
-    context.fillStyle = "white"
-    context.fillRect(1330, 570, 230, 230)
-    context.drawImage(qrImage, 1340, 580, 210, 210)
+    context.fillStyle = "#ffffff"
+    context.fillRect(1280, 235, 440, 440)
+    context.drawImage(qrImage, 1310, 265, 380, 380)
+    context.fillStyle = "#15355c"
+    context.font = "700 19px monospace"
+    context.fillText("BİLET NUMARASI", 1500, 760)
+    context.font = "600 24px monospace"
+    context.fillText(ticket.id, 1500, 802)
+    context.fillStyle = "#4b5c6e"
+    context.font = "18px Arial, sans-serif"
+    context.fillText("QR kodu girişte görevliye gösterin.", 1500, 875)
+    context.textAlign = "left"
     const link = document.createElement("a")
     link.download = `KEYNOTE26-${ticket.id}.png`
     link.href = canvas.toDataURL("image/png")

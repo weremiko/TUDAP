@@ -134,33 +134,53 @@ export default function PusulaToolSpec() {
     const entry = getResultEntry(resultSet, scored.quadrant, scored.tier)
     const canvas = document.createElement("canvas")
     canvas.width = 1080
-    canvas.height = 1350
+    canvas.height = 1680
     const context = canvas.getContext("2d")
     if (!context) return
+    const palette = {
+      mimar: "#d8e5f2",
+      dusunur: "#c9ddf1",
+      kasif: "#e4edf5",
+      gozlemci: "#bfd4e9",
+    }
     context.fillStyle = "#15355c"
     context.fillRect(0, 0, canvas.width, canvas.height)
     context.fillStyle = "#f7f7f4"
-    context.fillRect(54, 54, 972, 1236)
+    context.fillRect(48, 48, 984, 1584)
     context.fillStyle = "#15355c"
-    context.font = "700 36px Georgia"
-    context.fillText(lang === "tr" ? "TÜDAP · Dilbilim Pusulası" : "TÜDAP · Linguistics Compass", 105, 145)
+    context.font = "700 28px sans-serif"
+    context.fillText(lang === "tr" ? "TÜDAP  /  DİLBİLİM PUSULASI" : "TÜDAP  /  LINGUISTICS COMPASS", 100, 120)
+    context.fillStyle = "#64748b"
+    context.font = "600 18px sans-serif"
+    context.textAlign = "right"
+    context.fillText(lang === "tr" ? "EĞLENCE AMAÇLIDIR" : "FOR ENTERTAINMENT", 980, 120)
+    context.textAlign = "left"
     context.fillStyle = "#111"
-    context.font = "700 70px Georgia"
-    context.fillText(entry.name, 105, 260)
+    context.font = "700 58px Georgia"
+    context.fillText(entry.name, 100, 215, 880)
     context.fillStyle = "#315d8a"
-    context.font = "700 30px monospace"
-    context.fillText(entry.label[lang], 105, 310)
+    context.font = "700 22px sans-serif"
+    context.fillText(`${QUADRANTS[scored.quadrant][lang].toLocaleUpperCase(lang === "tr" ? "tr-TR" : "en-US")}  ·  ${entry.label[lang]}`, 100, 258, 880)
 
-    const x0 = 160
-    const y0 = 390
-    const size = 760
-    const colors = ["#e9eff7", "#dbe9f7", "#edf2f7", "#d5e3f1"]
-    ;[[0,0],[1,0],[0,1],[1,1]].forEach(([column, row], index) => {
-      context.fillStyle = colors[index]
-      context.fillRect(x0 + column * size / 2, y0 + row * size / 2, size / 2, size / 2)
+    const x0 = 240
+    const y0 = 340
+    const size = 600
+    const cells: { key: Quadrant; x: number; y: number }[] = [
+      { key: "mimar", x: 0, y: 0 },
+      { key: "dusunur", x: 1, y: 0 },
+      { key: "kasif", x: 0, y: 1 },
+      { key: "gozlemci", x: 1, y: 1 },
+    ]
+    cells.forEach(({ key, x, y }) => {
+      context.fillStyle = palette[key]
+      context.fillRect(x0 + x * size / 2, y0 + y * size / 2, size / 2, size / 2)
+      context.fillStyle = key === scored.quadrant ? "#15355c" : "#64748b"
+      context.font = `${key === scored.quadrant ? "700" : "500"} 18px sans-serif`
+      context.textAlign = "center"
+      context.fillText(QUADRANTS[key][lang], x0 + x * size / 2 + size / 4, y0 + y * size / 2 + 34, size / 2 - 20)
     })
     context.strokeStyle = "#15355c"
-    context.lineWidth = 4
+    context.lineWidth = 3
     context.strokeRect(x0, y0, size, size)
     context.beginPath()
     context.moveTo(x0 + size / 2, y0)
@@ -168,30 +188,66 @@ export default function PusulaToolSpec() {
     context.moveTo(x0, y0 + size / 2)
     context.lineTo(x0 + size, y0 + size / 2)
     context.stroke()
+    context.fillStyle = "#475569"
+    context.font = "600 16px sans-serif"
+    context.textAlign = "center"
+    context.fillText(lang === "tr" ? "KURAM" : "THEORY", x0 + size / 4, y0 - 12)
+    context.fillText(lang === "tr" ? "VERİ" : "DATA", x0 + size * .75, y0 - 12)
+    context.textAlign = "left"
+    context.fillText(lang === "tr" ? "KULLANIM" : "USE", 100, y0 + size * .25)
+    context.fillText(lang === "tr" ? "SİSTEM" : "SYSTEM", 100, y0 + size * .75)
     const pointX = x0 + size / 2 + (scored.A / 20) * size * 0.46
     const pointY = y0 + size / 2 - (scored.B / 20) * size * 0.46
     context.beginPath()
     context.arc(pointX, pointY, 24, 0, Math.PI * 2)
     context.fillStyle = "#15355c"
     context.fill()
+    context.strokeStyle = "#fff"
+    context.lineWidth = 5
+    context.stroke()
+    context.textAlign = "left"
 
-    context.fillStyle = "#111"
-    context.font = "700 28px Georgia"
-    context.fillText(lang === "tr" ? "Senin hakkında" : "About you", 105, 1220)
-    context.font = "24px Georgia"
-    const about = entry.about[lang]
-    const words = about.split(" ")
-    let line = ""
-    let lineY = 1260
-    for (const word of words) {
-      const testLine = line ? `${line} ${word}` : word
-      if (context.measureText(testLine).width > 870) {
-        context.fillText(line, 105, lineY)
-        line = word
-        lineY += 34
-      } else line = testLine
+    const drawParagraph = (heading: string, value: string, startY: number) => {
+      const left = 100
+      const maxWidth = 880
+      context.textAlign = "left"
+      context.fillStyle = "#15355c"
+      context.font = "700 19px sans-serif"
+      context.fillText(heading.toLocaleUpperCase(lang === "tr" ? "tr-TR" : "en-US"), left, startY)
+      context.fillStyle = "#1f2937"
+      context.font = "20px sans-serif"
+      const words = value.trim().split(/\s+/)
+      const lines: string[] = []
+      let line = ""
+      for (const word of words) {
+        const candidate = line ? `${line} ${word}` : word
+        if (context.measureText(candidate).width > maxWidth && line) {
+          lines.push(line)
+          line = word
+        } else line = candidate
+      }
+      if (line) lines.push(line)
+      const maxLines = 2
+      const visibleLines = lines.slice(0, maxLines)
+      if (lines.length > maxLines) {
+        let last = visibleLines[maxLines - 1]
+        while (last && context.measureText(`${last}…`).width > maxWidth) last = last.slice(0, -1)
+        visibleLines[maxLines - 1] = `${last.trimEnd()}…`
+      }
+      visibleLines.forEach((text, index) => context.fillText(text, left, startY + 30 + index * 26, maxWidth))
+      return startY + 30 + visibleLines.length * 26 + 18
     }
-    context.fillText(line, 105, lineY)
+
+    let textY = 1000
+    textY = drawParagraph(lang === "tr" ? "Senin hakkında" : "About you", entry.about[lang], textY)
+    textY = drawParagraph(lang === "tr" ? "Gerçek hayatta" : "In real life", entry.real[lang], textY)
+    drawParagraph(lang === "tr" ? "Danışmanın" : "Your advisor", entry.advisor[lang], textY)
+
+    context.fillStyle = "#64748b"
+    context.font = "600 15px sans-serif"
+    context.textAlign = "right"
+    context.fillText(`A ${scored.A > 0 ? "+" : ""}${scored.A}  /  B ${scored.B > 0 ? "+" : ""}${scored.B}`, 980, 1580)
+    context.textAlign = "left"
 
     canvas.toBlob((blob) => {
       if (!blob) return
