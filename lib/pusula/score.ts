@@ -23,9 +23,9 @@ export function scoreAnswers(
   A -= 30
   B -= 30
 
-  const quadrant: Quadrant = A < 0
-    ? (B < 0 ? "mimar" : "dusunur")
-    : (B < 0 ? "kasif" : "gozlemci")
+  const quadrant: Quadrant = B < 0
+    ? (A < 0 ? "mimar" : "dusunur")
+    : (A < 0 ? "kasif" : "gozlemci")
 
   const a = Math.abs(A)
   const b = Math.abs(B)
