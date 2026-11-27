@@ -21,7 +21,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const [challenge, setChallenge] = useState<{ challenge: string; question: string; signature: string } | null>(null)
   const [challengeAnswer, setChallengeAnswer] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)   const [googleLoading, setGoogleLoading] = useState(false)
 
   const isSignUp = mode === 'sign-up'
 
@@ -29,7 +29,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     getMathChallenge().then(setChallenge).catch(() => setError('İnsan doğrulaması yüklenemedi.'))
   }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleGoogleSignIn = async () => {     setError(null)     if (isSignUp && !termsAccepted) {       setError('Kayıt olmak için Kullanım Koşulları’nı kabul etmelisiniz.')       return     }      setGoogleLoading(true)     const { error: googleError } = await authClient.signIn.social({       provider: 'google',       callbackURL: '/',     })     setGoogleLoading(false)      if (googleError) setError(googleError.message ?? 'Google ile giriş yapılamadı.')   }    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     const allowedEmail = /@(gmail\.com|googlemail\.com|yahoo\.com|outlook\.com|hotmail\.com|proton\.me|protonmail\.com|dilbilim\.org\.tr|[a-z0-9-]+\.edu\.tr)$/i.test(email.trim())
@@ -178,7 +178,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
             </Button>
           </form>
 
-          <p className="text-sm text-muted-foreground text-center mt-5">
+          <div className="flex items-center gap-3 my-5">             <div className="h-px flex-1 bg-border" />             <span className="text-xs text-muted-foreground">veya</span>             <div className="h-px flex-1 bg-border" />           </div>            <Button             type="button"             variant="outline"             className="w-full"             disabled={googleLoading}             onClick={handleGoogleSignIn}           >             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none">               <path d="M21.35 12.18c0-.64-.06-1.26-.17-1.85H12v3.5h5.24a4.48 4.48 0 0 1-1.94 2.94v2.44h3.14c1.84-1.69 2.91-4.19 2.91-7.03Z" fill="#4285F4" />               <path d="M12 21.72c2.63 0 4.84-.87 6.45-2.35l-3.14-2.44c-.87.58-1.98.93-3.31.93-2.54 0-4.69-1.71-5.46-4.02H3.31v2.51A9.72 9.72 0 0 0 12 21.72Z" fill="#34A853" />               <path d="M6.54 13.84A5.84 5.84 0 0 1 6.23 12c0-.64.11-1.26.31-1.84V7.65H3.31A9.72 9.72 0 0 0 2.28 12c0 1.57.38 3.05 1.03 4.35l3.23-2.51Z" fill="#FBBC05" />               <path d="M12 6.14c1.43 0 2.71.49 3.72 1.45l2.79-2.79A9.35 9.35 0 0 0 12 2.28a9.72 9.72 0 0 0-8.69 5.37l3.23 2.51C7.31 7.85 9.46 6.14 12 6.14Z" fill="#EA4335" />             </svg>             {googleLoading ? 'Google ile bağlanılıyor…' : 'Google ile devam et'}           </Button>            <p className="text-sm text-muted-foreground text-center mt-5">
             {isSignUp ? 'Zaten hesabınız var mı? ' : 'Hesabınız yok mu? '}
             <Link
               href={isSignUp ? '/sign-in' : '/sign-up'}
