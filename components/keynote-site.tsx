@@ -250,7 +250,7 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
         <section className="kn-section kn-details" id="details">
           <div className="kn-section-top"><span>ETKİNLİK BİLGİLERİ</span><span>KEYNOTE’26</span></div>
           <div className="kn-detail-grid">
-            <article className="kn-detail"><span className="kn-detail-num">01</span><span className="kn-detail-heading">TARİH</span><strong>15<span className="kn-detail-unit"> ARALIK</span></strong><p>2026</p></article>
+            <article className="kn-detail"><span className="kn-detail-num">01</span><span className="kn-detail-heading">TARİH</span><strong>15<span className="kn-detail-unit"> ARALIK</span></strong><p>2026</p><p>15.00-16.45</p></article>
             <article className="kn-detail"><span className="kn-detail-num">02</span><span className="kn-detail-heading">YER</span><strong className="kn-detail-location">Köyceğiz<br />Merkez Kütüphane</strong><p>Köyceğiz</p></article>
             <article className="kn-detail"><span className="kn-detail-num">03</span><span className="kn-detail-heading">KATILIM</span><strong className="kn-detail-access">Ön kayıt</strong><p>Kayıt tamamlandığında QR biletin oluşturulur.</p></article>
           </div>
@@ -275,7 +275,7 @@ export function KeynoteSite({ hero }: { hero: KeynoteHero }) {
                   <div className="kn-field"><label htmlFor="kn-first-name">ADIN <b>*</b></label><input id="kn-first-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Adın" autoComplete="given-name" required minLength={2} maxLength={120} /></div>
                   <div className="kn-field"><label htmlFor="kn-last-name">SOYADIN <b>*</b></label><input id="kn-last-name" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Soyadın" autoComplete="family-name" required minLength={2} maxLength={120} /></div>
                 </div>
-                <div className="kn-field"><label htmlFor="kn-email">E-POSTA ADRESİN <b>*</b></label><input id="kn-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ornek@universite.edu.tr" autoComplete="email" required maxLength={254} /></div>
+                <div className="kn-field"><label htmlFor="kn-email">E-POSTA ADRESİN <b>*</b></label><input id="kn-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ornek@eposta.com" autoComplete="email" required maxLength={254} /></div>
                 <div className="kn-form-row">
                   <div className="kn-field"><label htmlFor="kn-institution">ÜNİVERSİTE / KURUM <b>*</b></label><input id="kn-institution" value={institution} onChange={(e) => setInstitution(e.target.value)} placeholder="Kurumun" required minLength={2} maxLength={100} /></div>
                   <div className="kn-field"><label htmlFor="kn-department">BÖLÜM <b>*</b></label><input id="kn-department" value={department} onChange={(e) => setDepartment(e.target.value)} placeholder="Bölümün" required minLength={2} maxLength={100} /></div>
