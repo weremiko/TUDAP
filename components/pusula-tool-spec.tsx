@@ -197,7 +197,7 @@ export default function PusulaToolSpec() {
     context.fillText(lang === "tr" ? "KULLANIM" : "USE", 100, y0 + size * .25)
     context.fillText(lang === "tr" ? "SİSTEM" : "SYSTEM", 100, y0 + size * .75)
     const pointX = x0 + size / 2 + (scored.A / 20) * size * 0.46
-    const pointY = y0 + size / 2 - (scored.B / 20) * size * 0.46
+    const pointY = y0 + size / 2 + (scored.B / 20) * size * 0.46
     context.beginPath()
     context.arc(pointX, pointY, 24, 0, Math.PI * 2)
     context.fillStyle = "#15355c"
