@@ -21,7 +21,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const [challenge, setChallenge] = useState<{ challenge: string; question: string; signature: string } | null>(null)
   const [challengeAnswer, setChallengeAnswer] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)   const [googleLoading, setGoogleLoading] = useState(false)
+  const [loading, setLoading] = useState(false);   const [googleLoading, setGoogleLoading] = useState(false)
 
   const isSignUp = mode === 'sign-up'
 
@@ -29,7 +29,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     getMathChallenge().then(setChallenge).catch(() => setError('İnsan doğrulaması yüklenemedi.'))
   }, [])
 
-  const handleGoogleSignIn = async () => {     setError(null)     if (isSignUp && !termsAccepted) {       setError('Kayıt olmak için Kullanım Koşulları’nı kabul etmelisiniz.')       return     }      setGoogleLoading(true)     const { error: googleError } = await authClient.signIn.social({       provider: 'google',       callbackURL: '/',     })     setGoogleLoading(false)      if (googleError) setError(googleError.message ?? 'Google ile giriş yapılamadı.')   }    const handleSubmit = async (e: React.FormEvent) => {
+  const handleGoogleSignIn = async () => { setError(null); if (isSignUp && !termsAccepted) { setError('Kayıt olmak için Kullanım Koşulları’nı kabul etmelisiniz.'); return; } setGoogleLoading(true); const { error: googleError } = await authClient.signIn.social({ provider: 'google', callbackURL: '/' }); setGoogleLoading(false); if (googleError) setError(googleError.message ?? 'Google ile giriş yapılamadı.'); }; const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     const allowedEmail = /@(gmail\.com|googlemail\.com|yahoo\.com|outlook\.com|hotmail\.com|proton\.me|protonmail\.com|dilbilim\.org\.tr|[a-z0-9-]+\.edu\.tr)$/i.test(email.trim())
