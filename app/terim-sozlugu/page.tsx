@@ -135,7 +135,7 @@ export default function GlossaryPage() {
               </Button>
             </div>
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
-              {totalCount > 0 ? `${totalCount} terim` : "Terimler yükleniyor…"} — Türkçe ve İngilizce karşılıklarıyla.
+              {totalCount > 0 ? `${totalCount} terim` : "Terimler yükleniyor…"} — Açıklamalarıyla, kategorileriyle ve İngilizce karşılıklarıyla birlikte. Arama yapabilir, kategorilere göre filtreleyebilir ve sözlüğe madde başı önerebilirsiniz.
             </p>
           </div>
 
